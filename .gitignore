@@ -1,0 +1,34 @@
+# compiled code
+venv
+*.pyc
+__pycache__
+
+# swap files
+*.swp
+*.swo
+*~
+*#
+
+# apple cruft
+.DS_Store
+
+# ide files
+.komodoproject
+.komodotools
+.classpath
+.project
+.pydevproject
+.settings
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# build files
+dist/
+build/
+*.egg-info/
+
+venv
+/.idea/modules.xml
