@@ -1,0 +1,5 @@
+C + D <-> F, k= 0.01, k_rev=0.05
+D <-> F, k =[0.01, 0.02], k_rev =(0.05, 0.01)
+W_{12} --> W , k=0.4, catalyst='E', Km=10
+G + K -> GK, k=(0.55, 0.1), regulating_species='R', alpha=2.5, K50=[30, 20], nH=3
+A -> B + C, k=(0.55, 0.1), regulating_species='A, C', alpha=[2.5, 1], K50=[(30, 5), [20, 10]], nH=[3, 2]

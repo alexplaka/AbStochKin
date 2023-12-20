@@ -1,0 +1,86 @@
+import unittest
+
+from abstochkin.base import AbStochKin
+
+
+# TODO: add tests for adding/removing processes
+
+
+class TestAbKin(unittest.TestCase):
+    def setUp(self):
+        # Test importing processes from file 1
+        self.sim1 = AbStochKin()
+        self.sim1.add_processes_from_file("processes_test_1.txt")
+        self.sim1.add_process({'G0_3': 1}, {'None': 0}, 1.023)
+        self.sim1.add_process_from_str(" -> X", 1)
+        self.sim1.simulate(p0={'C': 10, 'CaM_4Ca': 15, 'W_2': 40, 'Pi': 6, 'H2O': 100,
+                               'W_1': 10, 'G0_3': 3, 'D': 15, 'W': 36, 'ATP': 22,
+                               'ADP': 13, 'X': 57, 'Ca': 60, 'Y': 46, 'AMP': 14,
+                               'CaM': 5, 'PPi': 0}, t_max=10, dt=0.1, n=100, solve_odes=False,
+                           run=False)
+
+        # Import two processes, each from a str
+        self.sim2 = AbStochKin()
+        self.sim2.add_process_from_str("2A -> B", 0.3)
+        self.sim2.add_process_from_str("B -> ", 0.1)
+        self.sim2.simulate(p0={'A': 100, 'B': 0}, t_max=10, dt=0.01, n=100, solve_odes=True,
+                           run=False)
+
+        # Test importing processes from file 2
+        self.sim3 = AbStochKin()
+        self.sim3.add_processes_from_file("processes_test_2.txt")
+
+    def test_add_processes(self):
+        self.assertEqual(len(self.sim1.sims[0].all_species), 17)
+        self.assertSetEqual(self.sim1.sims[0].all_species,
+                            {'C', 'CaM_4Ca', 'W_2', 'Pi', 'H2O', 'W_1', 'G0_3', 'D',
+                             'W', 'ATP', 'ADP', 'X', 'Ca', 'Y', 'AMP', 'CaM', 'PPi'})
+        self.assertEqual(len(self.sim1.processes), 7)
+
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_reactant), 9)
+        self.assertNotIn('', self.sim1.sims[0]._procs_by_reactant)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_reactant['W_1']), 1)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_reactant['CaM']), 1)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_reactant['H2O']), 2)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_reactant['ATP']), 2)
+
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_product), 8)
+        self.assertNotIn('', self.sim1.sims[0]._procs_by_product)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_product['Y']), 1)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_product['Pi']), 1)
+        self.assertEqual(len(self.sim1.sims[0]._procs_by_product['Pi']), 1)
+
+        self.assertEqual(len(self.sim3.processes), 5)
+
+        self.assertEqual(self.sim3.processes[0].k, 0.01)
+        self.assertEqual(self.sim3.processes[0].k_rev, 0.05)
+
+        self.assertEqual(self.sim3.processes[1].k, [0.01, 0.02])
+        self.assertEqual(self.sim3.processes[1].k_rev, (0.05, 0.01))
+
+        self.assertEqual(self.sim3.processes[2].k, 0.4)
+        self.assertEqual(self.sim3.processes[2].catalyst, 'E')
+        self.assertEqual(self.sim3.processes[2].Km, 10)
+
+        self.assertEqual(self.sim3.processes[3].k, (0.55, 0.1))
+        self.assertEqual(self.sim3.processes[3].regulating_species, 'R')
+        self.assertEqual(self.sim3.processes[3].alpha, 2.5)
+        self.assertEqual(self.sim3.processes[3].K50, [30, 20])
+        self.assertEqual(self.sim3.processes[3].nH, 3)
+
+        self.assertEqual(self.sim3.processes[4].k, (0.55, 0.1))
+        self.assertEqual(self.sim3.processes[4].regulating_species, ['A', 'C'])
+        self.assertEqual(self.sim3.processes[4].alpha, [2.5, 1])
+        self.assertEqual(self.sim3.processes[4].K50, [(30, 5), [20, 10]])
+        self.assertEqual(self.sim3.processes[4].nH, [3, 2])
+
+    def test_remove_processes(self):
+        self.sim1.del_process({'C': 1, 'D': 1}, {'Y': 1}, k=0.01)
+        self.assertEqual(len(self.sim1.processes), 6)
+
+        self.sim3.del_process_from_str("D<->F", k=[0.01, 0.02], k_rev=(0.05, 0.01))
+        self.assertEqual(len(self.sim3.processes), 4)
+
+
+if __name__ == '__main__':
+    unittest.main()
