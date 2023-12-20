@@ -7,11 +7,11 @@ Example
 >>> from abstochkin import AbStochKin
 >>> sim = AbStochKin()
 >>> sim.add_process_from_str('A -> ', 0.2)  # degradation process
->>> sim.simulate(p0={'A': 100},t_max=20)
+>>> sim.simulate(p0={'A': 100}, t_max=20)
 >>> # All data for the above simulation is stored in `sim.sims[0]`.
 >>>
 >>> # Now set up a new simulation without actually running it.
->>> sim.simulate(p0={'A': 10},t_max=10,n=50,run=False)
+>>> sim.simulate(p0={'A': 10}, t_max=10, n=50, run=False)
 >>> # All data for the new simulation is stored in `sim.sims[1]`.
 >>> # The simulation can then be manually run using methods
 >>> # documented in the class `Simulation`.

@@ -1,3 +1,10 @@
+""" Some utility functions: 
+  - generate random number streams
+  - measure the runtime of a function
+  - calculate the coefficient of determination R^2
+  - unit conversion of kinetic parameters
+"""
+
 import functools
 from time import perf_counter
 
@@ -36,7 +43,6 @@ def rng_streams(n: int, random_state: int):
     >>> rng = rng_streams(5)  # make 5 random number generators
     >>> a = rng[1].integers(1, 10, 100)
     """
-
     ss = random.SeedSequence(random_state)
     seeds = ss.spawn(n)
 
@@ -48,7 +54,6 @@ def rng_streams(n: int, random_state: int):
 
 def measure_runtime(fcn):
     """ Decorator for measuring the duration of a function's execution. """
-
     @functools.wraps(fcn)
     def inner(*args, **kwargs):
         start = perf_counter()
@@ -65,21 +70,6 @@ def measure_runtime(fcn):
 
     return inner
 
-
-# class Parallel:
-#     """ Use a pool of workers for running an ensemble of simulations.
-#         TO BE IMPLEMENTED FULLY!
-#         https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing.pool
-#         https://docs.python.org/3/library/concurrent.futures.html
-#     """
-#
-#     def __init__(self, sim_func, reps):
-#         self.sim_func = sim_func  # simulation function
-#         self.reps = reps
-#
-#     def __call__(self, *args, **kwargs):
-#         with mp.Pool(processes=mp.cpu_count()) as multipool:
-#             multipool.map(self.sim_func, range(self.reps))
 
 def r_squared(actual: np.array, theoretical: np.array) -> float:
     """

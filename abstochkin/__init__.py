@@ -1,4 +1,4 @@
-""" Agent-based Kinetics (or Particle-based Kinetics). """
+""" Agent-based (or Particle-based) Stochastic Kinetics. """
 
 from .base import AbStochKin
 

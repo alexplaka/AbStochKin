@@ -2,7 +2,7 @@
 
 import unittest
 
-from sympy import symbols, Float, sympify
+from sympy import symbols, Float
 
 from abstochkin.base import AbStochKin
 

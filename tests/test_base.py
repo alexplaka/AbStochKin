@@ -3,9 +3,6 @@ import unittest
 from abstochkin.base import AbStochKin
 
 
-# TODO: add tests for adding/removing processes
-
-
 class TestAbKin(unittest.TestCase):
     def setUp(self):
         # Test importing processes from file 1

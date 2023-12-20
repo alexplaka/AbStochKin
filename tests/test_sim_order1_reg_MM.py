@@ -1,4 +1,5 @@
 import unittest
+
 from abstochkin.base import AbStochKin
 
 
@@ -17,7 +18,6 @@ class TestRegulatedMichaelisMentenFirstOrderSimulation(unittest.TestCase):
         self.assertEqual(self.sim1.sims[0]._het_processes_num, 0)
         self.assertGreaterEqual(self.sim1.sims[0].results['A']['R^2'], 0.999)
         self.assertGreaterEqual(self.sim1.sims[0].results['B']['R^2'], 0.999)
-
 
 
 if __name__ == '__main__':

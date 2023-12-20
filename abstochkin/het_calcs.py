@@ -1,45 +1,11 @@
+""" Some functions for calculating metrics of population heterogeneity. """
+
 from collections import Counter
 
 from numpy import log, ndarray
 
 from .process import MichaelisMentenProcess, RegulatedProcess, ReversibleProcess, \
     RegulatedMichaelisMentenProcess, Process
-
-
-# def count_het_processes(processes: list) -> int:
-#     """
-#     Count the number of heterogeneous processes.
-#     A process is heterogeneous if any of its parameters are defined as such.
-#     """
-#     num = 0
-#     for proc in processes:
-#         if isinstance(proc, MichaelisMentenProcess):
-#             if proc.is_heterogeneous or proc.is_heterogeneous_Km:
-#                 num += 1
-#         elif isinstance(proc, RegulatedMichaelisMentenProcess):
-#             if proc.is_heterogeneous or proc.is_heterogeneous_Km:
-#                 num += 1
-#             else:
-#                 if isinstance(proc.regulating_species, list):  # multiple regulators
-#                     if sum(proc.is_heterogeneous_K50) > 0:
-#                         num += 1
-#                 elif isinstance(proc.regulating_species, str):  # only one regulator
-#                     if proc.is_heterogeneous_K50:
-#                         num += 1
-#         elif isinstance(proc, RegulatedProcess):
-#             if proc.is_heterogeneous:
-#                 num += 1
-#             else:
-#                 if isinstance(proc.regulating_species, list):  # multiple regulators
-#                     if sum(proc.is_heterogeneous_K50) > 0:
-#                         num += 1
-#                 elif isinstance(proc.regulating_species, str):  # only one regulator
-#                     if proc.is_heterogeneous_K50:
-#                         num += 1
-#         else:  # isinstance(proc, Process)
-#             if proc.is_heterogeneous:
-#                 num += 1
-#     return num
 
 
 def get_het_processes(processes: list[Process, ...]) -> list[Process, ...]:
@@ -103,7 +69,6 @@ def idx_het(arr: list | ndarray) -> float:
       size increases.
     - A fully heterogeneous population returns 1.
     """
-
     ck = Counter(arr)  # counter of k values
     n_tot = len(arr)  # total number of entries in sequence `arr`
 
@@ -130,7 +95,6 @@ def info_het(arr: list | ndarray) -> float:
     - For a fully heterogeneous population, the measure increases
       with population size and has no upper limit.
     """
-
     ck = Counter(arr)  # counter of k values
     n_tot = len(arr)  # total number of agents
 

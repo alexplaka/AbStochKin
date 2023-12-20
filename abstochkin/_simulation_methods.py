@@ -811,64 +811,7 @@ class SimulationMethodsMixin:
         """
         Generate the sequence of functions to be called for the
         algorithm to perform the simulation.
-
-        Each chosen function is determined by the order of the
-        corresponding process and if multiple processes should
-        be treated concurrently.
         """
-
-        # fcn_o0 = list()  # functions for simulating 0th order processes
-        # fcn_o1 = list()  # functions for simulating 1st order processes
-        # fcn_o2 = list()  # functions for simulating 2nd order processes
-        # fcn_concurrent = list()  # functions for simulating concurrent processes
-
-        # seen_procs = []  # a process can only be considered once
-
-        # Zeroth order processes don't have a reactant, so go through
-        # species that appear as a product in a 0th order process.
-        # for _, sp_procs in self._procs_by_product.items():
-        #     for proc in sp_procs:
-        #         if proc.order == 0:
-        #             order_0 = partial(self._order_0, proc)
-        #             fcn_o0.append(order_0)
-        #             seen_procs.append(proc)
-
-        # for _, sp_procs in self._procs_by_reactant.items():
-        #     if len(sp_procs) == 1:  # if only 1 process where a species is a reactant
-        #         proc = sp_procs[0]
-        #         if proc not in seen_procs:
-        #             if proc.order == 1:
-        #                 order_1 = partial(self._order_1, proc)
-        #                 fcn_o1.append(order_1)
-        #             else:
-        #                 order_2 = partial(self._order_2, proc)
-        #                 fcn_o2.append(order_2)
-        #             seen_procs.append(proc)
-        #     else:  # if more than 1 process where a species is a reactant
-        #         # Check to see if any of the processes are in seen_procs?
-        #         # Make a set of the process orders:
-        #         procs_orders = {proc.order for proc in sp_procs}
-        #         assert len(procs_orders) in [1, 2], \
-        #             "3rd and higher order processes are not supported."
-        #
-        #         if len(procs_orders) == 1:
-        #             if procs_orders.pop() == 1:
-        #                 order_1_concurrent = partial(self._order_1_concurrent, *sp_procs)
-        #                 fcn_concurrent.append(order_1_concurrent)
-        #             else:
-        #                 order_2_concurrent = partial(self._order_2_concurrent, *sp_procs)
-        #                 fcn_concurrent.append(order_2_concurrent)
-        #         else:
-        #             order_12_concurrent = partial(self._order_12_concurrent, *sp_procs)
-        #             fcn_concurrent.append(order_12_concurrent)
-        #         seen_procs.extend(sp_procs)
-
-        # assert len(seen_procs) == len(self.processes), \
-        #     "All processes must be part of the algorithm's sequence of operations."
-
-        # self.algo_sequence = fcn_o0 + fcn_o1 + fcn_o2 + fcn_concurrent
-        """ Don't need concurrent processes and the order doesn't matter! """
-
         for proc in self._algo_processes:
             if proc.order == 0:
                 if isinstance(proc, RegulatedProcess):
@@ -928,10 +871,7 @@ class SimulationMethodsMixin:
             self._repeat_sim(i)
 
     def _repeat_sim(self, r: int):
-        """
-        Run a repetition (indexed `r`) of the simulation.
-        """
-
+        """ Run a repetition (indexed `r`) of the simulation. """
         for t in range(1, self.t_steps + 1):
             for algo_fcn in self.algo_sequence:
                 algo_fcn(r, t)
@@ -1282,15 +1222,6 @@ class SimulationMethodsMixin:
 
         return np.array(unique_pairs)
 
-    # def _order_1_concurrent(self, *procs, r):
-    #     raise NotImplementedError
-    #
-    # def _order_12_concurrent(self, *procs, r):
-    #     raise NotImplementedError
-    #
-    # def _order_2_concurrent(self, *procs, r):
-    #     raise NotImplementedError
-
     def _compute_trajectory_stats(self):
         """
         Compute statistics on all the species trajectories
@@ -1314,42 +1245,6 @@ class SimulationMethodsMixin:
                 # If the ODEs have been solved, then calculate R^2.
                 self.results[sp]['R^2'] = r_squared(self.results[sp]['N_avg'],
                                                     self.de_calcs.odes_sol.sol(self.time).T[:, i])
-
-    # def _compute_k_het_stats(self):
-    #     """
-    #     Compute statistics on process-specific metrics of
-    #     heterogeneity for `k` values obtained through an ensemble of
-    #     `n` simulations.
-    #     """
-    #     for proc, data in self.k_het_metrics.items():
-    #         self.k_het_metrics[proc]['<k_avg>'] = np.mean(data['k_avg'], axis=1)
-    #         self.k_het_metrics[proc]['<k_std>'] = np.mean(data['k_std'], axis=1)
-    #         self.k_het_metrics[proc]['psi_avg'] = np.mean(data['psi'], axis=1)
-    #         self.k_het_metrics[proc]['psi_std'] = np.std(data['psi'], axis=1)
-    #
-    # def _compute_Km_het_stats(self):
-    #     """
-    #     Compute statistics on process-specific metrics of
-    #     heterogeneity for `Km` values obtained through an ensemble of
-    #     `n` simulations.
-    #     """
-    #     for proc, data in self.Km_het_metrics.items():
-    #         self.Km_het_metrics[proc]['<Km_avg>'] = np.mean(data['Km_avg'], axis=1)
-    #         self.Km_het_metrics[proc]['<Km_std>'] = np.mean(data['Km_std'], axis=1)
-    #         self.Km_het_metrics[proc]['psi_avg'] = np.mean(data['psi'], axis=1)
-    #         self.Km_het_metrics[proc]['psi_std'] = np.std(data['psi'], axis=1)
-    #
-    # def _compute_K50_het_stats(self):
-    #     """
-    #     Compute statistics on process-specific metrics of
-    #     heterogeneity for `K50` values obtained through an ensemble of
-    #     `n` simulations.
-    #     """
-    #     for proc, data in self.K50_het_metrics.items():
-    #         self.K50_het_metrics[proc]['<K50_avg>'] = np.mean(data['K50_avg'], axis=1)
-    #         self.K50_het_metrics[proc]['<K50_std>'] = np.mean(data['K50_std'], axis=1)
-    #         self.K50_het_metrics[proc]['psi_avg'] = np.mean(data['psi'], axis=1)
-    #         self.K50_het_metrics[proc]['psi_std'] = np.std(data['psi'], axis=1)
 
     def _compute_het_stats(self):
         """ Compute statistics on process-specific metrics of heterogeneity. """

@@ -39,10 +39,10 @@ class Process:
               assumed to be heterogeneous with a normally distributed `k` value.
               The two entries in the tuple represent the mean and standard
               deviation (in that order) of the desired normal distribution.
-    order: int
+    order : int
         The order of the process (or the molecularity of an elementary process).
         It is the sum of the stoichiometric coefficients of the reactants.
-    species: set of strings
+    species : set of strings
         A set of all species in a process.
     reacts_ : list of strings
         A list containing all the reactants in a process.

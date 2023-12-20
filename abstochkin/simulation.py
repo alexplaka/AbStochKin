@@ -9,6 +9,7 @@ Agent-based Kinetics simulation and store its results.
 The class `AgentStateData` is used by a `Simulation`
 object to store and handle some of the necessary runtime data.
 """
+
 import contextlib
 
 import numpy as np
@@ -64,9 +65,6 @@ class Simulation(SimulationMethodsMixin):
         A string of the time unit to be used for describing the
         kinetics of the given processes.
     """
-
-    # TODO: Option to simulate using Gillespie method.
-    # TODO: Option to return pandas dataframe with all data (incl. all time trajectories?)
 
     def __init__(self,
                  /,
