@@ -1,7 +1,7 @@
 # compiled code
 venv
 *.pyc
-# __pycache__
+__pycache__
 
 # swap files
 *.swp
