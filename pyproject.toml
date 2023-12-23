@@ -1,0 +1,49 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "AbStochKin"
+version = "0.1.0"
+description = "Agent-based (or Particle-based) Stochastic Kinetics."
+readme = "README.md"
+license.file = "LICENSE"
+authors = [
+  { name = "Alex Plakantonakis", email = "alex.plaka@alumni.princeton.edu" },
+]
+maintainers = [
+  { name = "Alex Plakantonakis", email = "alex.plaka@alumni.princeton.edu" },
+]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy >=1.24",
+  "scipy >=1.10",
+  "sympy >=1.10",
+  "matplotlib >=3.5",
+  "tqdm >=4.66"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+
+[project.optional-dependencies]
+docs = [
+  "furo",
+  "myst_parser >=2.0",
+  "sphinx >=7.0",
+  "sphinx-copybutton >=0.5",
+  "sphinx-autodoc-typehints >= 1.25",
+]
+
+[project.urls]
+Homepage = "https://github.com/alexplaka/AbStochKin"
+#Documentation = "https://package.readthedocs.io/"
+"Bug Tracker" = "https://github.com/alexplaka/AbStochKin/issues"
+#Discussions = "https://github.com/alexplaka/AbStochKin/discussions"
+#Changelog = "https://package.readthedocs.io/en/latest/changelog.html"
