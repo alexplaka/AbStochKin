@@ -186,14 +186,16 @@ class DEcalcs:
 
         Notes
         -----
-        Using the solver `scipy.integrate.solve_ivp`, whose method can be one of the following:
-            - RK45 : Explicit Runge-Kutta method of order 5(4).
-            - RK23 : Explicit Runge-Kutta method of order 3(2).
-            - DOP853 : Explicit Runge-Kutta method of order 8.
-            - Radau : Implicit Runge-Kutta method of the Radau IIA family of order 5
-            - BDF : Implicit multistep variable-order (1 to 5) method based on a
-                     backward differentiation formula for the derivative approximation.
-            - LSODA : Adams/BDF method with automatic stiffness detection and switching.
+        Using the solver `scipy.integrate.solve_ivp`,
+        whose method can be one of the following:
+
+        - RK45 : Explicit Runge-Kutta method of order 5(4).
+        - RK23 : Explicit Runge-Kutta method of order 3(2).
+        - DOP853 : Explicit Runge-Kutta method of order 8.
+        - Radau : Implicit Runge-Kutta method of the Radau IIA family of order 5
+        - BDF : Implicit multistep variable-order (1 to 5) method based on a
+                 backward differentiation formula for the derivative approximation.
+        - LSODA : Adams/BDF method with automatic stiffness detection and switching.
 
         Documentation
         -------------
@@ -215,22 +217,6 @@ class DEcalcs:
 
     def get_fixed_pts(self):
         """
-        Notes
-        -----
-        Elements of a `self.fixed_pts` tuple are in the same order as
-        `self.species`.
+        Not currently implemented.
         """
-        pass
-        # odes_rhs = [d for d in self.odes.values()]
-        # self.jac = Matrix(odes_rhs).jacobian(self.species)  # Jacobian
-        # solset = solve(odes_rhs, self.species, set=True)
-        # if len(solset) != 0:  # if a solution was found
-        #     _, fps = solset
-        #
-        #     for fp_tuple in fps:
-        #         self.fixed_pts[fp_tuple] = dict()
-        #         js = self.jac.subs([(self.species[i], fp) for i, fp in enumerate(fp_tuple)])
-        #         self.fixed_pts[fp_tuple]['Jacobian_eval'] = js
-        #         self.fixed_pts[fp_tuple]['eigenvalues'] = list(js.eigenvals().keys())
-        # else:  # if sympy.solve() does not find a solution
-        #     pass  # use scipy.optimize.fsolve?
+        raise NotImplementedError
