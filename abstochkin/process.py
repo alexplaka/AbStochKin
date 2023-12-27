@@ -21,9 +21,9 @@ class Process:
         key-value pairs describing each species name and its
         stoichiometric coefficient, respectively.
     products : dict
-       The products of a given process are specified with
-       key-value pairs describing each species name and its
-       stoichiometric coefficient, respectively.
+        The products of a given process are specified with
+        key-value pairs describing each species name and its
+        stoichiometric coefficient, respectively.
     k : float, int, list of floats, tuple of floats
         The *microscopic* rate constant(s) for the given process. The data
         type of `k` determines the "structure" of the population as follows:
@@ -297,8 +297,8 @@ class Process:
 class ReversibleProcess(Process):
     """ Define a reversible process.
 
-    Attributes (specific to a reversible process)
-    ---------------------------------------------
+    Attributes
+    ----------
     k_rev : float or int or list of floats or 2-tuple of floats
         The *microscopic* rate constant for the reverse process.
     is_heterogeneous_rev : bool
@@ -424,8 +424,8 @@ class ReversibleProcess(Process):
 class MichaelisMentenProcess(Process):
     """ Define a process that obeys Michaelis-Menten kinetics.
 
-    Attributes (specific to Michaelis-Menten kinetics)
-    --------------------------------------------------
+    Attributes
+    ----------
     catalyst : str
         Name of the species acting as a catalyst for this process.
     Km : float or int or list of floats or 2-tuple of floats
@@ -565,8 +565,8 @@ class RegulatedProcess(Process):
     of their expected type, with the length of the list being equal to the
     number of regulating species.
     
-    Attributes (regulation-specific)
-    --------------------------------
+    Attributes
+    ----------
     k : float or int or list of floats or 2-tuple of floats
         The *microscopic* rate constant for the given process. It is the *basal*
         rate constant in the case of activation (or the minimum `k` value)
@@ -848,8 +848,8 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     of their expected type, with the length of the list being equal to the
     number of regulating species.
 
-    Attributes (regulation-specific)
-    --------------------------------
+    Attributes
+    ----------
     k : float or int or list of floats or 2-tuple of floats
         The *microscopic* rate constant for the given process. It is the *basal*
         rate constant in the case of activation (or the minimum `k` value)
@@ -898,7 +898,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     -----
     Currently only implemented for 1st order processes. 0th order processes
     cannot obey Michaelis-Menten kinetics and 2nd order Michaelis-Menten
-    are not implemented yet.
+    processes are not implemented yet.
     """
 
     def __init__(self, reactants: dict, products: dict,
@@ -963,9 +963,9 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
         alpha : float or int or list[float or int]
             Parameter denoting the degree of activation/repression.
 
-                - 0 <= alpha < 1: repression
-                - alpha = 1: no regulation
-                - alpha > 1: activation
+            - 0 <= alpha < 1: repression
+            - alpha = 1: no regulation
+            - alpha > 1: activation
 
             alpha is a multiplier: in the case of activation, the maximum
             rate constant value will be `alpha * k`.

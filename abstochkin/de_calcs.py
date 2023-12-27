@@ -1,3 +1,9 @@
+"""
+Perform deterministic calculations on a set of processes.
+Construct the ordinary differential equations (ODEs)
+describing the system and obtain a numerical solution.
+"""
+
 from numpy import mean
 from scipy.integrate import solve_ivp
 from sympy import Add, Mul, Pow, sympify, lambdify, symbols

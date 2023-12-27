@@ -34,11 +34,9 @@ classifiers = [
 
 [project.optional-dependencies]
 docs = [
-  "furo",
   "myst_parser >=2.0",
   "sphinx >=7.0",
-  "sphinx-copybutton >=0.5",
-  "sphinx-autodoc-typehints >= 1.25",
+  "pdoc3 >=0.10"
 ]
 
 [project.urls]

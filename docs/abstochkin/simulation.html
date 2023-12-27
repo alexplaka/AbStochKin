@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>abstochkin.simulation API documentation</title>
+<meta name="description" content="Perform an Agent-based Kinetics simulation …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}#lunr-search{width:100%;font-size:1em;padding:6px 9px 5px 9px;border:1px solid silver}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>abstochkin.simulation</code></h1>
+</header>
+<section id="section-intro">
+<p>Perform an Agent-based Kinetics simulation.</p>
+<p>This module contains the code for the class <code><a title="abstochkin.simulation.Simulation" href="#abstochkin.simulation.Simulation">Simulation</a></code>,
+which, along with the <code>SimulationMethodsMixin</code> class,
+does everything that is needed to run an
+Agent-based Kinetics simulation and store its results.</p>
+<p>The class <code>AgentStateData</code> is used by a <code><a title="abstochkin.simulation.Simulation" href="#abstochkin.simulation.Simulation">Simulation</a></code>
+object to store and handle some of the necessary runtime data.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Perform an Agent-based Kinetics simulation.
+
+This module contains the code for the class `Simulation`,
+which, along with the `SimulationMethodsMixin` class,
+does everything that is needed to run an
+Agent-based Kinetics simulation and store its results.
+
+The class `AgentStateData` is used by a `Simulation`
+object to store and handle some of the necessary runtime data.
+&#34;&#34;&#34;
+
+import contextlib
+
+import numpy as np
+from tqdm import tqdm
+
+from ._simulation_methods import SimulationMethodsMixin
+from .de_calcs import DEcalcs
+from .graphing import Graph
+from .het_calcs import get_het_processes
+from .process import update_all_species, MichaelisMentenProcess, \
+    RegulatedProcess, RegulatedMichaelisMentenProcess
+from .utils import rng_streams
+
+
+class Simulation(SimulationMethodsMixin):
+    &#34;&#34;&#34;
+    Run an Agent-based Kinetics simulation.
+
+    Attributes
+    ----------
+    p0 : dict[str: int]
+        Dictionary specifying the initial population sizes of all
+        species in the given processes.
+    t_max : float or int
+        Numerical value of the end of simulated time in the units
+        specified in the class attribute `AbStochKin.time_unit`.
+    dt : float
+        The duration of the time interval that the simulation&#39;s
+        algorithm considers. The current implementation only
+        supports a fixed time step interval whose value is `dt`.
+    n : int
+        The number of repetitions of the simulation to be
+        performed.
+    random_state : float or int
+        A number used to seed the random number generator.
+    use_multithreading : bool
+        Specify whether to parallelize the simulation
+        using multithreading. If `False`, the ensemble
+        of simulations is run sequentially.
+    max_agents : dict
+        Specification of the maximum number of agents that each
+        species should have when running the simulation. An
+        empty dictionary signifies that a default approach will
+        be taken and the number for each species will be
+        automatically determined (see method `_setup_runtime_data()`
+        for details). The entries in the dictionary should be
+        `species name (string): number (int)`.
+    max_agents_multiplier : float or int
+        Set the number of possible agents for each species to be the
+        maximum value of the ODE solution for the species
+        times `max_agents_multiplier`.
+    time_unit : str
+        A string of the time unit to be used for describing the
+        kinetics of the given processes.
+    &#34;&#34;&#34;
+
+    def __init__(self,
+                 /,
+                 p0: dict,
+                 t_max: float,
+                 dt: float,
+                 n: int,
+                 processes: list,
+                 *,
+                 random_state: int,
+                 do_solve_ODEs: bool,
+                 ODE_method: str,
+                 do_run: bool,
+                 show_graphs: bool,
+                 use_multithreading: bool,
+                 max_agents: dict,
+                 max_agents_multiplier: float | int,
+                 time_unit: str):
+        &#34;&#34;&#34;
+        The parameters below are not class attributes, but are part of a
+        `Simulation` object&#39;s initialization to trigger specific actions
+        to be automatically performed. Note that these actions can also
+        be performed manually by calling the appropriate methods once a
+        class object has been instantiated.
+
+        Other Parameters
+        ----------------
+        do_solve_ODEs : bool
+            If `True`, attempt to numerically solve the system
+            of ODEs defined from the given set of processes.
+            If `False`, do not attempt to solve the ODEs and
+            do not run the simulation.
+        ODE_method : str
+            Method to use when attempting to solve the system
+            of ODEs (if `do_solve_ODEs` is `True`).
+            Available ODE methods: RK45, RK23, DOP853, Radau,
+            BDF, LSODA.
+        do_run : bool
+            Specify whether to run the AbStochKin simulation.
+            If `False`, then a `Simulation` object is created but
+            the simulation is not run. A user can then manually
+            run it by calling the class method `run_simulation()`.
+        show_graphs : bool
+            Specify whether to show graphs of the results.
+        &#34;&#34;&#34;
+
+        self.p0 = p0  # dictionary of initial population sizes
+        self.t_min = 0  # start simulation at time 0 (by assumption)
+        self.t_max = t_max  # end simulation at time t_max
+        self.dt = dt  # fixed time interval
+        self.n = n  # repeat the simulation this many times
+        self.random_state = random_state
+        self.use_multithreading = use_multithreading
+        self.max_agents = max_agents
+        self.max_agents_multiplier = max_agents_multiplier
+        self.time_unit = time_unit
+
+        self.all_species, self._procs_by_reactant, self._procs_by_product = \
+            update_all_species(tuple(processes))
+
+        &#34;&#34;&#34; Generate the list of processes to be used by the algorithm. 
+        This is done because some processes (e.g., reversible processes) 
+        need to be split up into the forward and reverse processes. &#34;&#34;&#34;
+        self._algo_processes = list()
+        self._gen_algo_processes(processes)
+        self._het_processes = get_het_processes(self._algo_processes)
+        self._het_processes_num = len(self._het_processes)
+
+        self._validate_p0()  # validate initial population sizes
+
+        # Generate streams of random numbers given a seed
+        self.streams = rng_streams(self.n, self.random_state)
+
+        # ******************** Deterministic calculations ********************
+        self.de_calcs = DEcalcs(self.p0, self.t_min, self.t_max, processes,
+                                ode_method=ODE_method, time_unit=self.time_unit)
+        if do_solve_ODEs:
+            try:
+                self.de_calcs.solve_ODEs()
+            except Exception as exc:
+                print(f&#34;ODE solver exception:\n{exc}&#34;)
+        else:
+            if do_run:
+                print(&#34;Warning: Must specify the maximum number of agents for &#34;
+                      &#34;each species when not solving the system ODEs.&#34;)
+        # ********************************************************************
+
+        self.total_time = self.t_max - self.t_min
+        self.t_steps = int(self.total_time / self.dt)
+        self.time = np.linspace(0, self.total_time, self.t_steps + 1)
+
+        # Initialize data structures for results, runtime data (rtd),
+        # process-specific k values, transition probabilities
+        # for 0th and 1st order processes, metrics of population
+        # heterogeneity, sequence of functions th algorithm will
+        # execute, and progress bar.
+        self.results, self.rtd = dict(), dict()
+
+        self.trans_p = dict()  # Process-specific transition probabilities
+
+        # Process-specific parameters that can exhibit heterogeneity
+        self.k_vals = dict()
+        self.Km_vals = dict()
+        self.K50_vals = dict()
+
+        self.k_het_metrics = dict()
+        self.Km_het_metrics = dict()
+        self.K50_het_metrics = dict()
+
+        # Runtime-specific attributes
+        self.algo_sequence = list()
+        self.progress_bar = None
+
+        if do_run:
+            self.run_simulation()
+            if show_graphs:  # Simulation must first be run before plotting
+                self.graph_results()
+
+    def run_simulation(self):
+        &#34;&#34;&#34;
+        Run an ensemble of simulations and compute statistics
+        of simulation data.
+        &#34;&#34;&#34;
+        bar_fmt = f&#34;{{desc}}: {{percentage:3.0f}}% |{{bar}}| &#34; \
+                  f&#34;n={{n_fmt}}/{{total_fmt}} &#34; \
+                  f&#34;[{{elapsed}}{&#39;&#39; if self.use_multithreading else &#39;&lt;{remaining}&#39;}, &#34; \
+                  f&#34;{{rate_fmt}}{{postfix}}]&#34;
+        self.progress_bar = tqdm(total=self.n,
+                                 ncols=65 if self.use_multithreading else 71,
+                                 desc=&#34;Progress&#34;,
+                                 bar_format=bar_fmt,
+                                 colour=&#39;green&#39;)
+        # Note on progress bar info: Multi-threading makes calculating
+        # the remaining time of the simulation unreliable, so only
+        # the elapsed time is shown.
+
+        self._setup_data()  # initialize data
+        self._gen_algo_sequence()  # generate sequence of processes for algorithm
+
+        self._parallel_run() if self.use_multithreading else self._sequential_run()
+
+        self._compute_trajectory_stats()  # Get statistics on simulation data
+
+        # self._compute_k_het_stats()  # Get statistics on heterogeneity data (k)
+        # self._compute_Km_het_stats()  # Get statistics on heterogeneity data (Km)
+        # self._compute_K50_het_stats()  # Get statistics on heterogeneity data (Km)
+        self._compute_het_stats()  # Get statistics on heterogeneity data
+
+        self._post_run_cleanup()  # free up some memory
+        self.progress_bar.close()
+
+    def graph_results(self, /, graphs_to_show=None, species_to_show=None):
+        &#34;&#34;&#34;
+        Make graphs of the results.
+
+        Parameters
+        ----------
+        species_to_show : `None` or list of string(s), default: `None`
+            If `None`, data for all species are plotted.
+
+        graphs_to_show : `None` or string or list of string(s), default: `None`
+            If `None`, all graphs are shown. If a string is given then the
+            graph that matches the string is shown. A list of strings shows
+            all the graphs specified in the list.
+            Graph specifications:
+
+            &#39;avg&#39; : Plot the average trajectories and their
+                one-standard deviation envelopes. The ODE
+                trajectories are also shown.
+            &#39;traj&#39; : Plot the species trajectories of individual
+                simulations.
+            &#39;ode&#39; : Plot the deterministic species trajectories,
+                obtained by numerically solving the ODEs.
+            &#39;eta&#39; : Plot the coefficient of variation (CoV) and
+                the CoV assuming that all processes a species
+                participates in obey Poisson statistics.
+            &#39;het&#39; : Plot species- and process-specific metrics
+                of heterogeneity (`k` and `ψ`) and their
+                one-standard deviation envelopes.
+        &#34;&#34;&#34;
+
+        if graphs_to_show is None:
+            graphs_to_show = [&#39;avg&#39;, &#39;het&#39;]
+        if species_to_show is None:
+            species_to_show = self.all_species
+
+        if &#39;avg&#39; in graphs_to_show:
+            graph_avg = Graph()
+            with contextlib.suppress(AttributeError):
+                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show)
+            graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
+
+        if &#39;traj&#39; in graphs_to_show:
+            graph_traj = Graph()
+            graph_traj.plot_trajectories(self.time, self.results, species=species_to_show)
+
+        if &#39;ode&#39; in graphs_to_show:
+            graph_ode = Graph()
+            graph_ode.plot_ODEs(self.de_calcs, species=species_to_show)
+
+        if &#39;eta&#39; in graphs_to_show:
+            graph_eta = Graph()
+            graph_eta.plot_eta(self.time, self.results, species=species_to_show)
+
+        if &#39;het&#39; in graphs_to_show:
+            for proc in self._algo_processes:
+                if proc.is_heterogeneous:
+                    graph_het = Graph()
+                    graph_het.plot_het_metrics(self.time,
+                                               (str(proc), &#39;&#39;),
+                                               self.k_het_metrics[proc])
+
+                if isinstance(proc, (MichaelisMentenProcess, RegulatedMichaelisMentenProcess)):
+                    if proc.is_heterogeneous_Km:
+                        graph_het = Graph()
+                        graph_het.plot_het_metrics(self.time,
+                                                   (str(proc), f&#34;K_m={proc.Km}&#34;),
+                                                   self.Km_het_metrics[proc],
+                                                   het_attr=&#39;Km&#39;)
+
+                if isinstance(proc, (RegulatedProcess, RegulatedMichaelisMentenProcess)):
+                    if isinstance(proc.is_heterogeneous_K50, list):  # multiple regulators
+                        for i in range(len(proc.regulating_species)):
+                            if proc.is_heterogeneous_K50[i]:
+                                graph_het = Graph()
+                                extra_str = f&#34;\\textrm{{{proc.regulation_type[i]} by }}&#34; \
+                                            f&#34;{proc.regulating_species[i]}, &#34; \
+                                            f&#34;K_{{50}}={proc.K50[i]}&#34;
+                                graph_het.plot_het_metrics(self.time,
+                                                           (str(proc), extra_str),
+                                                           self.K50_het_metrics[proc][i],
+                                                           het_attr=&#39;K50&#39;)
+                    else:  # one regulator
+                        if proc.is_heterogeneous_K50:
+                            graph_het = Graph()
+                            graph_het.plot_het_metrics(self.time,
+                                                       (str(proc), f&#34;K_{{50}}={proc.K50}&#34;),
+                                                       self.K50_het_metrics[proc],
+                                                       het_attr=&#39;K50&#39;)
+
+    def __repr__(self):
+        return f&#34;AbStochKin Simulation(p0={self.p0},\n&#34; \
+               f&#34;                 t_min={self.t_min},\n&#34; \
+               f&#34;                 t_max={self.t_max},\n&#34; \
+               f&#34;                 dt={self.dt},\n&#34; \
+               f&#34;                 n={self.n},\n&#34; \
+               f&#34;                 random_state={self.random_state})&#34;
+
+    def __str__(self):
+        descr = f&#34;AbStochKin Simulation object with\n&#34; \
+                f&#34;Processes: {self._algo_processes}\n&#34; \
+                f&#34;Number of heterogeneous processes: {len(self._het_processes)}\n&#34; \
+                f&#34;Initial population sizes: {self.p0}\n&#34; \
+                f&#34;Simulated time interval: {self.t_min} - {self.t_max} {self.time_unit} &#34; \
+                f&#34;with fixed time step increment {self.dt} {self.time_unit}\n&#34; \
+                f&#34;Simulation runs: {self.n}\n&#34; \
+                f&#34;Use multi-threading: {self.use_multithreading}\n&#34; \
+                f&#34;Random state seed: {self.random_state}\n&#34;
+
+        if self.de_calcs.odes_sol is not None:
+            descr += f&#34;Attempt to solve ODEs with method &#34; \
+                     f&#34;{self.de_calcs.ode_method}: &#34; \
+                     f&#34;{&#39;Successful&#39; if self.de_calcs.odes_sol.success else &#39;Failed&#39;}\n&#34;
+
+        return descr</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="abstochkin.simulation.Simulation"><code class="flex name class">
+<span>class <span class="ident">Simulation</span></span>
+<span>(</span><span>p0: dict, t_max: float, dt: float, n: int, processes: list, *, random_state: int, do_solve_ODEs: bool, ODE_method: str, do_run: bool, show_graphs: bool, use_multithreading: bool, max_agents: dict, max_agents_multiplier: float | int, time_unit: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run an Agent-based Kinetics simulation.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>p0</code></strong> :&ensp;<code>dict[str: int]</code></dt>
+<dd>Dictionary specifying the initial population sizes of all
+species in the given processes.</dd>
+<dt><strong><code>t_max</code></strong> :&ensp;<code>float</code> or <code>int</code></dt>
+<dd>Numerical value of the end of simulated time in the units
+specified in the class attribute <code>AbStochKin.time_unit</code>.</dd>
+<dt><strong><code>dt</code></strong> :&ensp;<code>float</code></dt>
+<dd>The duration of the time interval that the simulation's
+algorithm considers. The current implementation only
+supports a fixed time step interval whose value is <code>dt</code>.</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code></dt>
+<dd>The number of repetitions of the simulation to be
+performed.</dd>
+<dt><strong><code>random_state</code></strong> :&ensp;<code>float</code> or <code>int</code></dt>
+<dd>A number used to seed the random number generator.</dd>
+<dt><strong><code>use_multithreading</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Specify whether to parallelize the simulation
+using multithreading. If <code>False</code>, the ensemble
+of simulations is run sequentially.</dd>
+<dt><strong><code>max_agents</code></strong> :&ensp;<code>dict</code></dt>
+<dd>Specification of the maximum number of agents that each
+species should have when running the simulation. An
+empty dictionary signifies that a default approach will
+be taken and the number for each species will be
+automatically determined (see method <code>_setup_runtime_data()</code>
+for details). The entries in the dictionary should be
+<code>species name (string): number (int)</code>.</dd>
+<dt><strong><code>max_agents_multiplier</code></strong> :&ensp;<code>float</code> or <code>int</code></dt>
+<dd>Set the number of possible agents for each species to be the
+maximum value of the ODE solution for the species
+times <code>max_agents_multiplier</code>.</dd>
+<dt><strong><code>time_unit</code></strong> :&ensp;<code>str</code></dt>
+<dd>A string of the time unit to be used for describing the
+kinetics of the given processes.</dd>
+</dl>
+<p>The parameters below are not class attributes, but are part of a
+<code><a title="abstochkin.simulation.Simulation" href="#abstochkin.simulation.Simulation">Simulation</a></code> object's initialization to trigger specific actions
+to be automatically performed. Note that these actions can also
+be performed manually by calling the appropriate methods once a
+class object has been instantiated.</p>
+<h2 id="other-parameters">Other Parameters</h2>
+<dl>
+<dt><strong><code>do_solve_ODEs</code></strong> :&ensp;<code>bool</code></dt>
+<dd>If <code>True</code>, attempt to numerically solve the system
+of ODEs defined from the given set of processes.
+If <code>False</code>, do not attempt to solve the ODEs and
+do not run the simulation.</dd>
+<dt><strong><code>ODE_method</code></strong> :&ensp;<code>str</code></dt>
+<dd>Method to use when attempting to solve the system
+of ODEs (if <code>do_solve_ODEs</code> is <code>True</code>).
+Available ODE methods: RK45, RK23, DOP853, Radau,
+BDF, LSODA.</dd>
+<dt><strong><code>do_run</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Specify whether to run the AbStochKin simulation.
+If <code>False</code>, then a <code><a title="abstochkin.simulation.Simulation" href="#abstochkin.simulation.Simulation">Simulation</a></code> object is created but
+the simulation is not run. A user can then manually
+run it by calling the class method <code>run_simulation()</code>.</dd>
+<dt><strong><code>show_graphs</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Specify whether to show graphs of the results.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Simulation(SimulationMethodsMixin):
+    &#34;&#34;&#34;
+    Run an Agent-based Kinetics simulation.
+
+    Attributes
+    ----------
+    p0 : dict[str: int]
+        Dictionary specifying the initial population sizes of all
+        species in the given processes.
+    t_max : float or int
+        Numerical value of the end of simulated time in the units
+        specified in the class attribute `AbStochKin.time_unit`.
+    dt : float
+        The duration of the time interval that the simulation&#39;s
+        algorithm considers. The current implementation only
+        supports a fixed time step interval whose value is `dt`.
+    n : int
+        The number of repetitions of the simulation to be
+        performed.
+    random_state : float or int
+        A number used to seed the random number generator.
+    use_multithreading : bool
+        Specify whether to parallelize the simulation
+        using multithreading. If `False`, the ensemble
+        of simulations is run sequentially.
+    max_agents : dict
+        Specification of the maximum number of agents that each
+        species should have when running the simulation. An
+        empty dictionary signifies that a default approach will
+        be taken and the number for each species will be
+        automatically determined (see method `_setup_runtime_data()`
+        for details). The entries in the dictionary should be
+        `species name (string): number (int)`.
+    max_agents_multiplier : float or int
+        Set the number of possible agents for each species to be the
+        maximum value of the ODE solution for the species
+        times `max_agents_multiplier`.
+    time_unit : str
+        A string of the time unit to be used for describing the
+        kinetics of the given processes.
+    &#34;&#34;&#34;
+
+    def __init__(self,
+                 /,
+                 p0: dict,
+                 t_max: float,
+                 dt: float,
+                 n: int,
+                 processes: list,
+                 *,
+                 random_state: int,
+                 do_solve_ODEs: bool,
+                 ODE_method: str,
+                 do_run: bool,
+                 show_graphs: bool,
+                 use_multithreading: bool,
+                 max_agents: dict,
+                 max_agents_multiplier: float | int,
+                 time_unit: str):
+        &#34;&#34;&#34;
+        The parameters below are not class attributes, but are part of a
+        `Simulation` object&#39;s initialization to trigger specific actions
+        to be automatically performed. Note that these actions can also
+        be performed manually by calling the appropriate methods once a
+        class object has been instantiated.
+
+        Other Parameters
+        ----------------
+        do_solve_ODEs : bool
+            If `True`, attempt to numerically solve the system
+            of ODEs defined from the given set of processes.
+            If `False`, do not attempt to solve the ODEs and
+            do not run the simulation.
+        ODE_method : str
+            Method to use when attempting to solve the system
+            of ODEs (if `do_solve_ODEs` is `True`).
+            Available ODE methods: RK45, RK23, DOP853, Radau,
+            BDF, LSODA.
+        do_run : bool
+            Specify whether to run the AbStochKin simulation.
+            If `False`, then a `Simulation` object is created but
+            the simulation is not run. A user can then manually
+            run it by calling the class method `run_simulation()`.
+        show_graphs : bool
+            Specify whether to show graphs of the results.
+        &#34;&#34;&#34;
+
+        self.p0 = p0  # dictionary of initial population sizes
+        self.t_min = 0  # start simulation at time 0 (by assumption)
+        self.t_max = t_max  # end simulation at time t_max
+        self.dt = dt  # fixed time interval
+        self.n = n  # repeat the simulation this many times
+        self.random_state = random_state
+        self.use_multithreading = use_multithreading
+        self.max_agents = max_agents
+        self.max_agents_multiplier = max_agents_multiplier
+        self.time_unit = time_unit
+
+        self.all_species, self._procs_by_reactant, self._procs_by_product = \
+            update_all_species(tuple(processes))
+
+        &#34;&#34;&#34; Generate the list of processes to be used by the algorithm. 
+        This is done because some processes (e.g., reversible processes) 
+        need to be split up into the forward and reverse processes. &#34;&#34;&#34;
+        self._algo_processes = list()
+        self._gen_algo_processes(processes)
+        self._het_processes = get_het_processes(self._algo_processes)
+        self._het_processes_num = len(self._het_processes)
+
+        self._validate_p0()  # validate initial population sizes
+
+        # Generate streams of random numbers given a seed
+        self.streams = rng_streams(self.n, self.random_state)
+
+        # ******************** Deterministic calculations ********************
+        self.de_calcs = DEcalcs(self.p0, self.t_min, self.t_max, processes,
+                                ode_method=ODE_method, time_unit=self.time_unit)
+        if do_solve_ODEs:
+            try:
+                self.de_calcs.solve_ODEs()
+            except Exception as exc:
+                print(f&#34;ODE solver exception:\n{exc}&#34;)
+        else:
+            if do_run:
+                print(&#34;Warning: Must specify the maximum number of agents for &#34;
+                      &#34;each species when not solving the system ODEs.&#34;)
+        # ********************************************************************
+
+        self.total_time = self.t_max - self.t_min
+        self.t_steps = int(self.total_time / self.dt)
+        self.time = np.linspace(0, self.total_time, self.t_steps + 1)
+
+        # Initialize data structures for results, runtime data (rtd),
+        # process-specific k values, transition probabilities
+        # for 0th and 1st order processes, metrics of population
+        # heterogeneity, sequence of functions th algorithm will
+        # execute, and progress bar.
+        self.results, self.rtd = dict(), dict()
+
+        self.trans_p = dict()  # Process-specific transition probabilities
+
+        # Process-specific parameters that can exhibit heterogeneity
+        self.k_vals = dict()
+        self.Km_vals = dict()
+        self.K50_vals = dict()
+
+        self.k_het_metrics = dict()
+        self.Km_het_metrics = dict()
+        self.K50_het_metrics = dict()
+
+        # Runtime-specific attributes
+        self.algo_sequence = list()
+        self.progress_bar = None
+
+        if do_run:
+            self.run_simulation()
+            if show_graphs:  # Simulation must first be run before plotting
+                self.graph_results()
+
+    def run_simulation(self):
+        &#34;&#34;&#34;
+        Run an ensemble of simulations and compute statistics
+        of simulation data.
+        &#34;&#34;&#34;
+        bar_fmt = f&#34;{{desc}}: {{percentage:3.0f}}% |{{bar}}| &#34; \
+                  f&#34;n={{n_fmt}}/{{total_fmt}} &#34; \
+                  f&#34;[{{elapsed}}{&#39;&#39; if self.use_multithreading else &#39;&lt;{remaining}&#39;}, &#34; \
+                  f&#34;{{rate_fmt}}{{postfix}}]&#34;
+        self.progress_bar = tqdm(total=self.n,
+                                 ncols=65 if self.use_multithreading else 71,
+                                 desc=&#34;Progress&#34;,
+                                 bar_format=bar_fmt,
+                                 colour=&#39;green&#39;)
+        # Note on progress bar info: Multi-threading makes calculating
+        # the remaining time of the simulation unreliable, so only
+        # the elapsed time is shown.
+
+        self._setup_data()  # initialize data
+        self._gen_algo_sequence()  # generate sequence of processes for algorithm
+
+        self._parallel_run() if self.use_multithreading else self._sequential_run()
+
+        self._compute_trajectory_stats()  # Get statistics on simulation data
+
+        # self._compute_k_het_stats()  # Get statistics on heterogeneity data (k)
+        # self._compute_Km_het_stats()  # Get statistics on heterogeneity data (Km)
+        # self._compute_K50_het_stats()  # Get statistics on heterogeneity data (Km)
+        self._compute_het_stats()  # Get statistics on heterogeneity data
+
+        self._post_run_cleanup()  # free up some memory
+        self.progress_bar.close()
+
+    def graph_results(self, /, graphs_to_show=None, species_to_show=None):
+        &#34;&#34;&#34;
+        Make graphs of the results.
+
+        Parameters
+        ----------
+        species_to_show : `None` or list of string(s), default: `None`
+            If `None`, data for all species are plotted.
+
+        graphs_to_show : `None` or string or list of string(s), default: `None`
+            If `None`, all graphs are shown. If a string is given then the
+            graph that matches the string is shown. A list of strings shows
+            all the graphs specified in the list.
+            Graph specifications:
+
+            &#39;avg&#39; : Plot the average trajectories and their
+                one-standard deviation envelopes. The ODE
+                trajectories are also shown.
+            &#39;traj&#39; : Plot the species trajectories of individual
+                simulations.
+            &#39;ode&#39; : Plot the deterministic species trajectories,
+                obtained by numerically solving the ODEs.
+            &#39;eta&#39; : Plot the coefficient of variation (CoV) and
+                the CoV assuming that all processes a species
+                participates in obey Poisson statistics.
+            &#39;het&#39; : Plot species- and process-specific metrics
+                of heterogeneity (`k` and `ψ`) and their
+                one-standard deviation envelopes.
+        &#34;&#34;&#34;
+
+        if graphs_to_show is None:
+            graphs_to_show = [&#39;avg&#39;, &#39;het&#39;]
+        if species_to_show is None:
+            species_to_show = self.all_species
+
+        if &#39;avg&#39; in graphs_to_show:
+            graph_avg = Graph()
+            with contextlib.suppress(AttributeError):
+                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show)
+            graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
+
+        if &#39;traj&#39; in graphs_to_show:
+            graph_traj = Graph()
+            graph_traj.plot_trajectories(self.time, self.results, species=species_to_show)
+
+        if &#39;ode&#39; in graphs_to_show:
+            graph_ode = Graph()
+            graph_ode.plot_ODEs(self.de_calcs, species=species_to_show)
+
+        if &#39;eta&#39; in graphs_to_show:
+            graph_eta = Graph()
+            graph_eta.plot_eta(self.time, self.results, species=species_to_show)
+
+        if &#39;het&#39; in graphs_to_show:
+            for proc in self._algo_processes:
+                if proc.is_heterogeneous:
+                    graph_het = Graph()
+                    graph_het.plot_het_metrics(self.time,
+                                               (str(proc), &#39;&#39;),
+                                               self.k_het_metrics[proc])
+
+                if isinstance(proc, (MichaelisMentenProcess, RegulatedMichaelisMentenProcess)):
+                    if proc.is_heterogeneous_Km:
+                        graph_het = Graph()
+                        graph_het.plot_het_metrics(self.time,
+                                                   (str(proc), f&#34;K_m={proc.Km}&#34;),
+                                                   self.Km_het_metrics[proc],
+                                                   het_attr=&#39;Km&#39;)
+
+                if isinstance(proc, (RegulatedProcess, RegulatedMichaelisMentenProcess)):
+                    if isinstance(proc.is_heterogeneous_K50, list):  # multiple regulators
+                        for i in range(len(proc.regulating_species)):
+                            if proc.is_heterogeneous_K50[i]:
+                                graph_het = Graph()
+                                extra_str = f&#34;\\textrm{{{proc.regulation_type[i]} by }}&#34; \
+                                            f&#34;{proc.regulating_species[i]}, &#34; \
+                                            f&#34;K_{{50}}={proc.K50[i]}&#34;
+                                graph_het.plot_het_metrics(self.time,
+                                                           (str(proc), extra_str),
+                                                           self.K50_het_metrics[proc][i],
+                                                           het_attr=&#39;K50&#39;)
+                    else:  # one regulator
+                        if proc.is_heterogeneous_K50:
+                            graph_het = Graph()
+                            graph_het.plot_het_metrics(self.time,
+                                                       (str(proc), f&#34;K_{{50}}={proc.K50}&#34;),
+                                                       self.K50_het_metrics[proc],
+                                                       het_attr=&#39;K50&#39;)
+
+    def __repr__(self):
+        return f&#34;AbStochKin Simulation(p0={self.p0},\n&#34; \
+               f&#34;                 t_min={self.t_min},\n&#34; \
+               f&#34;                 t_max={self.t_max},\n&#34; \
+               f&#34;                 dt={self.dt},\n&#34; \
+               f&#34;                 n={self.n},\n&#34; \
+               f&#34;                 random_state={self.random_state})&#34;
+
+    def __str__(self):
+        descr = f&#34;AbStochKin Simulation object with\n&#34; \
+                f&#34;Processes: {self._algo_processes}\n&#34; \
+                f&#34;Number of heterogeneous processes: {len(self._het_processes)}\n&#34; \
+                f&#34;Initial population sizes: {self.p0}\n&#34; \
+                f&#34;Simulated time interval: {self.t_min} - {self.t_max} {self.time_unit} &#34; \
+                f&#34;with fixed time step increment {self.dt} {self.time_unit}\n&#34; \
+                f&#34;Simulation runs: {self.n}\n&#34; \
+                f&#34;Use multi-threading: {self.use_multithreading}\n&#34; \
+                f&#34;Random state seed: {self.random_state}\n&#34;
+
+        if self.de_calcs.odes_sol is not None:
+            descr += f&#34;Attempt to solve ODEs with method &#34; \
+                     f&#34;{self.de_calcs.ode_method}: &#34; \
+                     f&#34;{&#39;Successful&#39; if self.de_calcs.odes_sol.success else &#39;Failed&#39;}\n&#34;
+
+        return descr</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>abstochkin._simulation_methods.SimulationMethodsMixin</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="abstochkin.simulation.Simulation.graph_results"><code class="name flex">
+<span>def <span class="ident">graph_results</span></span>(<span>self, /, graphs_to_show=None, species_to_show=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make graphs of the results.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>species_to_show</code></strong> :&ensp;<code>None</code> or <code>list</code> of <code>string(s)</code>, default<code>:</code>None``</dt>
+<dd>If <code>None</code>, data for all species are plotted.</dd>
+<dt><strong><code>graphs_to_show</code></strong> :&ensp;<code>None</code> or <code>string</code> or <code>list</code> of <code>string(s)</code>, default<code>:</code>None``</dt>
+<dd>
+<p>If <code>None</code>, all graphs are shown. If a string is given then the
+graph that matches the string is shown. A list of strings shows
+all the graphs specified in the list.
+Graph specifications:</p>
+<p>'avg' : Plot the average trajectories and their
+one-standard deviation envelopes. The ODE
+trajectories are also shown.
+'traj' : Plot the species trajectories of individual
+simulations.
+'ode' : Plot the deterministic species trajectories,
+obtained by numerically solving the ODEs.
+'eta' : Plot the coefficient of variation (CoV) and
+the CoV assuming that all processes a species
+participates in obey Poisson statistics.
+'het' : Plot species- and process-specific metrics
+of heterogeneity (<code>k</code> and <code>ψ</code>) and their
+one-standard deviation envelopes.</p>
+</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def graph_results(self, /, graphs_to_show=None, species_to_show=None):
+    &#34;&#34;&#34;
+    Make graphs of the results.
+
+    Parameters
+    ----------
+    species_to_show : `None` or list of string(s), default: `None`
+        If `None`, data for all species are plotted.
+
+    graphs_to_show : `None` or string or list of string(s), default: `None`
+        If `None`, all graphs are shown. If a string is given then the
+        graph that matches the string is shown. A list of strings shows
+        all the graphs specified in the list.
+        Graph specifications:
+
+        &#39;avg&#39; : Plot the average trajectories and their
+            one-standard deviation envelopes. The ODE
+            trajectories are also shown.
+        &#39;traj&#39; : Plot the species trajectories of individual
+            simulations.
+        &#39;ode&#39; : Plot the deterministic species trajectories,
+            obtained by numerically solving the ODEs.
+        &#39;eta&#39; : Plot the coefficient of variation (CoV) and
+            the CoV assuming that all processes a species
+            participates in obey Poisson statistics.
+        &#39;het&#39; : Plot species- and process-specific metrics
+            of heterogeneity (`k` and `ψ`) and their
+            one-standard deviation envelopes.
+    &#34;&#34;&#34;
+
+    if graphs_to_show is None:
+        graphs_to_show = [&#39;avg&#39;, &#39;het&#39;]
+    if species_to_show is None:
+        species_to_show = self.all_species
+
+    if &#39;avg&#39; in graphs_to_show:
+        graph_avg = Graph()
+        with contextlib.suppress(AttributeError):
+            graph_avg.plot_ODEs(self.de_calcs, species=species_to_show)
+        graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
+
+    if &#39;traj&#39; in graphs_to_show:
+        graph_traj = Graph()
+        graph_traj.plot_trajectories(self.time, self.results, species=species_to_show)
+
+    if &#39;ode&#39; in graphs_to_show:
+        graph_ode = Graph()
+        graph_ode.plot_ODEs(self.de_calcs, species=species_to_show)
+
+    if &#39;eta&#39; in graphs_to_show:
+        graph_eta = Graph()
+        graph_eta.plot_eta(self.time, self.results, species=species_to_show)
+
+    if &#39;het&#39; in graphs_to_show:
+        for proc in self._algo_processes:
+            if proc.is_heterogeneous:
+                graph_het = Graph()
+                graph_het.plot_het_metrics(self.time,
+                                           (str(proc), &#39;&#39;),
+                                           self.k_het_metrics[proc])
+
+            if isinstance(proc, (MichaelisMentenProcess, RegulatedMichaelisMentenProcess)):
+                if proc.is_heterogeneous_Km:
+                    graph_het = Graph()
+                    graph_het.plot_het_metrics(self.time,
+                                               (str(proc), f&#34;K_m={proc.Km}&#34;),
+                                               self.Km_het_metrics[proc],
+                                               het_attr=&#39;Km&#39;)
+
+            if isinstance(proc, (RegulatedProcess, RegulatedMichaelisMentenProcess)):
+                if isinstance(proc.is_heterogeneous_K50, list):  # multiple regulators
+                    for i in range(len(proc.regulating_species)):
+                        if proc.is_heterogeneous_K50[i]:
+                            graph_het = Graph()
+                            extra_str = f&#34;\\textrm{{{proc.regulation_type[i]} by }}&#34; \
+                                        f&#34;{proc.regulating_species[i]}, &#34; \
+                                        f&#34;K_{{50}}={proc.K50[i]}&#34;
+                            graph_het.plot_het_metrics(self.time,
+                                                       (str(proc), extra_str),
+                                                       self.K50_het_metrics[proc][i],
+                                                       het_attr=&#39;K50&#39;)
+                else:  # one regulator
+                    if proc.is_heterogeneous_K50:
+                        graph_het = Graph()
+                        graph_het.plot_het_metrics(self.time,
+                                                   (str(proc), f&#34;K_{{50}}={proc.K50}&#34;),
+                                                   self.K50_het_metrics[proc],
+                                                   het_attr=&#39;K50&#39;)</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.simulation.Simulation.run_simulation"><code class="name flex">
+<span>def <span class="ident">run_simulation</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run an ensemble of simulations and compute statistics
+of simulation data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_simulation(self):
+    &#34;&#34;&#34;
+    Run an ensemble of simulations and compute statistics
+    of simulation data.
+    &#34;&#34;&#34;
+    bar_fmt = f&#34;{{desc}}: {{percentage:3.0f}}% |{{bar}}| &#34; \
+              f&#34;n={{n_fmt}}/{{total_fmt}} &#34; \
+              f&#34;[{{elapsed}}{&#39;&#39; if self.use_multithreading else &#39;&lt;{remaining}&#39;}, &#34; \
+              f&#34;{{rate_fmt}}{{postfix}}]&#34;
+    self.progress_bar = tqdm(total=self.n,
+                             ncols=65 if self.use_multithreading else 71,
+                             desc=&#34;Progress&#34;,
+                             bar_format=bar_fmt,
+                             colour=&#39;green&#39;)
+    # Note on progress bar info: Multi-threading makes calculating
+    # the remaining time of the simulation unreliable, so only
+    # the elapsed time is shown.
+
+    self._setup_data()  # initialize data
+    self._gen_algo_sequence()  # generate sequence of processes for algorithm
+
+    self._parallel_run() if self.use_multithreading else self._sequential_run()
+
+    self._compute_trajectory_stats()  # Get statistics on simulation data
+
+    # self._compute_k_het_stats()  # Get statistics on heterogeneity data (k)
+    # self._compute_Km_het_stats()  # Get statistics on heterogeneity data (Km)
+    # self._compute_K50_het_stats()  # Get statistics on heterogeneity data (Km)
+    self._compute_het_stats()  # Get statistics on heterogeneity data
+
+    self._post_run_cleanup()  # free up some memory
+    self.progress_bar.close()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+Agent-based Stochastic Kinetics
+<form>
+<input id="lunr-search" name="q" placeholder="🔎 Search ..." aria-label="Search"
+disabled minlength="2">
+</form>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.css" integrity="sha512-j1u8eUJ4f23xPPxwOrLUPQaCD2dwzNqqmDDcWS4deWsMv2ohLqmXXuP3hU7g8TyzbMSakP/mMqoNBYWj8AEIFg==" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.js" integrity="sha512-plGUER9JkeEWPPqQBE4sdLqBoQug5Ap+BCGMc7bJ8BXkm+VVj6QzkpBz5Yv2yPkkq+cqg9IpkBaGCas6uDbW8g==" crossorigin></script>
+<style>
+.modal-dialog iframe {
+width: 100vw;
+height: calc(100vh - 80px);
+}
+@media screen and (min-width: 700px) {
+.modal-dialog iframe {
+width: 70vw;
+height: 80vh;
+}
+}
+.modal-dialog .tingle-modal-box {width: auto;}
+.modal-dialog .tingle-modal-box__content {padding: 0;}
+</style>
+<script>
+const input = document.getElementById('lunr-search');
+input.disabled = false;
+input.form.addEventListener('submit', (ev) => {
+ev.preventDefault();
+const url = new URL(window.location);
+url.searchParams.set('q', input.value);
+history.replaceState({}, null, url.toString());
+search(input.value);
+});
+const query = new URL(window.location).searchParams.get('q');
+if (query)
+search(query);
+function search(query) {
+const url = '../doc-search.html#' + encodeURIComponent(query);
+new tingle.modal({
+cssClass: ['modal-dialog'],
+onClose: () => {
+const url = new URL(window.location);
+url.searchParams.delete('q');
+history.replaceState({}, null, url.toString());
+setTimeout(() => input.focus(), 100);
+}
+}).setContent('<iframe src="' + url + '"></iframe>').open();
+}
+</script>
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="abstochkin" href="index.html">abstochkin</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="abstochkin.simulation.Simulation" href="#abstochkin.simulation.Simulation">Simulation</a></code></h4>
+<ul class="">
+<li><code><a title="abstochkin.simulation.Simulation.graph_results" href="#abstochkin.simulation.Simulation.graph_results">graph_results</a></code></li>
+<li><code><a title="abstochkin.simulation.Simulation.run_simulation" href="#abstochkin.simulation.Simulation.run_simulation">run_simulation</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+© Copyright 2024, Alex Plakantonakis.
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

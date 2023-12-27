@@ -1,0 +1,1252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>abstochkin.base API documentation</title>
+<meta name="description" content="Base class, AbStochKin, for initializing and storing all data for
+performing stochastic simulations using the Agent-based Kinetics
+method. A …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}#lunr-search{width:100%;font-size:1em;padding:6px 9px 5px 9px;border:1px solid silver}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>abstochkin.base</code></h1>
+</header>
+<section id="section-intro">
+<p>Base class, AbStochKin, for initializing and storing all data for
+performing stochastic simulations using the Agent-based Kinetics
+method. A simulation project can be initialized and run as follows:</p>
+<h2 id="example">Example</h2>
+<pre><code class="language-python-repl">&gt;&gt;&gt; from abstochkin import AbStochKin
+&gt;&gt;&gt; sim = AbStochKin()
+&gt;&gt;&gt; sim.add_process_from_str('A -&gt; ', 0.2)  # degradation process
+&gt;&gt;&gt; sim.simulate(p0={'A': 100}, t_max=20)
+&gt;&gt;&gt; # All data for the above simulation is stored in &lt;code&gt;sim.sims\[0]&lt;/code&gt;.
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Now set up a new simulation without actually running it.
+&gt;&gt;&gt; sim.simulate(p0={'A': 10}, t_max=10, n=50, run=False)
+&gt;&gt;&gt; # All data for the new simulation is stored in &lt;code&gt;sim.sims\[1]&lt;/code&gt;.
+&gt;&gt;&gt; # The simulation can then be manually run using methods
+&gt;&gt;&gt; # documented in the class &lt;code&gt;Simulation&lt;/code&gt;.
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34; Base class, AbStochKin, for initializing and storing all data for
+performing stochastic simulations using the Agent-based Kinetics
+method. A simulation project can be initialized and run as follows:
+
+Example
+-------
+&gt;&gt;&gt; from abstochkin import AbStochKin
+&gt;&gt;&gt; sim = AbStochKin()
+&gt;&gt;&gt; sim.add_process_from_str(&#39;A -&gt; &#39;, 0.2)  # degradation process
+&gt;&gt;&gt; sim.simulate(p0={&#39;A&#39;: 100}, t_max=20)
+&gt;&gt;&gt; # All data for the above simulation is stored in `sim.sims[0]`.
+&gt;&gt;&gt;
+&gt;&gt;&gt; # Now set up a new simulation without actually running it.
+&gt;&gt;&gt; sim.simulate(p0={&#39;A&#39;: 10}, t_max=10, n=50, run=False)
+&gt;&gt;&gt; # All data for the new simulation is stored in `sim.sims[1]`.
+&gt;&gt;&gt; # The simulation can then be manually run using methods
+&gt;&gt;&gt; # documented in the class `Simulation`.
+
+&#34;&#34;&#34;
+import re
+from ast import literal_eval
+from concurrent.futures import ProcessPoolExecutor
+
+from .het_calcs import get_het_processes
+from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
+    RegulatedProcess, RegulatedMichaelisMentenProcess
+from .simulation import Simulation
+
+
+class AbStochKin:
+    &#34;&#34;&#34; Base class for Agent-based Kinetics (AbStochKin) simulator.
+
+    Attributes
+    ----------
+    time_unit : str, default : sec, optional
+        A string of the time unit to be used for describing the kinetics
+        of the given processes.
+    processes : list
+        A list of the processes that the AbStochKin object has.
+    het_processes : list
+        A list of the processes where population heterogeneity in one
+        of the parameters is to be modeled. This list is a subset of
+        the `processes` attribute.
+    sims : list
+        A list of all simulations performed for the given set of processes.
+        Each member of the list is an object of the `Simulation` class and
+        contains all data for that simulation.
+    &#34;&#34;&#34;
+
+    def __init__(self, time_unit=&#39;sec&#39;):
+        self.time_unit = time_unit
+        self.processes = list()
+        self.het_processes = list()
+        self.sims = list()
+
+    def add_processes_from_file(self, filename: str):
+        &#34;&#34;&#34; Add a batch of processes from a text file. &#34;&#34;&#34;
+        with open(filename) as f:
+            lines = f.readlines()
+
+        for line in lines:
+            self.extract_process_from_str(line)
+
+    def extract_process_from_str(self, process_str):
+        &#34;&#34;&#34;
+        Extract a process and all of its specified parameters from a string.
+
+        This functions parses a string specifying all values and parameters
+        needed to define a process. It then creates a Process object
+        based on the extracted data.
+        &#34;&#34;&#34;
+        process_str = process_str.replace(&#39; &#39;, &#39;&#39;).replace(&#39;&#34;&#39;, &#39;\&#39;&#39;)
+
+        proc_str = process_str.split(&#39;,&#39;)[0]
+
+        # Extract string parameters first
+        patt_str_params = r&#34;(\w+)=(&#39;[\w\s,]+&#39;)&#34;
+        str_params = re.findall(patt_str_params, process_str)
+
+        process_str_remain = re.sub(r&#34;\w+=&#39;[\w\s,]+&#39;&#34;, &#39;&#39;, process_str)
+
+        patt_num_params = r&#34;(\w+)=([\[\(,.\s\d\)\]]+)&#34;
+        num_params = re.findall(patt_num_params, process_str_remain)
+
+        all_params = list()
+        for name, val_str in num_params + str_params:
+            while val_str.endswith(&#39;,&#39;):
+                val_str = val_str[:-1]
+            all_params.append((name, literal_eval(val_str)))
+
+        self.add_process_from_str(proc_str, **dict(all_params))
+
+    def add_process_from_str(self,
+                             process_str: str,
+                             /,
+                             k: float | int | list[float | int, ...] |
+                                tuple[float | int, float | int],
+                             **kwargs):
+        &#34;&#34;&#34;
+        Add a process by specifying a string: &#39;reactants -&gt; products&#39;.
+        Additional arguments determine if a specialized process
+        (such as a reversible, regulated, or Michaelis-Menten process)
+        is to be defined.
+        &#34;&#34;&#34;
+        if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.append(ReversibleProcess.from_string(process_str, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.append(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.append(RegulatedMichaelisMentenProcess.from_string(process_str,
+                                                                                  k, **kwargs))
+            else:  # Regulated process
+                self.processes.append(RegulatedProcess.from_string(process_str, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.append(Process.from_string(process_str, k, **kwargs))
+
+    def add_process(self,
+                    reactants: dict,
+                    products: dict,
+                    /,
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                    **kwargs):
+        &#34;&#34;&#34;
+        Add a process by using a dictionary for the reactants and products.
+        Additional arguments determine if a specialized process
+        (such as a reversible, regulated, or Michaelis-Menten process)
+        is to be defined.
+        &#34;&#34;&#34;
+        if &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.append(ReversibleProcess(reactants, products, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.append(MichaelisMentenProcess(reactants, products, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.append(
+                    RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+            else:  # Regulated process
+                self.processes.append(RegulatedProcess(reactants, products, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.append(Process(reactants, products, k, **kwargs))
+
+    def del_process_from_str(self,
+                             process_str: str,
+                             /,
+                             k: float | int | list[float | int, ...] | tuple[float | int],
+                             **kwargs):
+        &#34;&#34;&#34; Delete a process by specifying a string: &#39;reactants -&gt; products&#39;. &#34;&#34;&#34;
+        try:
+            if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+                self.processes.remove(ReversibleProcess.from_string(process_str, k, **kwargs))
+            elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+                self.processes.remove(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+            elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+                if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                    self.processes.remove(
+                        RegulatedMichaelisMentenProcess.from_string(process_str, k, **kwargs))
+                else:  # Regulated process
+                    self.processes.remove(RegulatedProcess.from_string(process_str, k, **kwargs))
+            else:  # simple unidirectional process
+                self.processes.remove(Process.from_string(process_str, k, **kwargs))
+        except ValueError:
+            print(&#34;Process to be removed was not found.&#34;)
+        else:
+            print(f&#34;Removed: {process_str}, k = {k}, kwargs = {kwargs}&#34;)
+
+    def del_process(self,
+                    reactants: dict,
+                    products: dict,
+                    /,
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                    **kwargs):
+        &#34;&#34;&#34; Delete a process by using a dictionary for the reactants and products. &#34;&#34;&#34;
+        try:
+            if &#39;k_rev&#39; in kwargs:  # reversible process
+                self.processes.remove(ReversibleProcess(reactants, products, k, **kwargs))
+            elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+                self.processes.remove(MichaelisMentenProcess(reactants, products, k, **kwargs))
+            elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+                if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                    self.processes.remove(
+                        RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+                else:  # Regulated process
+                    self.processes.remove(RegulatedProcess(reactants, products, k, **kwargs))
+            else:  # simple unidirectional process
+                self.processes.remove(Process(reactants, products, k, **kwargs))
+        except ValueError:
+            print(&#34;Process to be removed was not found.&#34;)
+        else:
+            lhs, rhs = Process(reactants, products, k)._reconstruct_string()
+            print(f&#34;Removed: &#34; + &#34; -&gt; &#34;.join([lhs, rhs]) + f&#34;, k = {k}, kwargs = {kwargs}&#34;)
+
+    def simulate(self,
+                 /,
+                 p0: dict,
+                 t_max: float | int,
+                 dt: float = 0.01,
+                 n: int = 100,
+                 *,
+                 random_seed: int = 19,
+                 solve_odes: bool = True,
+                 ode_method: str = &#39;RK45&#39;,
+                 run: bool = True,
+                 show_plots: bool = True,
+                 multithreading: bool = True,
+                 max_agents_by_species: dict = None,
+                 max_agents_multiplier: int = 2,
+                 _return_simulation: bool = False):
+        &#34;&#34;&#34;
+        Start an AbStochKin simulation by creating an instance of the class
+        `Simulation`. The resulting object is appended to the list
+        in the class attribute `AbStochKin.sims`.
+
+        Parameters
+        ----------
+        p0 : dict[str: int]
+            Dictionary specifying the initial population sizes of all
+            species in the given processes.
+        t_max : float or int
+            Numerical value of the end of simulated time in the units
+            specified in the class attribute `AbStochKin.time_unit`.
+        dt : float, default: 0.1, optional
+            The duration of the time interval that the simulation&#39;s
+            algorithm considers. The current implementation only
+            supports a fixed time step interval whose value is `dt`.
+        n : int, default: 100, optional
+            The number of repetitions of the simulation to be performed.
+        random_seed : int, default: 19, optional
+            A number used to seed the random number generator.
+        solve_odes : bool, default: True, optional
+            Specify whether to numerically solve the system of
+            ODEs defined from the given set of processes.
+        ode_method : str, default: RK45, optional
+            Available ODE methods: RK45, RK23, DOP853, Radau, BDF, LSODA.
+        run : bool, default: True, optional
+            Specify whether to run an AbStochKin simulation.
+        show_plots : bool, default: True, optional
+            Specify whether to graph the results of the AbStochKin simulation.
+        multithreading : bool, default: True, optional
+            Specify whether to parallelize the simulation
+            using multithreading. If `False`, the ensemble
+            of simulations is run sequentially.
+        max_agents_by_species : None or dict, default: dict
+            Specification of the maximum number of agents that each
+            species should have when running the simulation.
+            If `None`, that a default approach will
+            be taken by the class `Simulation` and the number
+            for each species will be automatically determined
+            (see method `Simulation._setup_runtime_data()` for details).
+            The entries in the dictionary should be
+            `species name (string): number (int)`.
+        max_agents_multiplier : float or int, default: 2
+            This parameter is used to calculate the maximum number of
+            agents of each species that the simulation engine allocates
+            memory for. This be determined by multiplying the maximum value
+            of the ODE time trajectory for this species by the
+            multiplier value specified here.
+        _return_simulation : bool
+            Determines if the `self.simulate` method returns a `Simulation`
+            object or appends it to the list `self.sims`.
+            Returning a `Simulation` object is needed when calling the method
+            `simulate_series_in_parallel`.
+        &#34;&#34;&#34;
+
+        if max_agents_by_species is None:
+            max_agents_by_species = dict()
+
+        self.het_processes = get_het_processes(self.processes)
+
+        sim = Simulation(p0,
+                         t_max,
+                         dt,
+                         n,
+                         self.processes,
+                         random_state=random_seed,
+                         do_solve_ODEs=solve_odes,
+                         ODE_method=ode_method,
+                         do_run=run,
+                         show_graphs=show_plots,
+                         use_multithreading=multithreading,
+                         max_agents=max_agents_by_species,
+                         max_agents_multiplier=max_agents_multiplier,
+                         time_unit=self.time_unit)
+
+        if _return_simulation:
+            assert run, &#34;Must run individual simulations if a series of &#34; \
+                        &#34;simulations is to be run with multiprocessing.&#34;
+
+            # Set un-pickleable objects to None for data serialization to work
+            sim.algo_sequence = None
+            sim.progress_bar = None
+
+            return sim
+        else:
+            self.sims.append(sim)
+
+    def simulate_series_in_parallel(self,
+                                    series_kwargs: list[dict, ...],
+                                    *,
+                                    max_workers: int = None):
+        &#34;&#34;&#34;
+        Perform a series of simulations in parallel by initializing
+        separate processes. Each process runs a simulation and appends
+        a `Simulation` object in the list `self.sims`.
+
+        Parameters
+        ----------
+        series_kwargs : list of dict
+            A list containing dictionaries of the keyword arguments for
+            performing each simulation in the series. The number of elements
+            in the list is the number of simulations that will be run.
+        max_workers : int, default: None
+            The maximum number of processes to be used for performing
+            the given series of simulations. If None, then as many worker
+            processes will be created as the machine has processors.
+
+        Examples
+        --------
+        - Run a series of simulations by varying the initial population size of A.
+        &gt;&gt;&gt;  from abstochkin import AbStochKin
+        &gt;&gt;&gt;  sim = AbStochKin()
+        &gt;&gt;&gt;  sim.add_process_from_str(&#34;A -&gt; B&#34;, 0.3, catalyst=&#39;E&#39;, Km=10)
+        &gt;&gt;&gt;  series_kwargs = [{&#34;p0&#34;: {&#39;A&#39;: i, &#39;B&#39;: 0, &#39;E&#39;: 10}, &#34;t_max&#34;: 10} for i in range(40, 51)]
+        &gt;&gt;&gt; sim.simulate_series_in_parallel(series_kwargs)
+        &#34;&#34;&#34;
+        extra_opts = {&#34;show_plots&#34;: False, &#34;_return_simulation&#34;: True}
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self.simulate, **(kwargs | extra_opts)) for kwargs in
+                       series_kwargs]
+            for future in futures:
+                self.sims.append(future.result())</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="abstochkin.base.AbStochKin"><code class="flex name class">
+<span>class <span class="ident">AbStochKin</span></span>
+<span>(</span><span>time_unit='sec')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Base class for Agent-based Kinetics (AbStochKin) simulator.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>time_unit</code></strong> :&ensp;<code>str</code>, default <code>: sec</code>, optional</dt>
+<dd>A string of the time unit to be used for describing the kinetics
+of the given processes.</dd>
+<dt><strong><code>processes</code></strong> :&ensp;<code>list</code></dt>
+<dd>A list of the processes that the AbStochKin object has.</dd>
+<dt><strong><code>het_processes</code></strong> :&ensp;<code>list</code></dt>
+<dd>A list of the processes where population heterogeneity in one
+of the parameters is to be modeled. This list is a subset of
+the <code>processes</code> attribute.</dd>
+<dt><strong><code>sims</code></strong> :&ensp;<code>list</code></dt>
+<dd>A list of all simulations performed for the given set of processes.
+Each member of the list is an object of the <code>Simulation</code> class and
+contains all data for that simulation.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AbStochKin:
+    &#34;&#34;&#34; Base class for Agent-based Kinetics (AbStochKin) simulator.
+
+    Attributes
+    ----------
+    time_unit : str, default : sec, optional
+        A string of the time unit to be used for describing the kinetics
+        of the given processes.
+    processes : list
+        A list of the processes that the AbStochKin object has.
+    het_processes : list
+        A list of the processes where population heterogeneity in one
+        of the parameters is to be modeled. This list is a subset of
+        the `processes` attribute.
+    sims : list
+        A list of all simulations performed for the given set of processes.
+        Each member of the list is an object of the `Simulation` class and
+        contains all data for that simulation.
+    &#34;&#34;&#34;
+
+    def __init__(self, time_unit=&#39;sec&#39;):
+        self.time_unit = time_unit
+        self.processes = list()
+        self.het_processes = list()
+        self.sims = list()
+
+    def add_processes_from_file(self, filename: str):
+        &#34;&#34;&#34; Add a batch of processes from a text file. &#34;&#34;&#34;
+        with open(filename) as f:
+            lines = f.readlines()
+
+        for line in lines:
+            self.extract_process_from_str(line)
+
+    def extract_process_from_str(self, process_str):
+        &#34;&#34;&#34;
+        Extract a process and all of its specified parameters from a string.
+
+        This functions parses a string specifying all values and parameters
+        needed to define a process. It then creates a Process object
+        based on the extracted data.
+        &#34;&#34;&#34;
+        process_str = process_str.replace(&#39; &#39;, &#39;&#39;).replace(&#39;&#34;&#39;, &#39;\&#39;&#39;)
+
+        proc_str = process_str.split(&#39;,&#39;)[0]
+
+        # Extract string parameters first
+        patt_str_params = r&#34;(\w+)=(&#39;[\w\s,]+&#39;)&#34;
+        str_params = re.findall(patt_str_params, process_str)
+
+        process_str_remain = re.sub(r&#34;\w+=&#39;[\w\s,]+&#39;&#34;, &#39;&#39;, process_str)
+
+        patt_num_params = r&#34;(\w+)=([\[\(,.\s\d\)\]]+)&#34;
+        num_params = re.findall(patt_num_params, process_str_remain)
+
+        all_params = list()
+        for name, val_str in num_params + str_params:
+            while val_str.endswith(&#39;,&#39;):
+                val_str = val_str[:-1]
+            all_params.append((name, literal_eval(val_str)))
+
+        self.add_process_from_str(proc_str, **dict(all_params))
+
+    def add_process_from_str(self,
+                             process_str: str,
+                             /,
+                             k: float | int | list[float | int, ...] |
+                                tuple[float | int, float | int],
+                             **kwargs):
+        &#34;&#34;&#34;
+        Add a process by specifying a string: &#39;reactants -&gt; products&#39;.
+        Additional arguments determine if a specialized process
+        (such as a reversible, regulated, or Michaelis-Menten process)
+        is to be defined.
+        &#34;&#34;&#34;
+        if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.append(ReversibleProcess.from_string(process_str, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.append(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.append(RegulatedMichaelisMentenProcess.from_string(process_str,
+                                                                                  k, **kwargs))
+            else:  # Regulated process
+                self.processes.append(RegulatedProcess.from_string(process_str, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.append(Process.from_string(process_str, k, **kwargs))
+
+    def add_process(self,
+                    reactants: dict,
+                    products: dict,
+                    /,
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                    **kwargs):
+        &#34;&#34;&#34;
+        Add a process by using a dictionary for the reactants and products.
+        Additional arguments determine if a specialized process
+        (such as a reversible, regulated, or Michaelis-Menten process)
+        is to be defined.
+        &#34;&#34;&#34;
+        if &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.append(ReversibleProcess(reactants, products, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.append(MichaelisMentenProcess(reactants, products, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.append(
+                    RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+            else:  # Regulated process
+                self.processes.append(RegulatedProcess(reactants, products, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.append(Process(reactants, products, k, **kwargs))
+
+    def del_process_from_str(self,
+                             process_str: str,
+                             /,
+                             k: float | int | list[float | int, ...] | tuple[float | int],
+                             **kwargs):
+        &#34;&#34;&#34; Delete a process by specifying a string: &#39;reactants -&gt; products&#39;. &#34;&#34;&#34;
+        try:
+            if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+                self.processes.remove(ReversibleProcess.from_string(process_str, k, **kwargs))
+            elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+                self.processes.remove(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+            elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+                if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                    self.processes.remove(
+                        RegulatedMichaelisMentenProcess.from_string(process_str, k, **kwargs))
+                else:  # Regulated process
+                    self.processes.remove(RegulatedProcess.from_string(process_str, k, **kwargs))
+            else:  # simple unidirectional process
+                self.processes.remove(Process.from_string(process_str, k, **kwargs))
+        except ValueError:
+            print(&#34;Process to be removed was not found.&#34;)
+        else:
+            print(f&#34;Removed: {process_str}, k = {k}, kwargs = {kwargs}&#34;)
+
+    def del_process(self,
+                    reactants: dict,
+                    products: dict,
+                    /,
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                    **kwargs):
+        &#34;&#34;&#34; Delete a process by using a dictionary for the reactants and products. &#34;&#34;&#34;
+        try:
+            if &#39;k_rev&#39; in kwargs:  # reversible process
+                self.processes.remove(ReversibleProcess(reactants, products, k, **kwargs))
+            elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+                self.processes.remove(MichaelisMentenProcess(reactants, products, k, **kwargs))
+            elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+                if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                    self.processes.remove(
+                        RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+                else:  # Regulated process
+                    self.processes.remove(RegulatedProcess(reactants, products, k, **kwargs))
+            else:  # simple unidirectional process
+                self.processes.remove(Process(reactants, products, k, **kwargs))
+        except ValueError:
+            print(&#34;Process to be removed was not found.&#34;)
+        else:
+            lhs, rhs = Process(reactants, products, k)._reconstruct_string()
+            print(f&#34;Removed: &#34; + &#34; -&gt; &#34;.join([lhs, rhs]) + f&#34;, k = {k}, kwargs = {kwargs}&#34;)
+
+    def simulate(self,
+                 /,
+                 p0: dict,
+                 t_max: float | int,
+                 dt: float = 0.01,
+                 n: int = 100,
+                 *,
+                 random_seed: int = 19,
+                 solve_odes: bool = True,
+                 ode_method: str = &#39;RK45&#39;,
+                 run: bool = True,
+                 show_plots: bool = True,
+                 multithreading: bool = True,
+                 max_agents_by_species: dict = None,
+                 max_agents_multiplier: int = 2,
+                 _return_simulation: bool = False):
+        &#34;&#34;&#34;
+        Start an AbStochKin simulation by creating an instance of the class
+        `Simulation`. The resulting object is appended to the list
+        in the class attribute `AbStochKin.sims`.
+
+        Parameters
+        ----------
+        p0 : dict[str: int]
+            Dictionary specifying the initial population sizes of all
+            species in the given processes.
+        t_max : float or int
+            Numerical value of the end of simulated time in the units
+            specified in the class attribute `AbStochKin.time_unit`.
+        dt : float, default: 0.1, optional
+            The duration of the time interval that the simulation&#39;s
+            algorithm considers. The current implementation only
+            supports a fixed time step interval whose value is `dt`.
+        n : int, default: 100, optional
+            The number of repetitions of the simulation to be performed.
+        random_seed : int, default: 19, optional
+            A number used to seed the random number generator.
+        solve_odes : bool, default: True, optional
+            Specify whether to numerically solve the system of
+            ODEs defined from the given set of processes.
+        ode_method : str, default: RK45, optional
+            Available ODE methods: RK45, RK23, DOP853, Radau, BDF, LSODA.
+        run : bool, default: True, optional
+            Specify whether to run an AbStochKin simulation.
+        show_plots : bool, default: True, optional
+            Specify whether to graph the results of the AbStochKin simulation.
+        multithreading : bool, default: True, optional
+            Specify whether to parallelize the simulation
+            using multithreading. If `False`, the ensemble
+            of simulations is run sequentially.
+        max_agents_by_species : None or dict, default: dict
+            Specification of the maximum number of agents that each
+            species should have when running the simulation.
+            If `None`, that a default approach will
+            be taken by the class `Simulation` and the number
+            for each species will be automatically determined
+            (see method `Simulation._setup_runtime_data()` for details).
+            The entries in the dictionary should be
+            `species name (string): number (int)`.
+        max_agents_multiplier : float or int, default: 2
+            This parameter is used to calculate the maximum number of
+            agents of each species that the simulation engine allocates
+            memory for. This be determined by multiplying the maximum value
+            of the ODE time trajectory for this species by the
+            multiplier value specified here.
+        _return_simulation : bool
+            Determines if the `self.simulate` method returns a `Simulation`
+            object or appends it to the list `self.sims`.
+            Returning a `Simulation` object is needed when calling the method
+            `simulate_series_in_parallel`.
+        &#34;&#34;&#34;
+
+        if max_agents_by_species is None:
+            max_agents_by_species = dict()
+
+        self.het_processes = get_het_processes(self.processes)
+
+        sim = Simulation(p0,
+                         t_max,
+                         dt,
+                         n,
+                         self.processes,
+                         random_state=random_seed,
+                         do_solve_ODEs=solve_odes,
+                         ODE_method=ode_method,
+                         do_run=run,
+                         show_graphs=show_plots,
+                         use_multithreading=multithreading,
+                         max_agents=max_agents_by_species,
+                         max_agents_multiplier=max_agents_multiplier,
+                         time_unit=self.time_unit)
+
+        if _return_simulation:
+            assert run, &#34;Must run individual simulations if a series of &#34; \
+                        &#34;simulations is to be run with multiprocessing.&#34;
+
+            # Set un-pickleable objects to None for data serialization to work
+            sim.algo_sequence = None
+            sim.progress_bar = None
+
+            return sim
+        else:
+            self.sims.append(sim)
+
+    def simulate_series_in_parallel(self,
+                                    series_kwargs: list[dict, ...],
+                                    *,
+                                    max_workers: int = None):
+        &#34;&#34;&#34;
+        Perform a series of simulations in parallel by initializing
+        separate processes. Each process runs a simulation and appends
+        a `Simulation` object in the list `self.sims`.
+
+        Parameters
+        ----------
+        series_kwargs : list of dict
+            A list containing dictionaries of the keyword arguments for
+            performing each simulation in the series. The number of elements
+            in the list is the number of simulations that will be run.
+        max_workers : int, default: None
+            The maximum number of processes to be used for performing
+            the given series of simulations. If None, then as many worker
+            processes will be created as the machine has processors.
+
+        Examples
+        --------
+        - Run a series of simulations by varying the initial population size of A.
+        &gt;&gt;&gt;  from abstochkin import AbStochKin
+        &gt;&gt;&gt;  sim = AbStochKin()
+        &gt;&gt;&gt;  sim.add_process_from_str(&#34;A -&gt; B&#34;, 0.3, catalyst=&#39;E&#39;, Km=10)
+        &gt;&gt;&gt;  series_kwargs = [{&#34;p0&#34;: {&#39;A&#39;: i, &#39;B&#39;: 0, &#39;E&#39;: 10}, &#34;t_max&#34;: 10} for i in range(40, 51)]
+        &gt;&gt;&gt; sim.simulate_series_in_parallel(series_kwargs)
+        &#34;&#34;&#34;
+        extra_opts = {&#34;show_plots&#34;: False, &#34;_return_simulation&#34;: True}
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(self.simulate, **(kwargs | extra_opts)) for kwargs in
+                       series_kwargs]
+            for future in futures:
+                self.sims.append(future.result())</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="abstochkin.base.AbStochKin.add_process"><code class="name flex">
+<span>def <span class="ident">add_process</span></span>(<span>self, reactants: dict, products: dict, /, k: float | int | list[float | int, ...] | tuple[float | int, float | int], **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a process by using a dictionary for the reactants and products.
+Additional arguments determine if a specialized process
+(such as a reversible, regulated, or Michaelis-Menten process)
+is to be defined.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_process(self,
+                reactants: dict,
+                products: dict,
+                /,
+                k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                **kwargs):
+    &#34;&#34;&#34;
+    Add a process by using a dictionary for the reactants and products.
+    Additional arguments determine if a specialized process
+    (such as a reversible, regulated, or Michaelis-Menten process)
+    is to be defined.
+    &#34;&#34;&#34;
+    if &#39;k_rev&#39; in kwargs:  # reversible process
+        self.processes.append(ReversibleProcess(reactants, products, k, **kwargs))
+    elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+        self.processes.append(MichaelisMentenProcess(reactants, products, k, **kwargs))
+    elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+        if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+            self.processes.append(
+                RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+        else:  # Regulated process
+            self.processes.append(RegulatedProcess(reactants, products, k, **kwargs))
+    else:  # simple unidirectional process
+        self.processes.append(Process(reactants, products, k, **kwargs))</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.add_process_from_str"><code class="name flex">
+<span>def <span class="ident">add_process_from_str</span></span>(<span>self, process_str: str, /, k: float | int | list[float | int, ...] | tuple[float | int, float | int], **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a process by specifying a string: 'reactants -&gt; products'.
+Additional arguments determine if a specialized process
+(such as a reversible, regulated, or Michaelis-Menten process)
+is to be defined.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_process_from_str(self,
+                         process_str: str,
+                         /,
+                         k: float | int | list[float | int, ...] |
+                            tuple[float | int, float | int],
+                         **kwargs):
+    &#34;&#34;&#34;
+    Add a process by specifying a string: &#39;reactants -&gt; products&#39;.
+    Additional arguments determine if a specialized process
+    (such as a reversible, regulated, or Michaelis-Menten process)
+    is to be defined.
+    &#34;&#34;&#34;
+    if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+        self.processes.append(ReversibleProcess.from_string(process_str, k, **kwargs))
+    elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+        self.processes.append(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+    elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+        if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+            self.processes.append(RegulatedMichaelisMentenProcess.from_string(process_str,
+                                                                              k, **kwargs))
+        else:  # Regulated process
+            self.processes.append(RegulatedProcess.from_string(process_str, k, **kwargs))
+    else:  # simple unidirectional process
+        self.processes.append(Process.from_string(process_str, k, **kwargs))</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.add_processes_from_file"><code class="name flex">
+<span>def <span class="ident">add_processes_from_file</span></span>(<span>self, filename: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a batch of processes from a text file.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_processes_from_file(self, filename: str):
+    &#34;&#34;&#34; Add a batch of processes from a text file. &#34;&#34;&#34;
+    with open(filename) as f:
+        lines = f.readlines()
+
+    for line in lines:
+        self.extract_process_from_str(line)</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.del_process"><code class="name flex">
+<span>def <span class="ident">del_process</span></span>(<span>self, reactants: dict, products: dict, /, k: float | int | list[float | int, ...] | tuple[float | int, float | int], **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a process by using a dictionary for the reactants and products.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def del_process(self,
+                reactants: dict,
+                products: dict,
+                /,
+                k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                **kwargs):
+    &#34;&#34;&#34; Delete a process by using a dictionary for the reactants and products. &#34;&#34;&#34;
+    try:
+        if &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.remove(ReversibleProcess(reactants, products, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.remove(MichaelisMentenProcess(reactants, products, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.remove(
+                    RegulatedMichaelisMentenProcess(reactants, products, k, **kwargs))
+            else:  # Regulated process
+                self.processes.remove(RegulatedProcess(reactants, products, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.remove(Process(reactants, products, k, **kwargs))
+    except ValueError:
+        print(&#34;Process to be removed was not found.&#34;)
+    else:
+        lhs, rhs = Process(reactants, products, k)._reconstruct_string()
+        print(f&#34;Removed: &#34; + &#34; -&gt; &#34;.join([lhs, rhs]) + f&#34;, k = {k}, kwargs = {kwargs}&#34;)</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.del_process_from_str"><code class="name flex">
+<span>def <span class="ident">del_process_from_str</span></span>(<span>self, process_str: str, /, k: float | int | list[float | int, ...] | tuple[float | int], **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete a process by specifying a string: 'reactants -&gt; products'.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def del_process_from_str(self,
+                         process_str: str,
+                         /,
+                         k: float | int | list[float | int, ...] | tuple[float | int],
+                         **kwargs):
+    &#34;&#34;&#34; Delete a process by specifying a string: &#39;reactants -&gt; products&#39;. &#34;&#34;&#34;
+    try:
+        if &#39;&lt;-&gt;&#39; in process_str or &#39;k_rev&#39; in kwargs:  # reversible process
+            self.processes.remove(ReversibleProcess.from_string(process_str, k, **kwargs))
+        elif &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs and &#39;regulating_species&#39; not in kwargs:
+            self.processes.remove(MichaelisMentenProcess.from_string(process_str, k, **kwargs))
+        elif &#39;regulating_species&#39; in kwargs and &#39;alpha&#39; in kwargs and &#39;K50&#39; in kwargs and &#39;nH&#39; in kwargs:
+            if &#39;catalyst&#39; in kwargs and &#39;Km&#39; in kwargs:  # Regulated MM process
+                self.processes.remove(
+                    RegulatedMichaelisMentenProcess.from_string(process_str, k, **kwargs))
+            else:  # Regulated process
+                self.processes.remove(RegulatedProcess.from_string(process_str, k, **kwargs))
+        else:  # simple unidirectional process
+            self.processes.remove(Process.from_string(process_str, k, **kwargs))
+    except ValueError:
+        print(&#34;Process to be removed was not found.&#34;)
+    else:
+        print(f&#34;Removed: {process_str}, k = {k}, kwargs = {kwargs}&#34;)</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.extract_process_from_str"><code class="name flex">
+<span>def <span class="ident">extract_process_from_str</span></span>(<span>self, process_str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Extract a process and all of its specified parameters from a string.</p>
+<p>This functions parses a string specifying all values and parameters
+needed to define a process. It then creates a Process object
+based on the extracted data.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_process_from_str(self, process_str):
+    &#34;&#34;&#34;
+    Extract a process and all of its specified parameters from a string.
+
+    This functions parses a string specifying all values and parameters
+    needed to define a process. It then creates a Process object
+    based on the extracted data.
+    &#34;&#34;&#34;
+    process_str = process_str.replace(&#39; &#39;, &#39;&#39;).replace(&#39;&#34;&#39;, &#39;\&#39;&#39;)
+
+    proc_str = process_str.split(&#39;,&#39;)[0]
+
+    # Extract string parameters first
+    patt_str_params = r&#34;(\w+)=(&#39;[\w\s,]+&#39;)&#34;
+    str_params = re.findall(patt_str_params, process_str)
+
+    process_str_remain = re.sub(r&#34;\w+=&#39;[\w\s,]+&#39;&#34;, &#39;&#39;, process_str)
+
+    patt_num_params = r&#34;(\w+)=([\[\(,.\s\d\)\]]+)&#34;
+    num_params = re.findall(patt_num_params, process_str_remain)
+
+    all_params = list()
+    for name, val_str in num_params + str_params:
+        while val_str.endswith(&#39;,&#39;):
+            val_str = val_str[:-1]
+        all_params.append((name, literal_eval(val_str)))
+
+    self.add_process_from_str(proc_str, **dict(all_params))</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.simulate"><code class="name flex">
+<span>def <span class="ident">simulate</span></span>(<span>self, /, p0: dict, t_max: float | int, dt: float = 0.01, n: int = 100, *, random_seed: int = 19, solve_odes: bool = True, ode_method: str = 'RK45', run: bool = True, show_plots: bool = True, multithreading: bool = True, max_agents_by_species: dict = None, max_agents_multiplier: int = 2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Start an AbStochKin simulation by creating an instance of the class
+<code>Simulation</code>. The resulting object is appended to the list
+in the class attribute <code>AbStochKin.sims</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>p0</code></strong> :&ensp;<code>dict[str: int]</code></dt>
+<dd>Dictionary specifying the initial population sizes of all
+species in the given processes.</dd>
+<dt><strong><code>t_max</code></strong> :&ensp;<code>float</code> or <code>int</code></dt>
+<dd>Numerical value of the end of simulated time in the units
+specified in the class attribute <code>AbStochKin.time_unit</code>.</dd>
+<dt><strong><code>dt</code></strong> :&ensp;<code>float</code>, default<code>: 0.1</code>, optional</dt>
+<dd>The duration of the time interval that the simulation's
+algorithm considers. The current implementation only
+supports a fixed time step interval whose value is <code>dt</code>.</dd>
+<dt><strong><code>n</code></strong> :&ensp;<code>int</code>, default<code>: 100</code>, optional</dt>
+<dd>The number of repetitions of the simulation to be performed.</dd>
+<dt><strong><code>random_seed</code></strong> :&ensp;<code>int</code>, default<code>: 19</code>, optional</dt>
+<dd>A number used to seed the random number generator.</dd>
+<dt><strong><code>solve_odes</code></strong> :&ensp;<code>bool</code>, default<code>: True</code>, optional</dt>
+<dd>Specify whether to numerically solve the system of
+ODEs defined from the given set of processes.</dd>
+<dt><strong><code>ode_method</code></strong> :&ensp;<code>str</code>, default<code>: RK45</code>, optional</dt>
+<dd>Available ODE methods: RK45, RK23, DOP853, Radau, BDF, LSODA.</dd>
+<dt><strong><code>run</code></strong> :&ensp;<code>bool</code>, default<code>: True</code>, optional</dt>
+<dd>Specify whether to run an AbStochKin simulation.</dd>
+<dt><strong><code>show_plots</code></strong> :&ensp;<code>bool</code>, default<code>: True</code>, optional</dt>
+<dd>Specify whether to graph the results of the AbStochKin simulation.</dd>
+<dt><strong><code>multithreading</code></strong> :&ensp;<code>bool</code>, default<code>: True</code>, optional</dt>
+<dd>Specify whether to parallelize the simulation
+using multithreading. If <code>False</code>, the ensemble
+of simulations is run sequentially.</dd>
+<dt><strong><code>max_agents_by_species</code></strong> :&ensp;<code>None</code> or <code>dict</code>, default<code>: dict</code></dt>
+<dd>Specification of the maximum number of agents that each
+species should have when running the simulation.
+If <code>None</code>, that a default approach will
+be taken by the class <code>Simulation</code> and the number
+for each species will be automatically determined
+(see method <code>Simulation._setup_runtime_data()</code> for details).
+The entries in the dictionary should be
+<code>species name (string): number (int)</code>.</dd>
+<dt><strong><code>max_agents_multiplier</code></strong> :&ensp;<code>float</code> or <code>int</code>, default<code>: 2</code></dt>
+<dd>This parameter is used to calculate the maximum number of
+agents of each species that the simulation engine allocates
+memory for. This be determined by multiplying the maximum value
+of the ODE time trajectory for this species by the
+multiplier value specified here.</dd>
+<dt><strong><code>_return_simulation</code></strong> :&ensp;<code>bool</code></dt>
+<dd>Determines if the <code>self.simulate</code> method returns a <code>Simulation</code>
+object or appends it to the list <code>self.sims</code>.
+Returning a <code>Simulation</code> object is needed when calling the method
+<code>simulate_series_in_parallel</code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def simulate(self,
+             /,
+             p0: dict,
+             t_max: float | int,
+             dt: float = 0.01,
+             n: int = 100,
+             *,
+             random_seed: int = 19,
+             solve_odes: bool = True,
+             ode_method: str = &#39;RK45&#39;,
+             run: bool = True,
+             show_plots: bool = True,
+             multithreading: bool = True,
+             max_agents_by_species: dict = None,
+             max_agents_multiplier: int = 2,
+             _return_simulation: bool = False):
+    &#34;&#34;&#34;
+    Start an AbStochKin simulation by creating an instance of the class
+    `Simulation`. The resulting object is appended to the list
+    in the class attribute `AbStochKin.sims`.
+
+    Parameters
+    ----------
+    p0 : dict[str: int]
+        Dictionary specifying the initial population sizes of all
+        species in the given processes.
+    t_max : float or int
+        Numerical value of the end of simulated time in the units
+        specified in the class attribute `AbStochKin.time_unit`.
+    dt : float, default: 0.1, optional
+        The duration of the time interval that the simulation&#39;s
+        algorithm considers. The current implementation only
+        supports a fixed time step interval whose value is `dt`.
+    n : int, default: 100, optional
+        The number of repetitions of the simulation to be performed.
+    random_seed : int, default: 19, optional
+        A number used to seed the random number generator.
+    solve_odes : bool, default: True, optional
+        Specify whether to numerically solve the system of
+        ODEs defined from the given set of processes.
+    ode_method : str, default: RK45, optional
+        Available ODE methods: RK45, RK23, DOP853, Radau, BDF, LSODA.
+    run : bool, default: True, optional
+        Specify whether to run an AbStochKin simulation.
+    show_plots : bool, default: True, optional
+        Specify whether to graph the results of the AbStochKin simulation.
+    multithreading : bool, default: True, optional
+        Specify whether to parallelize the simulation
+        using multithreading. If `False`, the ensemble
+        of simulations is run sequentially.
+    max_agents_by_species : None or dict, default: dict
+        Specification of the maximum number of agents that each
+        species should have when running the simulation.
+        If `None`, that a default approach will
+        be taken by the class `Simulation` and the number
+        for each species will be automatically determined
+        (see method `Simulation._setup_runtime_data()` for details).
+        The entries in the dictionary should be
+        `species name (string): number (int)`.
+    max_agents_multiplier : float or int, default: 2
+        This parameter is used to calculate the maximum number of
+        agents of each species that the simulation engine allocates
+        memory for. This be determined by multiplying the maximum value
+        of the ODE time trajectory for this species by the
+        multiplier value specified here.
+    _return_simulation : bool
+        Determines if the `self.simulate` method returns a `Simulation`
+        object or appends it to the list `self.sims`.
+        Returning a `Simulation` object is needed when calling the method
+        `simulate_series_in_parallel`.
+    &#34;&#34;&#34;
+
+    if max_agents_by_species is None:
+        max_agents_by_species = dict()
+
+    self.het_processes = get_het_processes(self.processes)
+
+    sim = Simulation(p0,
+                     t_max,
+                     dt,
+                     n,
+                     self.processes,
+                     random_state=random_seed,
+                     do_solve_ODEs=solve_odes,
+                     ODE_method=ode_method,
+                     do_run=run,
+                     show_graphs=show_plots,
+                     use_multithreading=multithreading,
+                     max_agents=max_agents_by_species,
+                     max_agents_multiplier=max_agents_multiplier,
+                     time_unit=self.time_unit)
+
+    if _return_simulation:
+        assert run, &#34;Must run individual simulations if a series of &#34; \
+                    &#34;simulations is to be run with multiprocessing.&#34;
+
+        # Set un-pickleable objects to None for data serialization to work
+        sim.algo_sequence = None
+        sim.progress_bar = None
+
+        return sim
+    else:
+        self.sims.append(sim)</code></pre>
+</details>
+</dd>
+<dt id="abstochkin.base.AbStochKin.simulate_series_in_parallel"><code class="name flex">
+<span>def <span class="ident">simulate_series_in_parallel</span></span>(<span>self, series_kwargs: list[dict, ...], *, max_workers: int = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Perform a series of simulations in parallel by initializing
+separate processes. Each process runs a simulation and appends
+a <code>Simulation</code> object in the list <code>self.sims</code>.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>series_kwargs</code></strong> :&ensp;<code>list</code> of <code>dict</code></dt>
+<dd>A list containing dictionaries of the keyword arguments for
+performing each simulation in the series. The number of elements
+in the list is the number of simulations that will be run.</dd>
+<dt><strong><code>max_workers</code></strong> :&ensp;<code>int</code>, default<code>: None</code></dt>
+<dd>The maximum number of processes to be used for performing
+the given series of simulations. If None, then as many worker
+processes will be created as the machine has processors.</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<ul>
+<li>Run a series of simulations by varying the initial population size of A.</li>
+</ul>
+<pre><code class="language-python-repl">&gt;&gt;&gt;  from abstochkin import AbStochKin
+&gt;&gt;&gt;  sim = AbStochKin()
+&gt;&gt;&gt;  sim.add_process_from_str(&quot;A -&gt; B&quot;, 0.3, catalyst='E', Km=10)
+&gt;&gt;&gt;  series_kwargs = [{&quot;p0&quot;: {'A': i, 'B': 0, 'E': 10}, &quot;t_max&quot;: 10} for i in range(40, 51)]
+&gt;&gt;&gt; sim.simulate_series_in_parallel(series_kwargs)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def simulate_series_in_parallel(self,
+                                series_kwargs: list[dict, ...],
+                                *,
+                                max_workers: int = None):
+    &#34;&#34;&#34;
+    Perform a series of simulations in parallel by initializing
+    separate processes. Each process runs a simulation and appends
+    a `Simulation` object in the list `self.sims`.
+
+    Parameters
+    ----------
+    series_kwargs : list of dict
+        A list containing dictionaries of the keyword arguments for
+        performing each simulation in the series. The number of elements
+        in the list is the number of simulations that will be run.
+    max_workers : int, default: None
+        The maximum number of processes to be used for performing
+        the given series of simulations. If None, then as many worker
+        processes will be created as the machine has processors.
+
+    Examples
+    --------
+    - Run a series of simulations by varying the initial population size of A.
+    &gt;&gt;&gt;  from abstochkin import AbStochKin
+    &gt;&gt;&gt;  sim = AbStochKin()
+    &gt;&gt;&gt;  sim.add_process_from_str(&#34;A -&gt; B&#34;, 0.3, catalyst=&#39;E&#39;, Km=10)
+    &gt;&gt;&gt;  series_kwargs = [{&#34;p0&#34;: {&#39;A&#39;: i, &#39;B&#39;: 0, &#39;E&#39;: 10}, &#34;t_max&#34;: 10} for i in range(40, 51)]
+    &gt;&gt;&gt; sim.simulate_series_in_parallel(series_kwargs)
+    &#34;&#34;&#34;
+    extra_opts = {&#34;show_plots&#34;: False, &#34;_return_simulation&#34;: True}
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(self.simulate, **(kwargs | extra_opts)) for kwargs in
+                   series_kwargs]
+        for future in futures:
+            self.sims.append(future.result())</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+Agent-based Stochastic Kinetics
+<form>
+<input id="lunr-search" name="q" placeholder="🔎 Search ..." aria-label="Search"
+disabled minlength="2">
+</form>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.css" integrity="sha512-j1u8eUJ4f23xPPxwOrLUPQaCD2dwzNqqmDDcWS4deWsMv2ohLqmXXuP3hU7g8TyzbMSakP/mMqoNBYWj8AEIFg==" crossorigin>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tingle/0.15.3/tingle.min.js" integrity="sha512-plGUER9JkeEWPPqQBE4sdLqBoQug5Ap+BCGMc7bJ8BXkm+VVj6QzkpBz5Yv2yPkkq+cqg9IpkBaGCas6uDbW8g==" crossorigin></script>
+<style>
+.modal-dialog iframe {
+width: 100vw;
+height: calc(100vh - 80px);
+}
+@media screen and (min-width: 700px) {
+.modal-dialog iframe {
+width: 70vw;
+height: 80vh;
+}
+}
+.modal-dialog .tingle-modal-box {width: auto;}
+.modal-dialog .tingle-modal-box__content {padding: 0;}
+</style>
+<script>
+const input = document.getElementById('lunr-search');
+input.disabled = false;
+input.form.addEventListener('submit', (ev) => {
+ev.preventDefault();
+const url = new URL(window.location);
+url.searchParams.set('q', input.value);
+history.replaceState({}, null, url.toString());
+search(input.value);
+});
+const query = new URL(window.location).searchParams.get('q');
+if (query)
+search(query);
+function search(query) {
+const url = '../doc-search.html#' + encodeURIComponent(query);
+new tingle.modal({
+cssClass: ['modal-dialog'],
+onClose: () => {
+const url = new URL(window.location);
+url.searchParams.delete('q');
+history.replaceState({}, null, url.toString());
+setTimeout(() => input.focus(), 100);
+}
+}).setContent('<iframe src="' + url + '"></iframe>').open();
+}
+</script>
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#example">Example</a></li>
+</ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="abstochkin" href="index.html">abstochkin</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="abstochkin.base.AbStochKin" href="#abstochkin.base.AbStochKin">AbStochKin</a></code></h4>
+<ul class="">
+<li><code><a title="abstochkin.base.AbStochKin.add_process" href="#abstochkin.base.AbStochKin.add_process">add_process</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.add_process_from_str" href="#abstochkin.base.AbStochKin.add_process_from_str">add_process_from_str</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.add_processes_from_file" href="#abstochkin.base.AbStochKin.add_processes_from_file">add_processes_from_file</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.del_process" href="#abstochkin.base.AbStochKin.del_process">del_process</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.del_process_from_str" href="#abstochkin.base.AbStochKin.del_process_from_str">del_process_from_str</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.extract_process_from_str" href="#abstochkin.base.AbStochKin.extract_process_from_str">extract_process_from_str</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.simulate" href="#abstochkin.base.AbStochKin.simulate">simulate</a></code></li>
+<li><code><a title="abstochkin.base.AbStochKin.simulate_series_in_parallel" href="#abstochkin.base.AbStochKin.simulate_series_in_parallel">simulate_series_in_parallel</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+© Copyright 2024, Alex Plakantonakis.
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

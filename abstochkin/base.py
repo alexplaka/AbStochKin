@@ -1,4 +1,4 @@
-""" Base class, AbKin, for initializing and storing all data for
+""" Base class, AbStochKin, for initializing and storing all data for
 performing stochastic simulations using the Agent-based Kinetics
 method. A simulation project can be initialized and run as follows:
 
@@ -45,29 +45,6 @@ class AbStochKin:
         A list of all simulations performed for the given set of processes.
         Each member of the list is an object of the `Simulation` class and
         contains all data for that simulation.
-
-    Methods
-    -------
-    add_processes_from_file
-        Add several processes by reading them from a text file.
-    add_process_from_str
-        Add a process by specifying a string. The string is parsed
-        and a Process object is created.
-    add_process
-        Add a process by specifying the reactants and products using
-        a dictionary (key: value -> species_name: stoichiometric coefficient)
-        and the `k` value(s).
-    del_process_from_str
-        Delete a process by specifying a string. The string is parsed
-        and if there is a Process object match, it is removed from the
-        list of `processes`.
-    del_process
-        Delete a process by specifying the reactants and products using
-        a dictionary (key: value -> species_name: stoichiometric coefficient)
-        and the `k` value(s). If there is a Process object match, it is
-        removed from the list of `processes`.
-    simulate
-        Initialize and run a simulation by calling this method.
     """
 
     def __init__(self, time_unit='sec'):
