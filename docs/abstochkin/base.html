@@ -64,9 +64,25 @@ Example
 &gt;&gt;&gt; # documented in the class `Simulation`.
 
 &#34;&#34;&#34;
+#  Copyright (c) 2023, Alex Plakantonakis.
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
 import re
 from ast import literal_eval
 from concurrent.futures import ProcessPoolExecutor
+from typing import Any
 
 from .het_calcs import get_het_processes
 from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
@@ -342,7 +358,7 @@ class AbStochKin:
             self.sims.append(sim)
 
     def simulate_series_in_parallel(self,
-                                    series_kwargs: list[dict, ...],
+                                    series_kwargs: list[dict[str, Any], ...],
                                     *,
                                     max_workers: int = None):
         &#34;&#34;&#34;
@@ -681,7 +697,7 @@ contains all data for that simulation.</dd>
             self.sims.append(sim)
 
     def simulate_series_in_parallel(self,
-                                    series_kwargs: list[dict, ...],
+                                    series_kwargs: list[dict[str, Any], ...],
                                     *,
                                     max_workers: int = None):
         &#34;&#34;&#34;
@@ -1091,7 +1107,7 @@ Returning a <code>Simulation</code> object is needed when calling the method
 </details>
 </dd>
 <dt id="abstochkin.base.AbStochKin.simulate_series_in_parallel"><code class="name flex">
-<span>def <span class="ident">simulate_series_in_parallel</span></span>(<span>self, series_kwargs: list[dict, ...], *, max_workers: int = None)</span>
+<span>def <span class="ident">simulate_series_in_parallel</span></span>(<span>self, series_kwargs: list[dict[str, typing.Any], ...], *, max_workers: int = None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Perform a series of simulations in parallel by initializing
@@ -1123,7 +1139,7 @@ processes will be created as the machine has processors.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def simulate_series_in_parallel(self,
-                                series_kwargs: list[dict, ...],
+                                series_kwargs: list[dict[str, Any], ...],
                                 *,
                                 max_workers: int = None):
     &#34;&#34;&#34;
