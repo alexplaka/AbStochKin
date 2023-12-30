@@ -1,5 +1,5 @@
 # AbStochKin: Agent-based Stochastic Kinetics
-### Alternate name: PyStochKin (Particle-based Stochastic Kinetics)
+##### Alternate name: PyStochKin (Particle-based Stochastic Kinetics)
 
 `AbStochKin` is an agent-based (or particle-based) simulator of the time 
 evolution of systems comprised of coupled processes. The population of a species 
@@ -12,8 +12,6 @@ Although the algorithm was originally conceived for simulating biochemical
 systems, it is applicable to other disciplines where there is a need to model 
 how populations change over time.
 
-***********ENTER TOC!!!***********
-
 ## Installation
 The `AbStochKin` package can be installed via `pip` in an environment with 
 Python 3.10+. 
@@ -21,29 +19,29 @@ Python 3.10+.
 $ pip install abstochkin 
 ```
 
-## Requirements
-Significant effort has been made to only use Python's scientific ecosystem 
-libraries (`numpy`, `scipy`, `sympy`, `matplotlib`) and 
+### Requirements
+The package relies only on Python's scientific ecosystem 
+libraries (`numpy`, `scipy`, `matplotlib`, `sympy`) and 
 the standard library for implementing the core components of the algorithm. 
-These requirements can be easily met in any Python (3.10+) environment a 
-user may use.
+These requirements can be easily met in any Python (3.10+) environment.
 
 ## What processes can be modeled?
-- Simple processes (0th, 1st, 2nd order)
-- Processes obeying Michaelis-Menten kinetics (1st order)
-- Processes that are regulated by one or more species 
-- through activation or repression (0th, 1st, 2nd order)
-- Processes that are regulated and obey Michaelis-Menten kinetics (1st order)
+- Simple processes (0th, 1st, 2nd order).
+- Processes obeying Michaelis-Menten kinetics (1st order).
+- Processes that are regulated by one or more species through activation or repression (0th, 1st, 2nd order).
+- Processes that are regulated *and* obey Michaelis-Menten kinetics (1st order).
 
 ## Usage
 Here is a simple example of how to run a simulation: consider the process 
-$A -> B$, the conversion of agents of species $A$ to agents of species $B$. 
+$A \rightarrow B$, the conversion of agents of species $A$ to agents of species $B$. 
 Notice that we represent the process in standard chemical notation, therefore 
 there are 'reactants' and 'products' and each species has a stoichiometric 
 coefficient associated with it (implied to be $1$ if it is not explicitly written). 
 The rate constant for this process is specified to be $k=0.2$ and has units of 
 reciprocal seconds. Here, we assume a homogeneous population; that is, all 
-agents of species $A$ have the same propensity to 'transition' to species $B$.
+agents of species $A$ have the same propensity to 'transition' to species $B$. 
+Thus, the value $k=0.2$ applies to all $A$ agents when determining the transition 
+probability within a given time step.
 
 We then run an ensemble of simulations by specifying the initial population 
 sizes ($A$: $100$ agents, $B$: $0$ agents) and the simulated time of $10$ seconds. 
@@ -77,14 +75,16 @@ call a method of the base class.
 from abstochkin import AbStochKin
 sim = AbStochKin()
 # Define a process that obeys Michaelis-Menten kinetics:
-sim.add_process_from_str("A -> B", 0.3, catalyst='E', Km=10)
+sim.add_process_from_str("A -> B", k=0.3, catalyst='E', Km=10)
 # Vary the initial population size of species A:
 series_kwargs = [{"p0": {'A': a, 'B': 0, 'E': 10}, "t_max": 10} for a in range(40, 51)]
 sim.simulate_series_in_parallel(series_kwargs)
 ```
 
 ## Documentation
-Link to PDF in Docs!
+[API](/docs/abstochkin/index.html)
+
+[Agent-based Kinetics](/docs/Agent-basedKinetics_monograph.pdf)
 
 ## Contributing
 We welcome any contributions to the project in the form of bug reports, 
