@@ -85,7 +85,7 @@ sim.simulate_series_in_parallel(series_kwargs)
 ```
 
 ## Documentation
-See the documentation [here](alexplaka.github.io/abstochkin).
+See the documentation [here](alexplaka.github.io/AbStochKin).
 
 A monograph detailing the theoretical underpinnings of the *Agent-based Kinetics* 
 algorithm and a multitude of case studies highlighting its use can be found 
