@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "AbStochKin"
 version = "0.1.0"
-description = "Agent-based (or Particle-based) Stochastic Kinetics."
+description = "Agent-based Stochastic Kinetics: A method for simulating the dynamics of heterogeneous populations."
 readme = "README.md"
 license.file = "LICENSE"
 authors = [
@@ -41,7 +41,4 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/alexplaka/AbStochKin"
-#Documentation = "https://package.readthedocs.io/"
 "Bug Tracker" = "https://github.com/alexplaka/AbStochKin/issues"
-#Discussions = "https://github.com/alexplaka/AbStochKin/discussions"
-#Changelog = "https://package.readthedocs.io/en/latest/changelog.html"

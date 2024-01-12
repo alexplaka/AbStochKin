@@ -1,16 +1,17 @@
 # AbStochKin: Agent-based Stochastic Kinetics
 ##### Alternate name: PyStochKin (Particle-based Stochastic Kinetics)
 
-`AbStochKin` is an agent-based (or particle-based) simulator of the time 
+`AbStochKin` is an agent-based (or particle-based) Monte-Carlo simulator of the time 
 evolution of systems comprised of coupled processes. The population of a species 
-that participates in a given process (or processes) is considered as 
+that participates in a set of processes is considered as 
 composed of distinct individuals, termed *agents*, or *particles*. 
 This allows for the specification of the kinetic parameters describing 
-the propensity of each agent to participate in a given process. 
+the propensity of *each agent* to participate in a given process. 
 
 Although the algorithm was originally conceived for simulating biochemical 
 systems, it is applicable to other disciplines where there is a need to model 
-how populations change over time.
+how populations change over time by considering the effects of heterogeneity, 
+or diversity, in the composition of species populations on the dynamics of a system.
 
 ## Installation
 The `AbStochKin` package can be installed via `pip` in an environment with 
@@ -18,6 +19,8 @@ Python 3.10+.
 ```
 $ pip install abstochkin 
 ```
+For an overview of installing packages in Python, see the 
+[Python packaging user guide](https://packaging.python.org/en/latest/tutorials/installing-packages/).
 
 ### Requirements
 The package relies only on Python's scientific ecosystem 
@@ -82,9 +85,12 @@ sim.simulate_series_in_parallel(series_kwargs)
 ```
 
 ## Documentation
-[API](/docs/abstochkin/index.html)
+The documentation of all public classes, methods, and functions in the project 
+can be found [here](alexplaka.github.io/abstochkin/docs/abstochkin/index.html).
 
-[Agent-based Kinetics](/docs/Agent-basedKinetics_monograph.pdf)
+A monograph detailing the theoretical underpinnings of the *Agent-based Kinetics* 
+algorithm and a multitude of case studies highlighting its use can be found 
+[here](/docs/Agent-basedKinetics_monograph.pdf).
 
 ## Contributing
 We welcome any contributions to the project in the form of bug reports, 
@@ -93,8 +99,7 @@ and maintainer at alex dot plaka at alumni dot princeton.edu to introduce
 yourself and discuss possible ways to contribute.
 
 ### Financial contribution or support
-The author has exclusively funded the development of this project since its 
-inception. If you would like to financially contribute to or further support 
+If you would like to financially contribute to or further support 
 the development of this project, please contact the author.
 
 
