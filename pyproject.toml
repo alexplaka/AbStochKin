@@ -41,4 +41,5 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/alexplaka/AbStochKin"
+Documentation = "https://alexplaka.github.io/AbStochKin"
 "Bug Tracker" = "https://github.com/alexplaka/AbStochKin/issues"
