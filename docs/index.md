@@ -1,5 +1,3 @@
-The project's homepage on Github is [https://github.com/alexplaka/AbStochKin](https://github.com/alexplaka/AbStochKin).
-
 The documentation of all public classes, methods, and functions in the project 
 can be found [here](abstochkin/index.html). 
 
