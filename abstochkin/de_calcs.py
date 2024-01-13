@@ -83,7 +83,7 @@ class DEcalcs:
         self.fixed_pts = dict()  # dictionary of fixed points
 
         self.setup_ODEs()
-        self.get_fixed_pts()
+        # self.get_fixed_pts()
 
     def setup_ODEs(self, agent_based=True):
         """
@@ -230,8 +230,8 @@ class DEcalcs:
                                   t_eval=None,  # Specify points where the solution is desired
                                   dense_output=True)  # Compute a continuous solution
 
-    def get_fixed_pts(self):
-        """
-        Not currently implemented.
-        """
-        pass
+    # def get_fixed_pts(self):
+    #     """
+    #     Not currently implemented.
+    #     """
+    #     pass

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "abstochkin"
-version = "0.1.2"
+version = "0.1.3"
 description = "Agent-based Stochastic Kinetics: A method for simulating the dynamics of heterogeneous populations."
 readme = "README.md"
 license.file = "LICENSE"
