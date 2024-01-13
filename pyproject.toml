@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "abstochkin 0.1.1"
+name = "abstochkin"
 version = "0.1.1"
 description = "Agent-based Stochastic Kinetics: A method for simulating the dynamics of heterogeneous populations."
 readme = "README.md"

@@ -2,19 +2,19 @@
 ##### Alternate name: PyStochKin (Particle-based Stochastic Kinetics)
 
 `AbStochKin` is an agent-based (or particle-based) Monte-Carlo simulator of the time 
-evolution of systems comprised of coupled processes. The population of a species 
-that participates in a set of processes is considered as 
-composed of distinct individuals, termed *agents*, or *particles*. 
+evolution of systems composed of species that participate in coupled processes. 
+The population of a species is considered as composed of distinct individuals, 
+termed *agents*, or *particles*. 
 This allows for the specification of the kinetic parameters describing 
 the propensity of *each agent* to participate in a given process. 
 
 Although the algorithm was originally conceived for simulating biochemical 
 systems, it is applicable to other disciplines where there is a need to model 
-how populations change over time by considering the effects of heterogeneity, 
+how populations change over time and to study the effects of heterogeneity, 
 or diversity, in the composition of species populations on the dynamics of a system.
 
 ## Installation
-The `AbStochKin` package can be installed via `pip` in an environment with 
+The `abstochkin` package can be installed via `pip` in an environment with 
 Python 3.10+. 
 ```
 $ pip install abstochkin 
