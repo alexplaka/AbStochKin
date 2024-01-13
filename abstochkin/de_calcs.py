@@ -234,4 +234,4 @@ class DEcalcs:
         """
         Not currently implemented.
         """
-        raise NotImplementedError
+        pass
