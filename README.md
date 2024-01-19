@@ -99,6 +99,4 @@ yourself and discuss possible ways to contribute.
 
 ### Financial contribution or support
 If you would like to financially contribute to or further support 
-the development of this project, please contact the author.
-
-
+the development of this project, please go to my [sponsor page](https://github.com/sponsors/alexplaka).
