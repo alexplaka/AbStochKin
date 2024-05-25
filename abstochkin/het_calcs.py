@@ -23,7 +23,7 @@ from .process import MichaelisMentenProcess, RegulatedProcess, ReversibleProcess
     RegulatedMichaelisMentenProcess, Process
 
 
-def get_het_processes(processes: list[Process, ...]) -> list[Process, ...]:
+def get_het_processes(processes: list[Process]) -> list[Process]:
     """
     Filter the heterogeneous processes from a given list of processes.
     A process is heterogeneous if any of its parameters are defined as such.

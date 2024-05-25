@@ -61,7 +61,8 @@ class Graph:
         axs.xaxis.set_minor_locator(ticker.AutoMinorLocator())
         axs.yaxis.set_minor_locator(ticker.AutoMinorLocator())
 
-    def plot_ODEs(self, de_data,
+    def plot_ODEs(self,
+                  de_data,
                   *,
                   num_pts: int = 1000,
                   species: list[str] | tuple[str] = (),
@@ -115,7 +116,9 @@ class Graph:
         axs.legend(loc='upper right')
         self.fig.tight_layout()
 
-    def plot_trajectories(self, time, data,
+    def plot_trajectories(self,
+                          time,
+                          data,
                           *,
                           species: list[str] | tuple[str] = (),
                           ax_loc: tuple = ()):
@@ -136,7 +139,9 @@ class Graph:
         axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
         # axs.legend(loc='best')
 
-    def plot_avg_std(self, time, data,
+    def plot_avg_std(self,
+                     time,
+                     data,
                      *,
                      species: list[str] | tuple[str] = (),
                      ax_loc: tuple = ()):
@@ -162,7 +167,11 @@ class Graph:
         axs.legend(loc='upper right')
         self.fig.tight_layout()
 
-    def plot_eta(self, time, data, *, species: list[str] | tuple[str] = (),
+    def plot_eta(self,
+                 time,
+                 data,
+                 *,
+                 species: list[str] | tuple[str] = (),
                  ax_loc: tuple = ()):
         """ Graph the coefficient of variation. """
 
@@ -181,10 +190,12 @@ class Graph:
         axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
         axs.legend(loc='upper right')
 
-    def plot_het_metrics(self, time,
+    def plot_het_metrics(self,
+                         time,
                          proc_str: tuple[str, str],
                          proc_data: dict,
-                         *, het_attr='k', ax_loc: tuple = ()):
+                         *,
+                         het_attr='k', ax_loc: tuple = ()):
         """
         Graph species- and process-specific metrics of population heterogeneity.
         """

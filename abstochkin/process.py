@@ -73,7 +73,7 @@ class Process:
     def __init__(self,
                  reactants: dict,
                  products: dict,
-                 k: float | int | list[float, ...] | tuple[float, float],
+                 k: float | int | list[float] | tuple[float, float],
                  **kwargs):
 
         self.reactants = reactants
@@ -141,7 +141,7 @@ class Process:
     def from_string(cls,
                     proc_str: str,
                     /,
-                    k: float | int | list[float, ...] | tuple[float, float],
+                    k: float | int | list[float] | tuple[float, float],
                     *,
                     sep: str = '->',
                     **kwargs) -> Self:
@@ -327,8 +327,8 @@ class ReversibleProcess(Process):
     """
 
     def __init__(self, reactants: dict, products: dict,
-                 k: float | int | list[float, ...] | tuple[float, float],
-                 k_rev: float | int | list[float, ...] | tuple[float, float]):
+                 k: float | int | list[float] | tuple[float, float],
+                 k_rev: float | int | list[float] | tuple[float, float]):
         self.k_rev = k_rev  # rate constant for reverse process
         self.is_heterogeneous_rev = False if isinstance(self.k_rev, (int, float)) else True
 
@@ -340,9 +340,9 @@ class ReversibleProcess(Process):
     def from_string(cls,
                     proc_str: str,
                     /,
-                    k: float | int | list[float, ...] | tuple[float, float],
+                    k: float | int | list[float] | tuple[float, float],
                     *,
-                    k_rev: float | int | list[float, ...] | tuple[float, float] = 0,
+                    k_rev: float | int | list[float] | tuple[float, float] = 0,
                     sep: str = '<->') -> Self:
         """ Create a reversible process from a string.
 
@@ -454,9 +454,9 @@ class MichaelisMentenProcess(Process):
     """
 
     def __init__(self, reactants: dict, products: dict,
-                 k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                 k: float | int | list[float | int] | tuple[float | int, float | int],
                  catalyst: str,
-                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int]):
+                 Km: float | int | list[float | int] | tuple[float | int, float | int]):
         self.catalyst = catalyst
         self.Km = Km
         self.is_heterogeneous_Km = False if isinstance(self.Km, (int, float)) else True
@@ -475,10 +475,10 @@ class MichaelisMentenProcess(Process):
     def from_string(cls,
                     proc_str: str,
                     /,
-                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                    k: float | int | list[float | int] | tuple[float | int, float | int],
                     *,
                     catalyst: str = None,
-                    Km: float | int | list[float | int, ...] | tuple[
+                    Km: float | int | list[float | int] | tuple[
                         float | int, float | int] = None,
                     sep: str = '->') -> Self:
         """ Create a Michaelis-Menten process from a string.
@@ -624,12 +624,12 @@ class RegulatedProcess(Process):
     """
 
     def __init__(self, reactants: dict, products: dict,
-                 k: float | int | list[float, ...] | tuple[float, float],
-                 regulating_species: str | list[str, ...],
-                 alpha: float | int | list[float | int, ...],
-                 K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
-                      list[float | int | list[float | int, ...] | tuple[float | int, float | int]],
-                 nH: float | int | list[float | int, ...]):
+                 k: float | int | list[float] | tuple[float, float],
+                 regulating_species: str | list[str],
+                 alpha: float | int | list[float | int],
+                 K50: float | int | list[float | int] | tuple[float | int, float | int] |
+                      list[float | int | list[float | int] | tuple[float | int, float | int]],
+                 nH: float | int | list[float | int]):
         if isinstance(regulating_species, str):
             reg_sp_list = regulating_species.replace(' ', '').split(',')
             self.regulating_species = reg_sp_list[0] if len(reg_sp_list) == 1 else reg_sp_list
@@ -715,14 +715,14 @@ class RegulatedProcess(Process):
     def from_string(cls,
                     proc_str: str,
                     /,
-                    k: float | int | list[float, ...] | tuple[float, float],
+                    k: float | int | list[float] | tuple[float, float],
                     *,
-                    regulating_species: str | list[str, ...] = None,
-                    alpha: float | int | list[float | int, ...] = 1,
-                    K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
-                         list[float | int | list[float | int, ...] | tuple[
+                    regulating_species: str | list[str] = None,
+                    alpha: float | int | list[float | int] = 1,
+                    K50: float | int | list[float | int] | tuple[float | int, float | int] |
+                         list[float | int | list[float | int] | tuple[
                              float | int, float | int]] = None,
-                    nH: float | int | list[float | int, ...] = None,
+                    nH: float | int | list[float | int] = None,
                     sep: str = '->') -> Self:
         """ Create a regulated process from a string.
 
@@ -917,14 +917,14 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     """
 
     def __init__(self, reactants: dict, products: dict,
-                 k: float | int | list[float, ...] | tuple[float, float],
-                 regulating_species: str | list[str, ...],
-                 alpha: float | int | list[float | int, ...],
-                 K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
-                      list[float | int | list[float | int, ...] | tuple[float | int, float | int]],
-                 nH: float | int | list[float | int, ...],
+                 k: float | int | list[float] | tuple[float, float],
+                 regulating_species: str | list[str],
+                 alpha: float | int | list[float | int],
+                 K50: float | int | list[float | int] | tuple[float | int, float | int] |
+                      list[float | int | list[float | int] | tuple[float | int, float | int]],
+                 nH: float | int | list[float | int],
                  catalyst: str,
-                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int]):
+                 Km: float | int | list[float | int] | tuple[float | int, float | int]):
         self.catalyst = catalyst
         self.Km = Km
         self.is_heterogeneous_Km = False if isinstance(self.Km, (int, float)) else True
@@ -943,16 +943,16 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     def from_string(cls,
                     proc_str: str,
                     /,
-                    k: float | int | list[float, ...] | tuple[float, float],
+                    k: float | int | list[float] | tuple[float, float],
                     *,
-                    regulating_species: str | list[str, ...] = None,
-                    alpha: float | int | list[float | int, ...] = 1,
-                    K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
-                         list[float | int | list[float | int, ...] | tuple[
+                    regulating_species: str | list[str] = None,
+                    alpha: float | int | list[float | int] = 1,
+                    K50: float | int | list[float | int] | tuple[float | int, float | int] |
+                         list[float | int | list[float | int] | tuple[
                              float | int, float | int]] = None,
-                    nH: float | int | list[float | int, ...] = None,
+                    nH: float | int | list[float | int] = None,
                     catalyst: str = None,
-                    Km: float | int | list[float | int, ...] | tuple[
+                    Km: float | int | list[float | int] | tuple[
                         float | int, float | int] = None,
                     sep: str = '->') -> Self:
         """ Create a regulated Michaelis-Menten process from a string.
@@ -1111,7 +1111,7 @@ class NullSpeciesNameError(Exception):
         return "A species name cannot be an empty string."
 
 
-def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
+def update_all_species(procs: tuple[Process]) -> tuple[set, dict, dict]:
     """ Categorize all species in a list of processes.
 
     Extract all species from a list of processes. Then categorize each of them

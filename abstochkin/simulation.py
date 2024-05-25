@@ -223,9 +223,6 @@ class Simulation(SimulationMethodsMixin):
 
         self._compute_trajectory_stats()  # Get statistics on simulation data
 
-        # self._compute_k_het_stats()  # Get statistics on heterogeneity data (k)
-        # self._compute_Km_het_stats()  # Get statistics on heterogeneity data (Km)
-        # self._compute_K50_het_stats()  # Get statistics on heterogeneity data (Km)
         self._compute_het_stats()  # Get statistics on heterogeneity data
 
         self._post_run_cleanup()  # free up some memory
