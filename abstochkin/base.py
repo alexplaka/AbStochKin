@@ -109,7 +109,8 @@ class AbStochKin:
     def add_process_from_str(self,
                              process_str: str,
                              /,
-                             k: float | int | list[float | int] | tuple[float | int, float | int],
+                             k: float | int | list[float | int, ...] |
+                                tuple[float | int, float | int],
                              **kwargs):
         """
         Add a process by specifying a string: 'reactants -> products'.
@@ -134,7 +135,7 @@ class AbStochKin:
                     reactants: dict,
                     products: dict,
                     /,
-                    k: float | int | list[float | int] | tuple[float | int, float | int],
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """
         Add a process by using a dictionary for the reactants and products.
@@ -158,7 +159,7 @@ class AbStochKin:
     def del_process_from_str(self,
                              process_str: str,
                              /,
-                             k: float | int | list[float | int] | tuple[float | int],
+                             k: float | int | list[float | int, ...] | tuple[float | int],
                              **kwargs):
         """ Delete a process by specifying a string: 'reactants -> products'. """
         try:
@@ -183,7 +184,7 @@ class AbStochKin:
                     reactants: dict,
                     products: dict,
                     /,
-                    k: float | int | list[float | int] | tuple[float | int, float | int],
+                    k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """ Delete a process by using a dictionary for the reactants and products. """
         try:
@@ -310,7 +311,7 @@ class AbStochKin:
             self.sims.append(sim)
 
     def simulate_series_in_parallel(self,
-                                    series_kwargs: list[dict[str, Any]],
+                                    series_kwargs: list[dict[str, Any], ...],
                                     *,
                                     max_workers: int = None):
         """
