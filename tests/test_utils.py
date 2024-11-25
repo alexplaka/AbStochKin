@@ -72,6 +72,21 @@ class TestMacroToMicro(unittest.TestCase):
         self.assertAlmostEqual(macro_to_micro(0.01, 1e-15, 2),
                                1.660539e-12)
 
+    def test_vectorized_conversion(self):
+        result_0 = macro_to_micro([0.001, 0.002, 0.003], 1e-6, 0)
+        expected_0 = [6.02214076e14, 1.204428152e+15, 1.806642228e+15]
+        for i in range(len(expected_0)):
+            self.assertAlmostEqual(result_0[i], expected_0[i], places=6)
+
+        result_1 = macro_to_micro([0.15, 0.11], 2e-5, 1)
+        expected_1 = [0.15, 0.11]
+        self.assertListEqual(result_1, expected_1)
+
+        result_2 = macro_to_micro((0.001, 0.00025), 1e-10, 2)
+        expected_2 = (1.6605390671738466e-17, 4.1513476679346165e-18)
+        for i in range(len(expected_2)):
+            self.assertAlmostEqual(result_2[i], expected_2[i], places=6)
+
 
 if __name__ == '__main__':
     unittest.main()
