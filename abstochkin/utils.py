@@ -120,9 +120,9 @@ def r_squared(actual: np.array, theoretical: np.array) -> float:
     return 1 - ssr / sst if sst != 0 else np.nan
 
 
-def macro_to_micro(macro_val: float | int,
+def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float | int, float | int],
                    volume: float | int,
-                   order: int = 0) -> float:
+                   order: int = 0) -> float | list[float, ...] | tuple[float, float]:
     """
     Convert a kinetic parameter value from macroscopic to microscopic form.
 
@@ -164,8 +164,16 @@ def macro_to_micro(macro_val: float | int,
     for Simulating the Dynamics of Heterogeneous Populations.”
     OSF Preprints, 26 July 2019. Web. Section 2.1.
     """
-    assert macro_val >= 0, "The parameter value cannot be negative."
     assert volume > 0, "The volume has be a positive quantity."
     assert order >= 0, "The process order cannot be negative."
 
-    return macro_val / (N_A * volume) ** (order - 1)
+    denom = (N_A * volume) ** (order - 1)
+
+    if isinstance(macro_val, (list, tuple)):
+        assert all([True if val >= 0 else False for val in macro_val]), \
+            "The parameter values cannot be negative."
+        micro_vals = [val / denom for val in macro_val]
+        return micro_vals if isinstance(macro_val, list) else tuple(micro_vals)
+    else:
+        assert macro_val >= 0, "The parameter value cannot be negative."
+        return macro_val / denom
