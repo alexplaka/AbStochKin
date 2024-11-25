@@ -21,6 +21,8 @@ from typing import Self
 
 from numpy import array
 
+from abstochkin.utils import macro_to_micro
+
 
 class Process:
     """
@@ -54,6 +56,9 @@ class Process:
               assumed to be heterogeneous with a normally distributed `k` value.
               The two entries in the tuple represent the mean and standard
               deviation (in that order) of the desired normal distribution.
+    volume : float, default : None, optional
+        The volume *in liters* of the compartment in which the processes
+        are taking place.
     order : int
         The order of the process (or the molecularity of an elementary process).
         It is the sum of the stoichiometric coefficients of the reactants.
@@ -71,14 +76,17 @@ class Process:
     """
 
     def __init__(self,
-                 reactants: dict,
-                 products: dict,
+                 reactants: dict[str, int],
+                 products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
+                 *,
+                 volume: float | None = None,
                  **kwargs):
 
         self.reactants = reactants
         self.products = products
         self.k = k
+        self.volume = volume
 
         self._validate_nums()  # make sure there are no errors in given numbers
 
@@ -98,6 +106,10 @@ class Process:
                   "heterogeneity does not make sense in this context. Please define " \
                   "the rate constant k as a number. "
             assert not self.is_heterogeneous, msg
+
+        # Convert macroscopic to microscopic rate constant
+        if self.volume is not None:
+            self.k = macro_to_micro(self.k, self.volume, self.order)
 
         # Two ways of storing the involved species:
         # 1) A set of all species
@@ -143,6 +155,7 @@ class Process:
                     /,
                     k: float | int | list[float, ...] | tuple[float, float],
                     *,
+                    volume: float | None = None,
                     sep: str = '->',
                     **kwargs) -> Self:
         """ Create a process from a string.
@@ -159,6 +172,9 @@ class Process:
             or subinteractions depending on the order. If `k` is a 2-tuple,
             then the constant is normally-distributed with a mean and standard
             deviation specified in the tuple's elements.
+        volume : float, default : None, optional
+            The volume *in liters* of the compartment in which the processes
+            are taking place.
         sep : str, default: '->'
             Specifies the characters that distinguish the reactants from the
             products. The default is '->'. The code also treats `-->` as a
@@ -189,7 +205,7 @@ class Process:
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms), k)
+        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms), k, volume=volume)
 
     @staticmethod
     def _lsp(kwargs: dict):
@@ -221,8 +237,8 @@ class Process:
 
     @staticmethod
     def _to_dict(terms: list) -> dict:
-        """ Convert the information for a side of a process to a dictionary. """
-
+        """ Convert the information for a side (left, right) of a process
+        to a dictionary. """
         side_terms = dict()  # for storing the information of a side of a process
         patt = '^[\\-]*[1-9]+'  # regex pattern (accounts for leading erroneous minus sign)
 
@@ -251,10 +267,12 @@ class Process:
         return side_terms
 
     def _validate_nums(self):
-        """ Make sure coefficients and rate constant values are not negative. """
+        """ Make sure coefficients, rate constant, and volume values are not negative. """
+        # Check coefficients
         for r, val in (self.reactants | self.products).items():
             assert val >= 0, f"Coefficient cannot be negative: {val} {r}."
 
+        # Check rate constants
         error_msg = f"Rate constant values have to be positive: k = {self.k}."
         if isinstance(self.k, (list, tuple)):  # heterogeneous population
             assert all(array(self.k) > 0), error_msg
@@ -265,6 +283,10 @@ class Process:
         if isinstance(self.k, tuple):  # normal distribution of k values
             assert len(self.k) == 2, "Please specify the mean and standard deviation " \
                                      "of k in a 2-tuple: (mean, std)."
+
+        # Check volume
+        if self.volume is not None:
+            assert self.volume > 0, f"Volume cannot be negative: {self.volume}."
 
     def __eq__(self, other):
         if isinstance(other, Process):
@@ -287,7 +309,8 @@ class Process:
         return True if item in self.species else False
 
     def __repr__(self):
-        return f"Process Object: Process.from_string('{self._str.split(',')[0]}', k={self.k})"
+        return f"Process Object: Process.from_string('{self._str.split(',')[0]}', " \
+               f"k={self.k}, volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.k, (float, int)):
@@ -299,7 +322,9 @@ class Process:
                       f"mean {self.k[0]} and standard deviation {self.k[1]}."
 
         lhs, rhs = self._reconstruct_string()
-        return ' -> '.join([lhs, rhs]) + f', k = {self.k}; {het_str}'
+
+        vol_str = f", volume = {self.volume} L" if self.volume is not None else ""
+        return ' -> '.join([lhs, rhs]) + f', k = {self.k}{vol_str}; {het_str}'
 
     def _reconstruct_string(self):
         lhs = ' + '.join([f"{str(val) + ' ' if val not in [0, 1] else ''}{key}" for key, val in
@@ -312,6 +337,8 @@ class Process:
 class ReversibleProcess(Process):
     """ Define a reversible process.
 
+    The class-specific attributes are listed below.
+
     Attributes
     ----------
     k_rev : float or int or list of floats or 2-tuple of floats
@@ -322,19 +349,26 @@ class ReversibleProcess(Process):
 
     Notes
     -----
-    A ReversibleProcess object gets split into two Process objects
+    A `ReversibleProcess` object gets split into two `Process` objects
     (forward and reverse process) when the algorithm runs.
     """
 
-    def __init__(self, reactants: dict, products: dict,
+    def __init__(self,
+                 reactants: dict[str, int],
+                 products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
-                 k_rev: float | int | list[float, ...] | tuple[float, float]):
+                 k_rev: float | int | list[float, ...] | tuple[float, float],
+                 *,
+                 volume: float | None = None):
         self.k_rev = k_rev  # rate constant for reverse process
         self.is_heterogeneous_rev = False if isinstance(self.k_rev, (int, float)) else True
 
-        super().__init__(reactants, products, k)
+        super().__init__(reactants, products, k, volume=volume)
 
         self.order_rev = sum(self.products.values())
+
+        if self.volume is not None:  # Convert macroscopic to microscopic rate constants
+            self.k_rev = macro_to_micro(k_rev, self.volume, self.order_rev)
 
     @classmethod
     def from_string(cls,
@@ -343,6 +377,7 @@ class ReversibleProcess(Process):
                     k: float | int | list[float, ...] | tuple[float, float],
                     *,
                     k_rev: float | int | list[float, ...] | tuple[float, float] = 0,
+                    volume: float | None = None,
                     sep: str = '<->') -> Self:
         """ Create a reversible process from a string.
 
@@ -355,6 +390,9 @@ class ReversibleProcess(Process):
             The *microscopic* rate constant for the forward process.
         k_rev : float or int or list of floats or 2-tuple of floats
             The *microscopic* rate constant for the reverse process.
+        volume : float, default : None, optional
+            The volume *in liters* of the compartment in which the processes
+            are taking place.
         sep : str, default: '<->'
             Specifies the characters that distinguish the reactants from the
             products. The default is '<->'. The code also treats `<-->` as a
@@ -380,11 +418,12 @@ class ReversibleProcess(Process):
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
         return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms),
-                   k, k_rev)
+                   k, k_rev, volume=volume)
 
     def __repr__(self):
         return f"ReversibleProcess Object: ReversibleProcess.from_string(" \
-               f"'{self._str.split(',')[0]}', k={self.k}, k_rev={self.k_rev})"
+               f"'{self._str.split(',')[0]}', k={self.k}, k_rev={self.k_rev}, " \
+               f"volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.k, (float, int)):
@@ -406,7 +445,8 @@ class ReversibleProcess(Process):
                           f"k with mean {self.k_rev[0]} and standard deviation {self.k_rev[1]}."
 
         lhs, rhs = self._reconstruct_string()
-        return " <-> ".join([lhs, rhs]) + f", k = {self.k}, k_rev = {self.k_rev}; " \
+        vol_str = f", volume = {self.volume} L" if self.volume is not None else ""
+        return " <-> ".join([lhs, rhs]) + f", k = {self.k}, k_rev = {self.k_rev}{vol_str}; " \
                                           f"{het_str} {het_rev_str}"
 
     def _reconstruct_string(self):
@@ -439,6 +479,8 @@ class ReversibleProcess(Process):
 class MichaelisMentenProcess(Process):
     """ Define a process that obeys Michaelis-Menten kinetics.
 
+    The class-specific attributes are listed below.
+
     Attributes
     ----------
     catalyst : str
@@ -453,7 +495,9 @@ class MichaelisMentenProcess(Process):
         (distinct subspecies/interactions or normally-distributed).
     """
 
-    def __init__(self, reactants: dict, products: dict,
+    def __init__(self,
+                 reactants: dict[str, int],
+                 products: dict[str, int],
                  k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                  catalyst: str,
                  Km: float | int | list[float | int, ...] | tuple[float | int, float | int]):
@@ -579,6 +623,9 @@ class RegulatedProcess(Process):
     If there are multiple regulating species, then all parameters are a list
     of their expected type, with the length of the list being equal to the
     number of regulating species.
+
+    The class-specific attributes (except for `k`, which requires some
+    additional notes) are listed below.
     
     Attributes
     ----------
@@ -623,7 +670,9 @@ class RegulatedProcess(Process):
     a process.
     """
 
-    def __init__(self, reactants: dict, products: dict,
+    def __init__(self,
+                 reactants: dict[str, int],
+                 products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
                  regulating_species: str | list[str, ...],
                  alpha: float | int | list[float | int, ...],
@@ -863,6 +912,9 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     of their expected type, with the length of the list being equal to the
     number of regulating species.
 
+    The class-specific attributes (except for `k`, which requires some
+    additional notes) are listed below.
+
     Attributes
     ----------
     k : float or int or list of floats or 2-tuple of floats
@@ -916,7 +968,9 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     processes are not implemented yet.
     """
 
-    def __init__(self, reactants: dict, products: dict,
+    def __init__(self,
+                 reactants: dict[str, int],
+                 products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
                  regulating_species: str | list[str, ...],
                  alpha: float | int | list[float | int, ...],
