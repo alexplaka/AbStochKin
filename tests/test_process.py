@@ -324,5 +324,62 @@ class TestProcessEquality(unittest.TestCase):
         self.assertEqual(self.procs_dict[self.f], self.procs_dict[f_str])
 
 
+class TestProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        """ Set up some processes for testing. """
+        # Some processes from a dictionary:
+        self.proc1a = Process({'A': 2}, {'B': 1}, 0.01, volume=1e-9)
+        self.proc1b = Process({'A': 1}, {'B': 1}, 0.01, volume=1e-9)
+        self.proc1c = Process({'': 0}, {'A_d': 1}, 0.157, volume=1e-9)
+
+        # Some processes from a string:
+        self.proc2a = Process.from_string(' -> 2 X', 0.349, volume=1e-6)
+        self.proc2b = Process.from_string('A + A ->  C  ', 0.5, volume=1e-6)
+        self.proc2c = Process.from_string('A -> 2 C + C  ', (0.05, 0.01), volume=1e-6)
+
+    def test_micro_k_vals(self):
+        self.assertAlmostEqual(self.proc1a.k, 1.6605390671738466e-17)
+        self.assertEqual(self.proc1b.k, 0.01)
+        self.assertAlmostEqual(self.proc1c.k, 94547609932000.0)
+
+        self.assertAlmostEqual(self.proc2a.k, 2.10172712524e+17)
+        self.assertAlmostEqual(self.proc2b.k, 8.302695335869233e-19)
+        self.assertTupleEqual(self.proc2c.k, (0.05, 0.01))
+
+
+class TestReversibleProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = ReversibleProcess({'A': 1}, {'B': 1},
+                                        k=0.1, k_rev=0.2,
+                                        volume=1e-10)
+        self.proc1b = ReversibleProcess({'A': 1}, {'B': 2},
+                                        k=[0.5, 0.25, 0.35], k_rev=(0.3, 0.1),
+                                        volume=1e-8)
+
+        self.proc2a = ReversibleProcess.from_string('A <--> B',
+                                                    k=0.2, k_rev=0.15,
+                                                    volume=3e-9)
+        self.proc2b = ReversibleProcess.from_string('A <-> 2B',
+                                                    k=[0.11, 0.29], k_rev=[0.25, 0.05],
+                                                    volume=2e-8)
+        self.proc2c = ReversibleProcess.from_string('2A <-> B',
+                                                    k=(0.5, 0.25), k_rev=0.1,
+                                                    volume=2e-10)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 0.1)
+        self.assertEqual(self.proc1a.k_rev, 0.2)
+        self.assertListEqual(self.proc1b.k, [0.5, 0.25, 0.35])
+        self.assertTupleEqual(self.proc1b.k_rev, (4.98161720152154e-17, 1.660539067173847e-17))
+
+        self.assertEqual(self.proc2a.k, 0.2)
+        self.assertEqual(self.proc2a.k_rev, 0.15)
+        self.assertListEqual(self.proc2b.k, [0.11, 0.29])
+        self.assertListEqual(self.proc2b.k_rev, [2.0756738339673084e-17, 4.151347667934617e-18])
+
+        self.assertTupleEqual(self.proc2c.k, (4.1513476679346165e-15, 2.0756738339673083e-15))
+        self.assertEqual(self.proc2c.k_rev, 0.1)
+
+
 if __name__ == '__main__':
     unittest.main()
