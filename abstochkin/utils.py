@@ -164,7 +164,7 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
     for Simulating the Dynamics of Heterogeneous Populations.”
     OSF Preprints, 26 July 2019. Web. Section 2.1.
     """
-    assert volume > 0, "The volume has be a positive quantity."
+    assert volume > 0, "The volume has to be a positive quantity."
     assert order >= 0, "The process order cannot be negative."
 
     denom = (N_A * volume) ** (order - 1)
