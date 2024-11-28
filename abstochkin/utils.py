@@ -122,7 +122,9 @@ def r_squared(actual: np.array, theoretical: np.array) -> float:
 
 def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float | int, float | int],
                    volume: float | int,
-                   order: int = 0) -> float | list[float, ...] | tuple[float, float]:
+                   order: int = 0,
+                   *,
+                   inverse: bool = False) -> float | list[float, ...] | tuple[float, float]:
     """
     Convert a kinetic parameter value from macroscopic to microscopic form.
 
@@ -145,6 +147,9 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
         The order of the process whose kinetic parameter is to be converted.
         The default value of 0 is for parameters (such as Km or K50) whose
         units are molarity.
+    inverse : bool, default: False
+        Perform the inverse of this operation. That is, convert
+        from microscopic to macroscopic form.
 
     Returns
     --------
@@ -167,7 +172,7 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
     assert volume > 0, "The volume has to be a positive quantity."
     assert order >= 0, "The process order cannot be negative."
 
-    denom = (N_A * volume) ** (order - 1)
+    denom = (N_A * volume) ** (order - 1) if not inverse else 1 / (N_A * volume) ** (order - 1)
 
     if isinstance(macro_val, (list, tuple)):
         assert all([True if val >= 0 else False for val in macro_val]), \

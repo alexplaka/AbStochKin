@@ -87,6 +87,33 @@ class TestMacroToMicro(unittest.TestCase):
         for i in range(len(expected_2)):
             self.assertAlmostEqual(result_2[i], expected_2[i], places=6)
 
+    def test_inverse_conversion(self):
+        self.assertEqual(macro_to_micro(60221.4076, 1e-16, 0, inverse=True), 0.001)
+        self.assertEqual(macro_to_micro(0.1, 1e-6, 1, inverse=True), 0.1)
+        self.assertEqual(macro_to_micro(8.302695335869234e-05, 1e-20, 2, inverse=True), 0.5)
+
+        # Do composition of functions
+        k_micro_0 = 1.5  # 0th order microscopic k value
+        self.assertEqual(
+            macro_to_micro(
+                macro_to_micro(k_micro_0, volume=1e-10, order=0),  # get macroscopic value
+                volume=1e-10, order=0, inverse=True),
+            k_micro_0)
+
+        k_micro_1 = 0.5  # 1st order microscopic k value
+        self.assertEqual(
+            macro_to_micro(
+                macro_to_micro(k_micro_1, volume=1e-5, order=1),  # get macroscopic value
+                volume=1e-5, order=1, inverse=True),
+            k_micro_1)
+
+        k_micro_2 = 0.002  # 2nd order microscopic k value
+        self.assertEqual(
+            macro_to_micro(
+                macro_to_micro(k_micro_2, volume=1e-15, order=2),  # get macroscopic value
+                volume=1e-15, order=2, inverse=True),
+            k_micro_2)
+
 
 if __name__ == '__main__':
     unittest.main()
