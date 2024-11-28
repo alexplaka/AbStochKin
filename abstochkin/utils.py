@@ -88,15 +88,15 @@ def measure_runtime(fcn):
 
 def r_squared(actual: np.array, theoretical: np.array) -> float:
     """
-    Compute the coefficient of determination, \(R^2\).
+    Compute the coefficient of determination, R².
 
     In the case of comparing the average AbStochKin-simulated species
     trajectory to its deterministic trajectory. Since the latter is only
-    meaningful for a homogeneous population, \(R^2\) should be
+    meaningful for a homogeneous population, R² should be
     close to `1` for a simulated homogeneous process.
     For a heterogeneous process, it can be interpreted as how close
     the simulated trajectory is to the deterministic trajectory of a
-    *homogeneous* process. In this case, \(R^2\) would not be expected
+    *homogeneous* process. In this case, R² would not be expected
     to be close to `1` and the importance of looking at this metric
     is questionable.
 
@@ -110,7 +110,7 @@ def r_squared(actual: np.array, theoretical: np.array) -> float:
     Returns
     -------
     float
-        The coefficient of determination, \(R^2\).
+        The coefficient of determination, R².
     """
     # sst: total sum of squares for simulation avg trajectory
     sst = np.nansum((actual - np.nanmean(actual)) ** 2)
