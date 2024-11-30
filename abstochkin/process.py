@@ -76,6 +76,7 @@ class Process:
     """
 
     def __init__(self,
+                 /,
                  reactants: dict[str, int],
                  products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
@@ -205,7 +206,10 @@ class Process:
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms), k, volume=volume)
+        return cls(reactants=cls._to_dict(lhs_terms),
+                   products=cls._to_dict(rhs_terms),
+                   k=k,
+                   volume=volume)
 
     @staticmethod
     def _lsp(kwargs: dict):
@@ -294,7 +298,8 @@ class Process:
                         self.order == other.order and
                         self.reactants == other.reactants and
                         self.products == other.products and
-                        self.species == other.species)
+                        self.species == other.species and
+                        self.volume == other.volume)
             return is_equal
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
@@ -310,7 +315,8 @@ class Process:
 
     def __repr__(self):
         return f"Process Object: Process.from_string('{self._str.split(',')[0]}', " \
-               f"k={self.k}, volume={self.volume})"
+               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.k, (float, int)):
@@ -354,17 +360,22 @@ class ReversibleProcess(Process):
     """
 
     def __init__(self,
+                 /,
                  reactants: dict[str, int],
                  products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
                  k_rev: float | int | list[float, ...] | tuple[float, float],
                  *,
                  volume: float | None = None):
+
         self.k_rev = k_rev  # rate constant for reverse process
+
+        super().__init__(reactants=reactants,
+                         products=products,
+                         k=k,
+                         volume=volume)
+
         self.is_heterogeneous_rev = False if isinstance(self.k_rev, (int, float)) else True
-
-        super().__init__(reactants, products, k, volume=volume)
-
         self.order_rev = sum(self.products.values())
 
         if self.volume is not None:  # Convert macroscopic to microscopic rate constants
@@ -417,12 +428,17 @@ class ReversibleProcess(Process):
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms),
-                   k, k_rev, volume=volume)
+        return cls(reactants=cls._to_dict(lhs_terms),
+                   products=cls._to_dict(rhs_terms),
+                   k=k,
+                   k_rev=k_rev,
+                   volume=volume)
 
     def __repr__(self):
         return f"ReversibleProcess Object: ReversibleProcess.from_string(" \
-               f"'{self._str.split(',')[0]}', k={self.k}, k_rev={self.k_rev}, " \
+               f"'{self._str.split(',')[0]}', " \
+               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"k_rev={macro_to_micro(self.k_rev, self.volume, self.order_rev, inverse=True)}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -464,7 +480,8 @@ class ReversibleProcess(Process):
                         self.order_rev == other.order_rev and
                         self.reactants == other.reactants and
                         self.products == other.products and
-                        self.species == other.species)
+                        self.species == other.species and
+                        self.volume == other.volume)
             return is_equal
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
@@ -488,7 +505,7 @@ class MichaelisMentenProcess(Process):
     Km : float or int or list of floats or 2-tuple of floats
         *Microscopic* Michaelis constant. Corresponds to the number
         of `catalyst` agents that would produce half-maximal activity.
-        Heterogeneity in this parameter is determined by the type of `K50`,
+        Heterogeneity in this parameter is determined by the type of `Km`,
         using the same rules as for parameter `k`.
     is_heterogeneous_Km : bool
         Denotes if the parameter `Km` exhibits heterogeneity
@@ -496,17 +513,24 @@ class MichaelisMentenProcess(Process):
     """
 
     def __init__(self,
+                 /,
                  reactants: dict[str, int],
                  products: dict[str, int],
                  k: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                 *,
                  catalyst: str,
-                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int]):
+                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                 volume: float | None = None):
+
         self.catalyst = catalyst
         self.Km = Km
+
+        super().__init__(reactants=reactants,
+                         products=products,
+                         k=k,
+                         volume=volume)
+
         self.is_heterogeneous_Km = False if isinstance(self.Km, (int, float)) else True
-
-        super().__init__(reactants, products, k)
-
         self.species.add(self.catalyst)
         self._str += f", catalyst = {self.catalyst}, Km = {self.Km}"
 
@@ -514,6 +538,9 @@ class MichaelisMentenProcess(Process):
                                 "to act on, therefore it cannot follow Michaelis-Menten kinetics."
         if self.order == 2:
             raise NotImplementedError
+
+        if self.volume is not None:  # Convert macroscopic to microscopic Km value
+            self.Km = macro_to_micro(Km, self.volume)
 
     @classmethod
     def from_string(cls,
@@ -524,6 +551,7 @@ class MichaelisMentenProcess(Process):
                     catalyst: str = None,
                     Km: float | int | list[float | int, ...] | tuple[
                         float | int, float | int] = None,
+                    volume: float | None = None,
                     sep: str = '->') -> Self:
         """ Create a Michaelis-Menten process from a string.
 
@@ -545,6 +573,9 @@ class MichaelisMentenProcess(Process):
             *Microscopic* Michaelis constant for the process.
             Heterogeneity in this parameter is determined by the type of `Km`,
             using the same rules as for parameter `k`.
+        volume : float, default : None, optional
+            The volume *in liters* of the compartment in which the processes
+            are taking place.
         sep : str, default: '->'
             Specifies the characters that distinguish the reactants from the
             products. The default is '->'. The code also treats `-->` as a
@@ -570,9 +601,20 @@ class MichaelisMentenProcess(Process):
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms),
-                   k,
-                   catalyst, Km)
+        return cls(reactants=cls._to_dict(lhs_terms),
+                   products=cls._to_dict(rhs_terms),
+                   k=k,
+                   catalyst=catalyst,
+                   Km=Km,
+                   volume=volume)
+
+    def __repr__(self):
+        return f"MichaelisMentenProcess Object: " \
+               f"MichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
+               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"catalyst='{self.catalyst}', " \
+               f"Km={macro_to_micro(self.Km, self.volume, inverse=True)}, " \
+               f"volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.Km, (float, int)):
@@ -587,13 +629,6 @@ class MichaelisMentenProcess(Process):
         return super().__str__() + f" Catalyst: {self.catalyst}, " \
                                    f"Km = {self.Km}, {Km_het_str}"
 
-    def __repr__(self):
-        return f"MichaelisMentenProcess Object: " \
-               f"MichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={self.k}, " \
-               f"catalyst='{self.catalyst}', " \
-               f"Km={self.Km})"
-
     def __eq__(self, other):
         if isinstance(other, MichaelisMentenProcess):
             is_equal = (self.k == other.k and
@@ -602,7 +637,8 @@ class MichaelisMentenProcess(Process):
                         self.products == other.products and
                         self.catalyst == other.catalyst and
                         self.Km == other.Km and
-                        self.species == other.species)
+                        self.species == other.species and
+                        self.volume == other.volume)
             return is_equal
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
@@ -671,14 +707,18 @@ class RegulatedProcess(Process):
     """
 
     def __init__(self,
+                 /,
                  reactants: dict[str, int],
                  products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
+                 *,
                  regulating_species: str | list[str, ...],
                  alpha: float | int | list[float | int, ...],
                  K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
                       list[float | int | list[float | int, ...] | tuple[float | int, float | int]],
-                 nH: float | int | list[float | int, ...]):
+                 nH: float | int | list[float | int, ...],
+                 volume: float | None = None):
+
         if isinstance(regulating_species, str):
             reg_sp_list = regulating_species.replace(' ', '').split(',')
             self.regulating_species = reg_sp_list[0] if len(reg_sp_list) == 1 else reg_sp_list
@@ -695,7 +735,13 @@ class RegulatedProcess(Process):
         else:
             self.is_heterogeneous_K50 = False if isinstance(self.K50, (int, float)) else True
 
-        super().__init__(reactants, products, k)
+        super().__init__(reactants=reactants,
+                         products=products,
+                         k=k,
+                         volume=volume)
+
+        if self.volume is not None:  # Convert macroscopic to microscopic K50 value
+            self.K50 = macro_to_micro(K50, self.volume)
 
         self._str += f", regulating_species = {self.regulating_species}, alpha = {self.alpha}, " \
                      f"K50 = {self.K50}, nH = {self.nH}"
@@ -772,6 +818,7 @@ class RegulatedProcess(Process):
                          list[float | int | list[float | int, ...] | tuple[
                              float | int, float | int]] = None,
                     nH: float | int | list[float | int, ...] = None,
+                    volume: float | None = None,
                     sep: str = '->') -> Self:
         """ Create a regulated process from a string.
 
@@ -812,7 +859,10 @@ class RegulatedProcess(Process):
             using the same rules as for parameter `k`.
         nH : float or int or list[float or int]
             Hill coefficient for the given process. Indicates the degree of 
-            cooperativity in the regulatory interaction. 
+            cooperativity in the regulatory interaction.
+        volume : float, default : None, optional
+            The volume *in liters* of the compartment in which the processes
+            are taking place.
         sep : str, default: '->'
             Specifies the characters that distinguish the reactants from the
             products. The default is '->'. The code also treats `-->` as a
@@ -839,9 +889,24 @@ class RegulatedProcess(Process):
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms),
-                   k,
-                   regulating_species, alpha, K50, nH)
+        return cls(reactants=cls._to_dict(lhs_terms),
+                   products=cls._to_dict(rhs_terms),
+                   k=k,
+                   regulating_species=regulating_species,
+                   alpha=alpha,
+                   K50=K50,
+                   nH=nH,
+                   volume=volume)
+
+    def __repr__(self):
+        return f"RegulatedProcess Object: " \
+               f"RegulatedProcess.from_string('{self._str.split(',')[0]}', " \
+               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"regulating_species='{self.regulating_species}', " \
+               f"alpha={self.alpha}, " \
+               f"K50={macro_to_micro(self.K50, self.volume, inverse=True)}, " \
+               f"nH={self.nH}," \
+               f"volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.regulating_species, list):
@@ -870,15 +935,6 @@ class RegulatedProcess(Process):
                                    f"alpha = {self.alpha}, nH = {self.nH}, " \
                                    f"K50 = {self.K50}, {K50_het_str}"
 
-    def __repr__(self):
-        return f"RegulatedProcess Object: " \
-               f"RegulatedProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={self.k}, " \
-               f"regulating_species='{self.regulating_species}', " \
-               f"alpha={self.alpha}, " \
-               f"K50={self.K50}, " \
-               f"nH={self.nH})"
-
     def __eq__(self, other):
         if isinstance(other, RegulatedProcess):
             is_equal = (self.k == other.k and
@@ -889,7 +945,8 @@ class RegulatedProcess(Process):
                         self.alpha == other.alpha and
                         self.K50 == other.K50 and
                         self.nH == other.nH and
-                        self.species == other.species)
+                        self.species == other.species and
+                        self.volume == other.volume)
             return is_equal
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
@@ -969,29 +1026,45 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
     """
 
     def __init__(self,
+                 /,
                  reactants: dict[str, int],
                  products: dict[str, int],
                  k: float | int | list[float, ...] | tuple[float, float],
+                 *,
                  regulating_species: str | list[str, ...],
                  alpha: float | int | list[float | int, ...],
                  K50: float | int | list[float | int, ...] | tuple[float | int, float | int] |
                       list[float | int | list[float | int, ...] | tuple[float | int, float | int]],
                  nH: float | int | list[float | int, ...],
                  catalyst: str,
-                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int]):
+                 Km: float | int | list[float | int, ...] | tuple[float | int, float | int],
+                 volume: float | None = None):
+
         self.catalyst = catalyst
         self.Km = Km
         self.is_heterogeneous_Km = False if isinstance(self.Km, (int, float)) else True
 
-        super().__init__(reactants, products, k, regulating_species, alpha, K50, nH)
+        super().__init__(reactants=reactants,
+                         products=products,
+                         k=k,
+                         regulating_species=regulating_species,
+                         alpha=alpha,
+                         K50=K50,
+                         nH=nH,
+                         volume=volume)
 
-        self.species.add(self.catalyst)
-        self._str += f", catalyst = {self.catalyst}, Km = {self.Km}"
+        super()._validate_reg_params()
 
         assert self.order != 0, "A 0th order process has no substrate for a catalyst " \
                                 "to act on, therefore it cannot follow Michaelis-Menten kinetics."
         if self.order == 2:
             raise NotImplementedError
+
+        if self.volume is not None:  # Convert macroscopic to microscopic Km value
+            self.Km = macro_to_micro(Km, self.volume)
+
+        self.species.add(self.catalyst)
+        self._str += f", catalyst = {self.catalyst}, Km = {self.Km}"
 
     @classmethod
     def from_string(cls,
@@ -1008,6 +1081,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
                     catalyst: str = None,
                     Km: float | int | list[float | int, ...] | tuple[
                         float | int, float | int] = None,
+                    volume: float | None = None,
                     sep: str = '->') -> Self:
         """ Create a regulated Michaelis-Menten process from a string.
 
@@ -1055,6 +1129,9 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
             *Microscopic* Michaelis constant for the process.
             Heterogeneity in this parameter is determined by the type of `Km`,
             using the same rules as for parameter `k`.
+        volume : float, default : None, optional
+            The volume *in liters* of the compartment in which the processes
+            are taking place.
         sep : str, default: '->'
             Specifies the characters that distinguish the reactants from the
             products. The default is '->'. The code also treats `-->` as a
@@ -1080,10 +1157,28 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
         lhs_terms = lhs.split('+')  # Separate the terms on the left-hand side
         rhs_terms = rhs.split('+')  # Separate the terms on the right-hand side
 
-        return cls(cls._to_dict(lhs_terms), cls._to_dict(rhs_terms),
-                   k,
-                   regulating_species, alpha, K50, nH,
-                   catalyst, Km)
+        return cls(reactants=cls._to_dict(lhs_terms),
+                   products=cls._to_dict(rhs_terms),
+                   k=k,
+                   regulating_species=regulating_species,
+                   alpha=alpha,
+                   K50=K50,
+                   nH=nH,
+                   catalyst=catalyst,
+                   Km=Km,
+                   volume=volume)
+
+    def __repr__(self):
+        return f"RegulatedMichaelisMentenProcess Object: " \
+               f"RegulatedMichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
+               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"regulating_species='{self.regulating_species}', " \
+               f"alpha={self.alpha}, " \
+               f"K50={macro_to_micro(self.K50, self.volume, inverse=True)}, " \
+               f"nH={self.nH}, " \
+               f"catalyst={self.catalyst}, " \
+               f"Km={macro_to_micro(self.Km, self.volume, inverse=True)}," \
+               f"volume={self.volume})"
 
     def __str__(self):
         if isinstance(self.regulating_species, list):
@@ -1123,17 +1218,6 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
                                    f"Catalyst: {self.catalyst}, " \
                                    f"Km = {self.Km}, {Km_het_str}"
 
-    def __repr__(self):
-        return f"RegulatedMichaelisMentenProcess Object: " \
-               f"RegulatedMichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={self.k}, " \
-               f"regulating_species='{self.regulating_species}', " \
-               f"alpha={self.alpha}, " \
-               f"K50={self.K50}, " \
-               f"nH={self.nH}, " \
-               f"catalyst={self.catalyst}, " \
-               f"Km={self.Km})"
-
     def __eq__(self, other):
         if isinstance(other, RegulatedMichaelisMentenProcess):
             is_equal = (self.k == other.k and
@@ -1146,7 +1230,8 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
                         self.nH == other.nH and
                         self.catalyst == other.catalyst and
                         self.Km == other.Km and
-                        self.species == other.species)
+                        self.species == other.species and
+                        self.volume == other.volume)
             return is_equal
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other

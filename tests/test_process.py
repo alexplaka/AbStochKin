@@ -18,8 +18,8 @@
 import unittest
 
 from abstochkin.process import NullSpeciesNameError
-from abstochkin.process import Process, ReversibleProcess, MichaelisMentenProcess, RegulatedProcess, \
-    RegulatedMichaelisMentenProcess
+from abstochkin.process import Process, ReversibleProcess, MichaelisMentenProcess, \
+    RegulatedProcess, RegulatedMichaelisMentenProcess
 
 
 class TestProcess(unittest.TestCase):
@@ -379,6 +379,95 @@ class TestReversibleProcessInVolume(unittest.TestCase):
 
         self.assertTupleEqual(self.proc2c.k, (4.1513476679346165e-15, 2.0756738339673083e-15))
         self.assertEqual(self.proc2c.k_rev, 0.1)
+
+
+class TestMichaelisMentenProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = MichaelisMentenProcess({'A': 1}, {'B': 1},
+                                             k=0.03, catalyst='E', Km=1e-5,
+                                             volume=1e-15)
+        self.proc1b = MichaelisMentenProcess({'A': 1}, {'B': 1},
+                                             k=(0.03, 0.01), catalyst='E',
+                                             Km=[1e-5, 2e-5],
+                                             volume=1e-15)
+
+        self.proc1c = MichaelisMentenProcess.from_string("X -> Y",
+                                                         k=[0.05, 0.04, 0.03],
+                                                         catalyst='E',
+                                                         Km=(2e-8, 0.5e-8),
+                                                         volume=1e-16)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 0.03)
+        self.assertAlmostEqual(self.proc1a.Km, 6022.14076)
+        self.assertEqual(self.proc1b.k, (0.03, 0.01))
+        self.assertIsInstance(self.proc1b.Km, list)
+        self.assertAlmostEqual(self.proc1b.Km[0], 6022.14076)
+        self.assertAlmostEqual(self.proc1b.Km[1], 2 * 6022.14076)
+
+        self.assertListEqual(self.proc1c.k, [0.05, 0.04, 0.03])
+        self.assertIsInstance(self.proc1c.Km, tuple)
+        self.assertAlmostEqual(self.proc1c.Km[0], 1.204428152)
+        self.assertAlmostEqual(self.proc1c.Km[1], 1.204428152 / 4)
+
+
+class TestRegulatedProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = RegulatedProcess({'': 0}, {'B': 1},
+                                       k=0.5,
+                                       regulating_species='X',
+                                       alpha=1,
+                                       nH=2,
+                                       K50=1e-6,
+                                       volume=1e-15)
+
+        self.proc1b = RegulatedProcess.from_string("A -> B",
+                                                   k=0.035,
+                                                   regulating_species='H',
+                                                   alpha=2,
+                                                   nH=1,
+                                                   K50=(1e-6, 1e-7),
+                                                   volume=1e-15)
+
+        self.proc1c = RegulatedProcess.from_string("2A -> B",
+                                                   k=3e-4,
+                                                   regulating_species='H',
+                                                   alpha=0,
+                                                   nH=2,
+                                                   K50=1e-5,
+                                                   volume=1e-15)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 301107038.0)
+        self.assertAlmostEqual(self.proc1a.K50, 602.214076)
+
+        self.assertEqual(self.proc1b.k, 0.035)
+        self.assertIsInstance(self.proc1b.K50, tuple)
+        self.assertAlmostEqual(self.proc1b.K50[0], 602.214076)
+        self.assertAlmostEqual(self.proc1b.K50[1], 602.214076 / 10)
+
+        self.assertAlmostEqual(self.proc1c.k, 4.98161720152154e-13)
+        self.assertIsInstance(self.proc1c.K50, float)
+        self.assertAlmostEqual(self.proc1c.K50, 6022.14076)
+
+
+class TestRegulatedMichaelisMentenProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = RegulatedMichaelisMentenProcess.from_string("F -> G",
+                                                                  k=(0.05, 0.02),
+                                                                  catalyst='E',
+                                                                  Km=2e-8,
+                                                                  alpha=2,
+                                                                  nH=3,
+                                                                  K50=[1e-6, 1e-7],
+                                                                  volume=1e-16)
+
+    def test_micro_k_vals(self):
+        self.assertTupleEqual(self.proc1a.k, (0.05, 0.02))
+        self.assertAlmostEqual(self.proc1a.Km, 1.204428152)
+        self.assertIsInstance(self.proc1a.K50, list)
+        self.assertAlmostEqual(self.proc1a.K50[0], 60.2214076)
+        self.assertAlmostEqual(self.proc1a.K50[1], 6.02214076)
 
 
 if __name__ == '__main__':
