@@ -1,4 +1,26 @@
 # AbStochKin: Agent-based Stochastic Kinetics
+<p>
+  <a href="https://doi.org/10.5281/zenodo.14255157">
+    <img src="https://zenodo.org/badge/733779271.svg" alt="DOI">
+  </a>
+  <a href="https://pypi.org/project/abstochkin/">
+    <img src="https://img.shields.io/pypi/v/abstochkin"
+         alt="PyPI package version">
+  </a>
+  <a href="https://www.python.org">
+    <img src="https://img.shields.io/pypi/pyversions/abstochkin"
+         alt="Python versions">
+  </a>
+  <a href="https://alexplaka.github.io/AbStochKin">
+    <img src="https://img.shields.io/badge/-documentation-blue"
+         alt="Documentation">
+  </a>
+  <a href="https://github.com/alexplaka/abstochkin/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/alexplaka/abstochkin"
+         alt="GitHub license">
+  </a>
+</p>
+
 ##### Alternate name: PyStochKin (Particle-based Stochastic Kinetics)
 
 `AbStochKin` is an agent-based (or particle-based) Monte-Carlo simulator of the time 
