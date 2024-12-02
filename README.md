@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/-documentation-blue"
          alt="Documentation">
   </a>
-  <a href="https://github.com/alexplaka/abstochkin/blob/main/LICENSE">
+  <a href="https://github.com/alexplaka/abstochkin/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/alexplaka/abstochkin"
          alt="GitHub license">
   </a>
