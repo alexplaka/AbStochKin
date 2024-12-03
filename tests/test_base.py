@@ -18,7 +18,7 @@ import unittest
 from abstochkin.base import AbStochKin
 
 
-class TestAbKin(unittest.TestCase):
+class TestAbStochKin(unittest.TestCase):
     def setUp(self):
         # Test importing processes from file 1
         self.sim1 = AbStochKin()
@@ -41,6 +41,12 @@ class TestAbKin(unittest.TestCase):
         # Test importing processes from file 2
         self.sim3 = AbStochKin()
         self.sim3.add_processes_from_file("processes_test_2.txt")
+
+        # Test adding processes where the system is in a compartment with a specified volume
+        self.sim4 = AbStochKin(volume=1.5e-15)  # Approximate volume of an E. coli cell
+        self.sim4.add_process_from_str('2A <-> X', k=0.01, k_rev=0.05)
+        self.sim4.add_process_from_str(' -> C', k=0.001,
+                                       regulating_species='E', alpha=2.5, K50=10, nH=2)
 
     def test_add_processes(self):
         self.assertEqual(len(self.sim1.sims[0].all_species), 17)
@@ -85,6 +91,11 @@ class TestAbKin(unittest.TestCase):
         self.assertEqual(self.sim3.processes[4].alpha, [2.5, 1])
         self.assertEqual(self.sim3.processes[4].K50, [(30, 5), [20, 10]])
         self.assertEqual(self.sim3.processes[4].nH, [3, 2])
+
+        # Make sure k has been converted to its microscopic value
+        self.assertAlmostEqual(self.sim4.processes[0].k, 1.11e-11, places=2)
+        self.assertEqual(self.sim4.processes[0].k_rev, 0.05)
+        self.assertEqual(self.sim4.processes[1].K50, 9033211140.0)
 
     def test_remove_processes(self):
         self.sim1.del_process({'C': 1, 'D': 1}, {'Y': 1}, k=0.01)

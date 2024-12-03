@@ -19,11 +19,13 @@ from collections import Counter
 
 from numpy import log, ndarray
 
-from .process import MichaelisMentenProcess, RegulatedProcess, ReversibleProcess, \
-    RegulatedMichaelisMentenProcess, Process
+from .process import Process, ReversibleProcess, MichaelisMentenProcess, \
+    RegulatedProcess, RegulatedMichaelisMentenProcess
+
+ProcessClasses = Process | ReversibleProcess | MichaelisMentenProcess | RegulatedProcess | RegulatedMichaelisMentenProcess
 
 
-def get_het_processes(processes: list[Process, ...]) -> list[Process, ...]:
+def get_het_processes(processes: list[ProcessClasses, ...]) -> list[ProcessClasses, ...]:
     """
     Filter the heterogeneous processes from a given list of processes.
     A process is heterogeneous if any of its parameters are defined as such.

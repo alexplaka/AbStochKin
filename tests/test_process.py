@@ -18,8 +18,8 @@
 import unittest
 
 from abstochkin.process import NullSpeciesNameError
-from abstochkin.process import Process, ReversibleProcess, MichaelisMentenProcess, RegulatedProcess, \
-    RegulatedMichaelisMentenProcess
+from abstochkin.process import Process, ReversibleProcess, MichaelisMentenProcess, \
+    RegulatedProcess, RegulatedMichaelisMentenProcess
 
 
 class TestProcess(unittest.TestCase):
@@ -322,6 +322,152 @@ class TestProcessEquality(unittest.TestCase):
         self.assertEqual(self.procs_dict[self.d], self.procs_dict[d_str])
         self.assertEqual(self.procs_dict[self.e], self.procs_dict[e_str])
         self.assertEqual(self.procs_dict[self.f], self.procs_dict[f_str])
+
+
+class TestProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        """ Set up some processes for testing. """
+        # Some processes from a dictionary:
+        self.proc1a = Process({'A': 2}, {'B': 1}, 0.01, volume=1e-9)
+        self.proc1b = Process({'A': 1}, {'B': 1}, 0.01, volume=1e-9)
+        self.proc1c = Process({'': 0}, {'A_d': 1}, 0.157, volume=1e-9)
+
+        # Some processes from a string:
+        self.proc2a = Process.from_string(' -> 2 X', 0.349, volume=1e-6)
+        self.proc2b = Process.from_string('A + A ->  C  ', 0.5, volume=1e-6)
+        self.proc2c = Process.from_string('A -> 2 C + C  ', (0.05, 0.01), volume=1e-6)
+
+    def test_micro_k_vals(self):
+        self.assertAlmostEqual(self.proc1a.k, 1.6605390671738466e-17)
+        self.assertEqual(self.proc1b.k, 0.01)
+        self.assertAlmostEqual(self.proc1c.k, 94547609932000.0)
+
+        self.assertAlmostEqual(self.proc2a.k, 2.10172712524e+17)
+        self.assertAlmostEqual(self.proc2b.k, 8.302695335869233e-19)
+        self.assertTupleEqual(self.proc2c.k, (0.05, 0.01))
+
+
+class TestReversibleProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = ReversibleProcess({'A': 1}, {'B': 1},
+                                        k=0.1, k_rev=0.2,
+                                        volume=1e-10)
+        self.proc1b = ReversibleProcess({'A': 1}, {'B': 2},
+                                        k=[0.5, 0.25, 0.35], k_rev=(0.3, 0.1),
+                                        volume=1e-8)
+
+        self.proc2a = ReversibleProcess.from_string('A <--> B',
+                                                    k=0.2, k_rev=0.15,
+                                                    volume=3e-9)
+        self.proc2b = ReversibleProcess.from_string('A <-> 2B',
+                                                    k=[0.11, 0.29], k_rev=[0.25, 0.05],
+                                                    volume=2e-8)
+        self.proc2c = ReversibleProcess.from_string('2A <-> B',
+                                                    k=(0.5, 0.25), k_rev=0.1,
+                                                    volume=2e-10)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 0.1)
+        self.assertEqual(self.proc1a.k_rev, 0.2)
+        self.assertListEqual(self.proc1b.k, [0.5, 0.25, 0.35])
+        self.assertTupleEqual(self.proc1b.k_rev, (4.98161720152154e-17, 1.660539067173847e-17))
+
+        self.assertEqual(self.proc2a.k, 0.2)
+        self.assertEqual(self.proc2a.k_rev, 0.15)
+        self.assertListEqual(self.proc2b.k, [0.11, 0.29])
+        self.assertListEqual(self.proc2b.k_rev, [2.0756738339673084e-17, 4.151347667934617e-18])
+
+        self.assertTupleEqual(self.proc2c.k, (4.1513476679346165e-15, 2.0756738339673083e-15))
+        self.assertEqual(self.proc2c.k_rev, 0.1)
+
+
+class TestMichaelisMentenProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = MichaelisMentenProcess({'A': 1}, {'B': 1},
+                                             k=0.03, catalyst='E', Km=1e-5,
+                                             volume=1e-15)
+        self.proc1b = MichaelisMentenProcess({'A': 1}, {'B': 1},
+                                             k=(0.03, 0.01), catalyst='E',
+                                             Km=[1e-5, 2e-5],
+                                             volume=1e-15)
+
+        self.proc1c = MichaelisMentenProcess.from_string("X -> Y",
+                                                         k=[0.05, 0.04, 0.03],
+                                                         catalyst='E',
+                                                         Km=(2e-8, 0.5e-8),
+                                                         volume=1e-16)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 0.03)
+        self.assertAlmostEqual(self.proc1a.Km, 6022.14076)
+        self.assertEqual(self.proc1b.k, (0.03, 0.01))
+        self.assertIsInstance(self.proc1b.Km, list)
+        self.assertAlmostEqual(self.proc1b.Km[0], 6022.14076)
+        self.assertAlmostEqual(self.proc1b.Km[1], 2 * 6022.14076)
+
+        self.assertListEqual(self.proc1c.k, [0.05, 0.04, 0.03])
+        self.assertIsInstance(self.proc1c.Km, tuple)
+        self.assertAlmostEqual(self.proc1c.Km[0], 1.204428152)
+        self.assertAlmostEqual(self.proc1c.Km[1], 1.204428152 / 4)
+
+
+class TestRegulatedProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = RegulatedProcess({'': 0}, {'B': 1},
+                                       k=0.5,
+                                       regulating_species='X',
+                                       alpha=1,
+                                       nH=2,
+                                       K50=1e-6,
+                                       volume=1e-15)
+
+        self.proc1b = RegulatedProcess.from_string("A -> B",
+                                                   k=0.035,
+                                                   regulating_species='H',
+                                                   alpha=2,
+                                                   nH=1,
+                                                   K50=(1e-6, 1e-7),
+                                                   volume=1e-15)
+
+        self.proc1c = RegulatedProcess.from_string("2A -> B",
+                                                   k=3e-4,
+                                                   regulating_species='H',
+                                                   alpha=0,
+                                                   nH=2,
+                                                   K50=1e-5,
+                                                   volume=1e-15)
+
+    def test_micro_k_vals(self):
+        self.assertEqual(self.proc1a.k, 301107038.0)
+        self.assertAlmostEqual(self.proc1a.K50, 602.214076)
+
+        self.assertEqual(self.proc1b.k, 0.035)
+        self.assertIsInstance(self.proc1b.K50, tuple)
+        self.assertAlmostEqual(self.proc1b.K50[0], 602.214076)
+        self.assertAlmostEqual(self.proc1b.K50[1], 602.214076 / 10)
+
+        self.assertAlmostEqual(self.proc1c.k, 4.98161720152154e-13)
+        self.assertIsInstance(self.proc1c.K50, float)
+        self.assertAlmostEqual(self.proc1c.K50, 6022.14076)
+
+
+class TestRegulatedMichaelisMentenProcessInVolume(unittest.TestCase):
+    def setUp(self):
+        self.proc1a = RegulatedMichaelisMentenProcess.from_string("F -> G",
+                                                                  k=(0.05, 0.02),
+                                                                  catalyst='E',
+                                                                  Km=2e-8,
+                                                                  alpha=2,
+                                                                  nH=3,
+                                                                  K50=[1e-6, 1e-7],
+                                                                  volume=1e-16)
+
+    def test_micro_k_vals(self):
+        self.assertTupleEqual(self.proc1a.k, (0.05, 0.02))
+        self.assertAlmostEqual(self.proc1a.Km, 1.204428152)
+        self.assertIsInstance(self.proc1a.K50, list)
+        self.assertAlmostEqual(self.proc1a.K50[0], 60.2214076)
+        self.assertAlmostEqual(self.proc1a.K50[1], 6.02214076)
 
 
 if __name__ == '__main__':
