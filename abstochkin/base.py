@@ -175,6 +175,8 @@ class AbStochKin:
                              k: float | int | list[float | int, ...] | tuple[float | int],
                              **kwargs):
         """ Delete a process by specifying a string: 'reactants -> products'. """
+        kwargs.setdefault('volume', self.volume)
+
         try:
             if '<->' in process_str or 'k_rev' in kwargs:  # reversible process
                 self.processes.remove(ReversibleProcess.from_string(process_str, k, **kwargs))
@@ -200,6 +202,8 @@ class AbStochKin:
                     k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """ Delete a process by using a dictionary for the reactants and products. """
+        kwargs.setdefault('volume', self.volume)
+
         try:
             if 'k_rev' in kwargs:  # reversible process
                 self.processes.remove(ReversibleProcess(reactants, products, k, **kwargs))

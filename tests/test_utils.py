@@ -92,26 +92,26 @@ class TestMacroToMicro(unittest.TestCase):
         self.assertEqual(macro_to_micro(0.1, 1e-6, 1, inverse=True), 0.1)
         self.assertEqual(macro_to_micro(8.302695335869234e-05, 1e-20, 2, inverse=True), 0.5)
 
-        # Do composition of functions
+        # Test with analogy to composition of functions $f(f^{-1}(x))=x$
         k_micro_0 = 1.5  # 0th order microscopic k value
         self.assertEqual(
             macro_to_micro(
-                macro_to_micro(k_micro_0, volume=1e-10, order=0),  # get macroscopic value
-                volume=1e-10, order=0, inverse=True),
+                macro_to_micro(k_micro_0, volume=1e-10, order=0, inverse=True),  # get macroscopic value
+                volume=1e-10, order=0),
             k_micro_0)
 
         k_micro_1 = 0.5  # 1st order microscopic k value
         self.assertEqual(
             macro_to_micro(
-                macro_to_micro(k_micro_1, volume=1e-5, order=1),  # get macroscopic value
-                volume=1e-5, order=1, inverse=True),
+                macro_to_micro(k_micro_1, volume=1e-5, order=1, inverse=True),  # get macroscopic value
+                volume=1e-5, order=1),
             k_micro_1)
 
         k_micro_2 = 0.002  # 2nd order microscopic k value
         self.assertEqual(
             macro_to_micro(
-                macro_to_micro(k_micro_2, volume=1e-15, order=2),  # get macroscopic value
-                volume=1e-15, order=2, inverse=True),
+                macro_to_micro(k_micro_2, volume=1e-15, order=2, inverse=True),  # get macroscopic value
+                volume=1e-15, order=2),
             k_micro_2)
 
 
