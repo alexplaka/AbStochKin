@@ -1,6 +1,7 @@
 """ Base class, AbStochKin, for initializing and storing all data for
 performing stochastic simulations using the Agent-based Kinetics
-method. A simulation project can be initialized and run as follows:
+method. A simulation project can be initialized and run as shown in
+the examples below.
 
 Example
 -------
@@ -48,9 +49,12 @@ class AbStochKin:
 
     Attributes
     ----------
-    time_unit : str, default : sec, optional
+    time_unit : str, default : 'sec', optional
         A string of the time unit to be used for describing the kinetics
         of the given processes.
+    volume : float, default : None, optional
+        The volume *in liters* of the compartment in which the processes
+        are taking place.
     processes : list
         A list of the processes that the AbStochKin object has.
     het_processes : list
@@ -63,8 +67,14 @@ class AbStochKin:
         contains all data for that simulation.
     """
 
-    def __init__(self, time_unit='sec'):
+    def __init__(self,
+                 volume: float = None,
+                 volume_unit: str = 'L',
+                 time_unit: str = 'sec'):
         self.time_unit = time_unit
+        self.volume = volume
+        self.volume_unit = volume_unit
+
         self.processes = list()
         self.het_processes = list()
         self.sims = list()
@@ -77,7 +87,7 @@ class AbStochKin:
         for line in lines:
             self.extract_process_from_str(line)
 
-    def extract_process_from_str(self, process_str):
+    def extract_process_from_str(self, process_str: str):
         """
         Extract a process and all of its specified parameters from a string.
 
@@ -109,8 +119,7 @@ class AbStochKin:
     def add_process_from_str(self,
                              process_str: str,
                              /,
-                             k: float | int | list[float | int, ...] |
-                                tuple[float | int, float | int],
+                             k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                              **kwargs):
         """
         Add a process by specifying a string: 'reactants -> products'.
@@ -118,6 +127,8 @@ class AbStochKin:
         (such as a reversible, regulated, or Michaelis-Menten process)
         is to be defined.
         """
+        kwargs.setdefault('volume', self.volume)
+
         if '<->' in process_str or 'k_rev' in kwargs:  # reversible process
             self.processes.append(ReversibleProcess.from_string(process_str, k, **kwargs))
         elif 'catalyst' in kwargs and 'Km' in kwargs and 'regulating_species' not in kwargs:
@@ -143,6 +154,8 @@ class AbStochKin:
         (such as a reversible, regulated, or Michaelis-Menten process)
         is to be defined.
         """
+        kwargs.setdefault('volume', self.volume)
+
         if 'k_rev' in kwargs:  # reversible process
             self.processes.append(ReversibleProcess(reactants, products, k, **kwargs))
         elif 'catalyst' in kwargs and 'Km' in kwargs and 'regulating_species' not in kwargs:
@@ -162,6 +175,8 @@ class AbStochKin:
                              k: float | int | list[float | int, ...] | tuple[float | int],
                              **kwargs):
         """ Delete a process by specifying a string: 'reactants -> products'. """
+        kwargs.setdefault('volume', self.volume)
+
         try:
             if '<->' in process_str or 'k_rev' in kwargs:  # reversible process
                 self.processes.remove(ReversibleProcess.from_string(process_str, k, **kwargs))
@@ -187,6 +202,8 @@ class AbStochKin:
                     k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """ Delete a process by using a dictionary for the reactants and products. """
+        kwargs.setdefault('volume', self.volume)
+
         try:
             if 'k_rev' in kwargs:  # reversible process
                 self.processes.remove(ReversibleProcess(reactants, products, k, **kwargs))
