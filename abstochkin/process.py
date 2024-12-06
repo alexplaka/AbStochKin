@@ -314,8 +314,9 @@ class Process:
         return True if item in self.species else False
 
     def __repr__(self):
+        repr_k = macro_to_micro(self.k, self.volume, self.order, inverse=True) if self.volume is not None else self.k
         return f"Process Object: Process.from_string('{self._str.split(',')[0]}', " \
-               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"k={repr_k}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -435,10 +436,13 @@ class ReversibleProcess(Process):
                    volume=volume)
 
     def __repr__(self):
+        repr_k = macro_to_micro(self.k, self.volume, self.order, inverse=True) if self.volume is not None else self.k
+        repr_k_rev = macro_to_micro(self.k_rev, self.volume, self.order_rev,
+                                    inverse=True) if self.volume is not None else self.k_rev
         return f"ReversibleProcess Object: ReversibleProcess.from_string(" \
                f"'{self._str.split(',')[0]}', " \
-               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
-               f"k_rev={macro_to_micro(self.k_rev, self.volume, self.order_rev, inverse=True)}, " \
+               f"k={repr_k}, " \
+               f"k_rev={repr_k_rev}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -609,11 +613,13 @@ class MichaelisMentenProcess(Process):
                    volume=volume)
 
     def __repr__(self):
+        repr_k = macro_to_micro(self.k, self.volume, self.order, inverse=True) if self.volume is not None else self.k
+        repr_Km = macro_to_micro(self.Km, self.volume, inverse=True) if self.volume is not None else self.Km
         return f"MichaelisMentenProcess Object: " \
                f"MichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"k={repr_k}, " \
                f"catalyst='{self.catalyst}', " \
-               f"Km={macro_to_micro(self.Km, self.volume, inverse=True)}, " \
+               f"Km={repr_Km}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -899,12 +905,14 @@ class RegulatedProcess(Process):
                    volume=volume)
 
     def __repr__(self):
+        repr_k = macro_to_micro(self.k, self.volume, self.order, inverse=True) if self.volume is not None else self.k
+        repr_K50 = macro_to_micro(self.K50, self.volume, inverse=True) if self.volume is not None else self.K50
         return f"RegulatedProcess Object: " \
                f"RegulatedProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"k={repr_k}, " \
                f"regulating_species='{self.regulating_species}', " \
                f"alpha={self.alpha}, " \
-               f"K50={macro_to_micro(self.K50, self.volume, inverse=True)}, " \
+               f"K50={repr_K50}, " \
                f"nH={self.nH}," \
                f"volume={self.volume})"
 
@@ -1169,15 +1177,18 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
                    volume=volume)
 
     def __repr__(self):
+        repr_k = macro_to_micro(self.k, self.volume, self.order, inverse=True) if self.volume is not None else self.k
+        repr_K50 = macro_to_micro(self.K50, self.volume, inverse=True) if self.volume is not None else self.K50
+        repr_Km = macro_to_micro(self.Km, self.volume, inverse=True) if self.volume is not None else self.Km
         return f"RegulatedMichaelisMentenProcess Object: " \
                f"RegulatedMichaelisMentenProcess.from_string('{self._str.split(',')[0]}', " \
-               f"k={macro_to_micro(self.k, self.volume, self.order, inverse=True)}, " \
+               f"k={repr_k}, " \
                f"regulating_species='{self.regulating_species}', " \
                f"alpha={self.alpha}, " \
-               f"K50={macro_to_micro(self.K50, self.volume, inverse=True)}, " \
+               f"K50={repr_K50}, " \
                f"nH={self.nH}, " \
                f"catalyst={self.catalyst}, " \
-               f"Km={macro_to_micro(self.Km, self.volume, inverse=True)}," \
+               f"Km={repr_Km}," \
                f"volume={self.volume})"
 
     def __str__(self):
