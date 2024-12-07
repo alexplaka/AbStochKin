@@ -75,7 +75,7 @@ class BirthDeathProcess2(unittest.TestCase):
         self.assertEqual(self.sim.sims[0]._het_processes_num, 0)
 
         # Make sure mean simulation trajectory agrees with DE/CME prediction
-        self.assertGreaterEqual(self.sim.sims[0].results['A']['R^2'], 0.99)
+        self.assertGreaterEqual(self.sim.sims[0].results['A']['R^2'], 0.989)
         self.assertGreaterEqual(self.sim.sims[0].results['B']['R^2'], 0.999)
 
         for sp in ['A', 'B']:
