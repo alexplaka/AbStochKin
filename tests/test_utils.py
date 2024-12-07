@@ -13,9 +13,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import unittest
+from contextlib import redirect_stdout
+from time import sleep
+
 import numpy as np
-from abstochkin.utils import rng_streams, macro_to_micro
+
+from abstochkin.utils import rng_streams, macro_to_micro, measure_runtime
 
 
 class TestRng(unittest.TestCase):
@@ -113,6 +118,20 @@ class TestMacroToMicro(unittest.TestCase):
                 macro_to_micro(k_micro_2, volume=1e-15, order=2, inverse=True),  # get macroscopic value
                 volume=1e-15, order=2),
             k_micro_2)
+
+
+class TestMeasureRuntime(unittest.TestCase):
+    def test_measure_runtime_seconds(self):
+        @measure_runtime
+        def sleeping_function():
+            sleep(1.243)
+
+        output = io.StringIO()
+        with redirect_stdout(output):
+            sleeping_function()
+
+        # Test if the message "Simulation Runtime: 1.000 sec" is printed
+        self.assertEqual(output.getvalue(), "Simulation Runtime: 1.243 sec\n")
 
 
 if __name__ == '__main__':
