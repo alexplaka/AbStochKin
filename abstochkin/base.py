@@ -143,9 +143,9 @@ class AbStochKin:
             self.processes.append(Process.from_string(process_str, k, **kwargs))
 
     def add_process(self,
+                    /,
                     reactants: dict,
                     products: dict,
-                    /,
                     k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """
@@ -196,9 +196,9 @@ class AbStochKin:
             print(f"Removed: {process_str}, k = {k}, kwargs = {kwargs}")
 
     def del_process(self,
+                    /,
                     reactants: dict,
                     products: dict,
-                    /,
                     k: float | int | list[float | int, ...] | tuple[float | int, float | int],
                     **kwargs):
         """ Delete a process by using a dictionary for the reactants and products. """

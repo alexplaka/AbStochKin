@@ -45,8 +45,9 @@ class TestAbStochKin(unittest.TestCase):
         # Test adding processes where the system is in a compartment with a specified volume
         self.sim4 = AbStochKin(volume=1.5e-15)  # Approximate volume of an E. coli cell
         self.sim4.add_process_from_str('2A <-> X', k=0.01, k_rev=0.05)
-        self.sim4.add_process_from_str(' -> C', k=0.001,
-                                       regulating_species='E', alpha=2.5, K50=10, nH=2)
+        self.sim4.add_process({'': 0}, {'C': 1},
+                              k=0.001,
+                              regulating_species='E', alpha=2.5, K50=10, nH=2)
 
     def test_add_processes(self):
         self.assertEqual(len(self.sim1.sims[0].all_species), 17)
@@ -103,6 +104,11 @@ class TestAbStochKin(unittest.TestCase):
 
         self.sim3.del_process_from_str("D<->F", k=[0.01, 0.02], k_rev=(0.05, 0.01))
         self.assertEqual(len(self.sim3.processes), 4)
+
+        self.sim4.del_process({'': 0}, {'C': 1},
+                              k=0.001,
+                              regulating_species='E', alpha=2.5, K50=10, nH=2)
+        self.assertEqual(len(self.sim4.processes), 1)
 
 
 if __name__ == '__main__':
