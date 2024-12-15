@@ -79,7 +79,8 @@ class TestRegulatedZerothOrderSimulation(unittest.TestCase):
                                        regulating_species='A, B', alpha=[2, 0.5],
                                        K50=[10, 5], nH=[2, 1])
         self.sim4.simulate(p0={'A': 50, 'B': 0, 'C': 0}, t_max=10, dt=0.01, n=150,
-                           max_agents_by_species={'A': 50, 'B': 50, 'C': 50})
+                           max_agents_by_species={'A': 50, 'B': 50, 'C': 50},
+                           show_plots=False)
 
     def test_simulations(self):
         self.assertEqual(self.sim1.sims[0]._het_processes_num, 0)
