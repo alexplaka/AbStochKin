@@ -5,7 +5,7 @@ when comparing time series data, and performing unit conversion of
 kinetic parameters.
 """
 
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

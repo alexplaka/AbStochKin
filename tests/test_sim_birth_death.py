@@ -7,7 +7,7 @@ This way, the statistics of the simulated trajectories can be
 compared to deterministic (ODE and CME) predictions.
 """
 
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

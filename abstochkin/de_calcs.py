@@ -4,7 +4,7 @@ Construct the ordinary differential equations (ODEs)
 describing the system and obtain a numerical solution.
 """
 
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

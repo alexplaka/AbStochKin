@@ -1,6 +1,6 @@
 """  Graphing for AbStochKin simulations. """
 
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import plotly.graph_objects as go
-from matplotlib.figure import Figure
 
 
 class Graph:
