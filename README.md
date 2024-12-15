@@ -74,8 +74,10 @@ Behind the scenes, default values for unspecified but necessary arguments are us
 (specifically, the number of simulations that comprise the ensemble, $n=100$, 
 and the duration of the fixed time interval for each step in the simulation, 
 $dt=0.01$ seconds).
+
 ```python
 from abstochkin import AbStochKin
+
 sim = AbStochKin()
 sim.add_process_from_str('A -> B', k=0.2)
 sim.simulate(p0={'A': 100, 'B': 0}, t_max=10)

@@ -16,10 +16,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
+from typing import Literal
 
+import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy as np
+import plotly.graph_objects as go
 
 
 class Graph:
@@ -43,25 +45,57 @@ class Graph:
     plt.rcParams["legend.fontsize"] = 7
     plt.rcParams["legend.framealpha"] = 0.65
 
-    def __init__(self, /, nrows=1, ncols=1, figsize=(5, 5), dpi=300, **kwargs):
-        self.fig, self.ax = plt.subplots(nrows=nrows, ncols=ncols,
-                                         figsize=figsize, dpi=dpi,
-                                         **kwargs)
+    def __init__(self,
+                 /,
+                 nrows=1,
+                 ncols=1,
+                 figsize=(5, 5),
+                 dpi=300,
+                 *,
+                 backend: Literal['matplotlib', 'plotly'] = 'matplotlib',
+                 **kwargs):
+        self.backend = backend
+
+        if self.backend == 'matplotlib':
+            self.fig, self.ax = plt.subplots(nrows=nrows, ncols=ncols,
+                                             figsize=figsize, dpi=dpi,
+                                             **kwargs)
+        elif self.backend == 'plotly':
+            self.fig = go.Figure()
+            self.fig.update_layout(
+                width=figsize[0] * dpi * 0.6,  # Convert figsize to pixels
+                height=figsize[1] * dpi * 0.6,  # Convert figsize to pixels
+            )
+        else:
+            raise ValueError(f"Unknown backend: {self.backend}. "
+                             f"Please choose from 'matplotlib' (default), 'plotly'.")
 
     def setup_spines_ticks(self, ax_loc):
         """
+        Set up the spines and ticks in a `matplotlib` graph.
         Make only the left and bottom spines/axes visible on the graph
         and place major ticks on them. Also set the minor ticks.
         """
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.spines[['left']].set_position('zero')
-        axs.spines[['top', 'right']].set_visible(False)
-        axs.xaxis.set_ticks_position('bottom')
-        axs.yaxis.set_ticks_position('left')
-        axs.xaxis.set_minor_locator(ticker.AutoMinorLocator())
-        axs.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+        if self.backend == 'matplotlib':
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.spines[['left']].set_position('zero')
+            axs.spines[['top', 'right']].set_visible(False)
+            axs.xaxis.set_ticks_position('bottom')
+            axs.yaxis.set_ticks_position('left')
+            axs.xaxis.set_minor_locator(ticker.AutoMinorLocator())
+            axs.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+        else:  # self.backend == 'plotly'
+            self.fig.update_layout(
+                xaxis=dict(zeroline=True, showline=True, linewidth=2,
+                           zerolinecolor="black", showticklabels=True,
+                           tickmode='auto', ticks='outside'),
+                yaxis=dict(zeroline=True, showline=True, linewidth=2,
+                           zerolinecolor="black", showticklabels=True,
+                           tickmode='auto', ticks='outside')
+            )
 
-    def plot_ODEs(self, de_data,
+    def plot_ODEs(self,
+                  de_data,
                   *,
                   num_pts: int = 1000,
                   species: list[str] | tuple[str] = (),
@@ -93,50 +127,94 @@ class Graph:
                 a 1-D array. For figures with multiple rows and columns of
                 subplots, a 2-D tuple is needed.
         """
-
         species = list(de_data.odes.keys()) if len(species) == 0 else species
-
-        self.setup_spines_ticks(ax_loc)
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.set(xlim=(0, de_data.odes_sol.t[-1]))
-
         # t, y = ode_sol.t, ode_sol.y.T  # values at precomputed time pts
         t = np.linspace(de_data.odes_sol.t[0], de_data.odes_sol.t[-1],
                         num_pts)  # time points for obtaining...
         y = de_data.odes_sol.sol(t).T  # an approximately continuous solution
 
-        for i, sp in enumerate(list(de_data.odes.keys())):
-            if sp in species:
-                axs.plot(t, y[:, i], label=f"${sp}_{{DE}}$",
-                         linestyle='--', linewidth=0.75, alpha=0.75)
+        self.setup_spines_ticks(ax_loc)
 
-        # axs.set(title="Deterministic trajectories")
-        axs.set(xlabel=f"${de_data.time_unit}$", ylabel="$N$")
-        axs.legend(loc='upper right')
-        self.fig.tight_layout()
+        if self.backend == 'matplotlib':
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.set(xlim=(0, de_data.odes_sol.t[-1]))
 
-    def plot_trajectories(self, time, data,
+            for i, sp in enumerate(list(de_data.odes.keys())):
+                if sp in species:
+                    axs.plot(t, y[:, i], label=f"${sp}_{{DE}}$",
+                             linestyle='--', linewidth=0.75, alpha=0.75)
+
+            # axs.set(title="Deterministic trajectories")
+            axs.set(xlabel=f"$t$ ({de_data.time_unit})", ylabel="$N$")
+            axs.legend(loc='upper right')
+            self.fig.tight_layout()
+        else:  # self.backend == plotly
+            for i, sp in enumerate(list(de_data.odes.keys())):
+                if sp in species:
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=t.tolist(),
+                            y=y[:, i].tolist(),
+                            mode='lines',
+                            name=f"${sp}_{{DE}}$",
+                            line=dict(dash='dash', width=1)
+                        )
+                    )
+
+            self.fig.update_layout(
+                xaxis=dict(title=f"$t \\, ({de_data.time_unit})$",
+                           range=[-0.01 * de_data.odes_sol.t[-1], de_data.odes_sol.t[-1]]),
+                yaxis=dict(title="$N$"),
+            )
+            self.fig.show()
+
+    def plot_trajectories(self,
+                          time,
+                          data,
                           *,
                           species: list[str] | tuple[str] = (),
                           ax_loc: tuple = ()):
         """ Graph simulation time trajectories. """
-
         self.setup_spines_ticks(ax_loc)
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.set(xlim=(0, time[-1]))
-
         species = list(data.keys()) if len(species) == 0 else species
-        for sp, sp_data in data.items():
-            if sp in species:
-                trajs = sp_data['N'].T
-                for traj in trajs:
-                    axs.plot(time, traj, linewidth=0.25)
 
-        axs.set(title="ABK trajectories")
-        axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
-        # axs.legend(loc='best')
+        if self.backend == 'matplotlib':
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.set(xlim=(0, time[-1]))
 
-    def plot_avg_std(self, time, data,
+            for sp, sp_data in data.items():
+                if sp in species:
+                    trajs = sp_data['N'].T
+                    for traj in trajs:
+                        axs.plot(time, traj, linewidth=0.25)
+
+            axs.set(title="ABK trajectories")
+            axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
+            # axs.legend(loc='best')
+        else:  # self.backend == plotly
+            for sp, sp_data in data.items():
+                if sp in species:
+                    trajs = sp_data['N'].T
+                    for i, traj in enumerate(trajs):
+                        self.fig.add_trace(
+                            go.Scatter(
+                                x=time.tolist(),
+                                y=traj.tolist(),
+                                mode='lines',
+                                name=f"${sp} \\; Run \\, {i}$",
+                                line=dict(width=0.5)
+                            )
+                        )
+            self.fig.update_layout(
+                xaxis=dict(title=f"$t \\; (sec)$",
+                           range=[-0.01 * time[-1], time[-1]]),
+                yaxis=dict(title="$N$")
+            )
+            self.fig.show()
+
+    def plot_avg_std(self,
+                     time,
+                     data,
                      *,
                      species: list[str] | tuple[str] = (),
                      ax_loc: tuple = ()):
@@ -145,94 +223,281 @@ class Graph:
         1-standard-deviation envelopes.
         """
         self.setup_spines_ticks(ax_loc)
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.set(xlim=(0, time[-1]))
-
         species = list(data.keys()) if len(species) == 0 else species
-        for sp, sp_data in data.items():
-            if sp in species:
-                axs.plot(time, sp_data['N_avg'],
-                         linewidth=1.5, label=f"${sp}$", alpha=0.5)
-                axs.fill_between(time,
-                                 sp_data['N_avg'] - sp_data['N_std'],
-                                 sp_data['N_avg'] + sp_data['N_std'],
-                                 alpha=0.5, linewidth=0)
 
-        axs.set(xlabel="$t$ (sec)", ylabel="$<N>$")
-        axs.legend(loc='upper right')
-        self.fig.tight_layout()
+        if self.backend == 'matplotlib':
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.set(xlim=(0, time[-1]))
 
-    def plot_eta(self, time, data, *, species: list[str] | tuple[str] = (),
+            for sp, sp_data in data.items():
+                if sp in species:
+                    axs.plot(time, sp_data['N_avg'],
+                             linewidth=1.5, label=f"$<{sp}>$", alpha=0.5)
+                    axs.fill_between(time,
+                                     sp_data['N_avg'] - sp_data['N_std'],
+                                     sp_data['N_avg'] + sp_data['N_std'],
+                                     alpha=0.5, linewidth=0)
+
+            axs.set(xlabel="$t$ (sec)", ylabel="$N$")
+            axs.legend(loc='upper right')
+            self.fig.tight_layout()
+        else:  # self.backend == plotly
+            for sp, sp_data in data.items():
+                if sp in species:
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=time.tolist(),
+                            y=sp_data['N_avg'].tolist(),
+                            mode='lines',
+                            name=f"$<{sp}>$",
+                            line=dict(width=2)
+                        )
+                    )
+
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=time.tolist(),
+                            y=(sp_data['N_avg'] + sp_data['N_std']).tolist(),
+                            mode='lines',
+                            name=f"$<{sp}> + \\sigma$",
+                            line=dict(width=0),
+                            showlegend=False
+                        )
+                    )
+
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=time.tolist(),
+                            y=(sp_data['N_avg'] - sp_data['N_std']).tolist(),
+                            mode='lines',
+                            line=dict(width=0),
+                            name=f"$<{sp}> - \\sigma$",
+                            fill='tonexty',
+                            showlegend=False
+                        )
+                    )
+
+            self.fig.update_layout(
+                xaxis=dict(title=f"$t \\; (sec)$",
+                           range=[-0.01 * time[-1], time[-1]]),
+                yaxis=dict(title="$N$")
+            )
+            self.fig.show()
+
+    def plot_eta(self,
+                 time,
+                 data,
+                 *,
+                 species: list[str] | tuple[str] = (),
                  ax_loc: tuple = ()):
         """ Graph the coefficient of variation. """
-
         self.setup_spines_ticks(ax_loc)
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.set(xlim=(0, time[-1]))
-
         species = list(data.keys()) if len(species) == 0 else species
-        for sp, sp_data in data.items():
-            if sp in species:
-                axs.plot(time, sp_data['eta'], linewidth=1.5, label=f"${sp}$")
-                axs.plot(time, sp_data['eta_p'], linewidth=1, linestyle='--',
-                         label=f"${sp}_{{Poisson}}$", color=(0.5, 0.5, 0.5))
 
-        axs.set(title="Coefficient of Variation, $\\eta$")
-        axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
-        axs.legend(loc='upper right')
+        if self.backend == "matplotlib":
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.set(xlim=(0, time[-1]))
 
-    def plot_het_metrics(self, time,
+            for sp, sp_data in data.items():
+                if sp in species:
+                    axs.plot(time, sp_data['eta'], linewidth=1.5, label=f"${sp}$")
+                    axs.plot(time, sp_data['eta_p'], linewidth=1, linestyle='--',
+                             label=f"${sp}_{{Poisson}}$", color=(0.5, 0.5, 0.5))
+
+            axs.set(title="Coefficient of Variation, $\\eta$")
+            axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
+            axs.legend(loc='upper right')
+        else:
+            for sp, sp_data in data.items():
+                if sp in species:
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=time.tolist(),
+                            y=sp_data['eta'].tolist(),
+                            mode='lines',
+                            name=f"${sp}$",
+                            line=dict(width=2)
+                        ))
+
+                    self.fig.add_trace(
+                        go.Scatter(
+                            x=time.tolist(),
+                            y=sp_data['eta_p'].tolist(),
+                            mode='lines',
+                            name=f"${sp}_{{Poisson}}$",
+                            line=dict(width=2, dash="dash")
+                        ))
+
+            self.fig.update_layout(
+                title="Coefficient of Variation",
+                xaxis=dict(title=f"$t \\; (sec)$",
+                           range=[-0.01 * time[-1], time[-1]]),
+                yaxis=dict(title="$\\eta$")
+            )
+            self.fig.show()
+
+    def plot_het_metrics(self,
+                         time,
                          proc_str: tuple[str, str],
                          proc_data: dict,
-                         *, het_attr='k', ax_loc: tuple = ()):
+                         *,
+                         het_attr='k',
+                         ax_loc: tuple = ()):
         """
         Graph species- and process-specific metrics of population heterogeneity.
         """
-
         self.setup_spines_ticks(ax_loc)
-        axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
-        axs.set(xlim=(0, time[-1]))
-        axs.set(xlim=(0, time[-1]),
-                ylim=(0, 1.5 * np.max(proc_data[f"<{het_attr}_avg>"] + proc_data[
-                    f"<{het_attr}_std>"])))
-        axs.plot(time, proc_data[f'<{het_attr}_avg>'],
-                 linewidth=1.5, label=f"$<{het_attr}>$", alpha=0.5)
-        axs.fill_between(time,
-                         proc_data[f"<{het_attr}_avg>"] - proc_data[f"<{het_attr}_std>"],
-                         proc_data[f"<{het_attr}_avg>"] + proc_data[f"<{het_attr}_std>"],
-                         alpha=0.5, linewidth=0)
-        axs.tick_params(axis='y', labelcolor='blue')
+        title = f"${proc_str[0].split(';')[0].replace(' ,', chr(92) + 'hspace{10pt} ,').replace('->', chr(92) + 'rightarrow')}$"
 
-        title = f"${proc_str[0].split(';')[0].replace(' ,' , chr(92) + 'hspace{10pt} ,').replace('->', chr(92) + 'rightarrow')}$"
-        axs.set(title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
-                xlabel=f"$t$ (sec)")
+        if self.backend == 'matplotlib':
+            axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
+            axs.set(xlim=(0, time[-1]))
+            axs.set(xlim=(0, time[-1]),
+                    ylim=(0, 1.5 * np.max(proc_data[f"<{het_attr}_avg>"] + proc_data[
+                        f"<{het_attr}_std>"])))
 
-        if het_attr == 'Km':
-            axs.set_ylabel(f"$K_m$", color='blue')
-        elif het_attr == 'K50':
-            axs.set_ylabel("$K_{50}$", color='blue')
-        else:
-            axs.set_ylabel(f"${het_attr}$", color='blue')
+            axs.plot(time, proc_data[f'<{het_attr}_avg>'],
+                     linewidth=1.5, label=f"$<{het_attr}>$", alpha=0.5)
+            axs.fill_between(time,
+                             proc_data[f"<{het_attr}_avg>"] - proc_data[f"<{het_attr}_std>"],
+                             proc_data[f"<{het_attr}_avg>"] + proc_data[f"<{het_attr}_std>"],
+                             alpha=0.5, linewidth=0)
+            axs.tick_params(axis='y', labelcolor='blue')
 
-        axs2 = axs.twinx()
-        axs2.spines[['bottom']].set_position('zero')  # x axis
-        axs2.spines[['right']].set_position(('axes', 1))  # y axis
-        axs2.spines[['top', 'left', 'bottom']].set_visible(False)
-        # axs2.spines['right'].set_color('red')
-        axs2.set(ylim=(0, 1))
-        axs2.tick_params(axis='y', labelcolor='red')
-        axs2.yaxis.set_ticks_position('right')
-        axs2.set_yticks([i for i in np.arange(0, 1.1, 0.1)])
-        axs2.yaxis.set_minor_locator(ticker.AutoMinorLocator())
-        axs2.grid(which='major', axis='y', color='r',
-                  linestyle='--', linewidth=0.25, alpha=0.25)
-        axs2.plot(time, proc_data['psi_avg'],
-                  linewidth=1.5, label='$<\\psi>$', color='red', alpha=0.5)
-        axs2.fill_between(time,
-                          proc_data['psi_avg'] - proc_data['psi_std'],
-                          proc_data['psi_avg'] + proc_data['psi_std'],
-                          color='red', alpha=0.5, linewidth=0)
-        axs2.set_ylabel("$\\psi$", color='red')
+            axs.set(title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
+                    xlabel=f"$t$ (sec)")
+
+            if het_attr == 'Km':
+                axs.set_ylabel("$K_m$", color='blue')
+            elif het_attr == 'K50':
+                axs.set_ylabel("$K_{50}$", color='blue')
+            else:
+                axs.set_ylabel(f"${het_attr}$", color='blue')
+
+            # Second y-axis
+            axs2 = axs.twinx()
+            axs2.spines[['bottom']].set_position('zero')  # x axis
+            axs2.spines[['right']].set_position(('axes', 1))  # y axis
+            axs2.spines[['top', 'left', 'bottom']].set_visible(False)
+            # axs2.spines['right'].set_color('red')
+            axs2.set(ylim=(0, 1))
+            axs2.tick_params(axis='y', labelcolor='red')
+            axs2.yaxis.set_ticks_position('right')
+            axs2.set_yticks([i for i in np.arange(0, 1.1, 0.1)])
+            axs2.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+            axs2.grid(which='major', axis='y', color='r',
+                      linestyle='--', linewidth=0.25, alpha=0.25)
+
+            axs2.plot(time, proc_data['psi_avg'],
+                      linewidth=1.5, label='$<\\psi>$', color='red', alpha=0.5)
+            axs2.fill_between(time,
+                              proc_data['psi_avg'] - proc_data['psi_std'],
+                              proc_data['psi_avg'] + proc_data['psi_std'],
+                              color='red', alpha=0.5, linewidth=0)
+            axs2.set_ylabel("$\\psi$", color='red')
+        else:  # self.backend == plotly
+            self.fig.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=proc_data[f'<{het_attr}_avg>'].tolist(),
+                    mode='lines',
+                    name=f"$<{het_attr}>$",
+                    line=dict(width=2, color='blue'),
+                )
+            )
+
+            self.fig.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=(proc_data[f"<{het_attr}_avg>"] + proc_data[f"<{het_attr}_std>"]).tolist(),
+                    mode='lines',
+                    name=f"$<{het_attr}> + \\sigma$",
+                    line=dict(width=0),
+                    showlegend=False
+                )
+            )
+
+            self.fig.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=(proc_data[f"<{het_attr}_avg>"] - proc_data[f"<{het_attr}_std>"]).tolist(),
+                    mode='lines',
+                    name=f"$<{het_attr}> - \\sigma$",
+                    line=dict(width=0),
+                    fill='tonexty',
+                    showlegend=False
+                )
+            )
+
+            self.fig.update_layout(
+                title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
+                xaxis=dict(title=f"$t \\; (sec)$",
+                           range=[-0.01 * time[-1], time[-1]]),
+                yaxis=dict(title="$K_m$" if het_attr == "Km" else "$K_{50}$" if het_attr == "K50" else f"${het_attr}$",
+                           color="blue",
+                           range=[0, 1.5 * np.max(proc_data[f"<{het_attr}_avg>"] + proc_data[f"<{het_attr}_std>"])])
+            )
+
+            self.fig.show()
+
+            # Plot psi on a separate figure
+            fig2 = go.Figure()
+            fig2.update_layout(
+                width=self.fig.layout.width,
+                height=self.fig.layout.height,
+                xaxis=dict(zeroline=True, showline=True, linewidth=2,
+                           zerolinecolor="black", showticklabels=True,
+                           tickmode='auto', ticks='outside'),
+                yaxis=dict(zeroline=True, showline=True, linewidth=2,
+                           zerolinecolor="black", showticklabels=True,
+                           tickmode='auto', ticks='outside')
+            )
+
+            fig2.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=proc_data['psi_avg'],
+                    mode='lines',
+                    name=f"$<\\psi>$",
+                    line=dict(width=2, color='red'),
+                )
+            )
+
+            fig2.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=proc_data['psi_avg'] + proc_data['psi_std'],
+                    mode='lines',
+                    name=f"$<\\psi> + \\sigma$",
+                    line=dict(width=0),
+                    showlegend=False
+                )
+            )
+
+            fig2.add_trace(
+                go.Scatter(
+                    x=time.tolist(),
+                    y=proc_data['psi_avg'] - proc_data['psi_std'],
+                    mode='lines',
+                    name=f"$<\\psi> + \\sigma$",
+                    line=dict(width=0),
+                    fill='tonexty',
+                    showlegend=False
+                )
+            )
+
+            fig2.update_layout(
+                title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
+                xaxis=dict(title=f"$t \\; (sec)$",
+                           range=[-0.01 * time[-1], time[-1]]),
+                yaxis=dict(title="$\\psi$",
+                           color="red",
+                           range=[0, 1],
+                           tick0=0,
+                           dtick=0.1)
+            )
+
+            fig2.show()
 
     def savefig(self, filename, **kwargs):
         """ Save the figure as a file. """
