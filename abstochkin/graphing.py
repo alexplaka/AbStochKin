@@ -16,12 +16,13 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Self
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import plotly.graph_objects as go
+from matplotlib.figure import Figure
 
 
 class Graph:
@@ -66,6 +67,7 @@ class Graph:
                 width=figsize[0] * dpi * 0.6,  # Convert figsize to pixels
                 height=figsize[1] * dpi * 0.6,  # Convert figsize to pixels
             )
+            self.fig2 = None  # optional second figure
         else:
             raise ValueError(f"Unknown backend: {self.backend}. "
                              f"Please choose from 'matplotlib' (default), 'plotly'.")
@@ -84,7 +86,9 @@ class Graph:
             axs.yaxis.set_ticks_position('left')
             axs.xaxis.set_minor_locator(ticker.AutoMinorLocator())
             axs.yaxis.set_minor_locator(ticker.AutoMinorLocator())
+
         else:  # self.backend == 'plotly'
+
             self.fig.update_layout(
                 xaxis=dict(zeroline=True, showline=True, linewidth=2,
                            zerolinecolor="black", showticklabels=True,
@@ -100,7 +104,8 @@ class Graph:
                   num_pts: int = 1000,
                   species: list[str] | tuple[str] = (),
                   show_plot: bool = True,
-                  ax_loc: tuple = ()):
+                  ax_loc: tuple = ()
+                  ) -> Self:
         """
         Plot the deterministic trajectories of all species obtained
         by obtaining the solution to a system of ODEs.
@@ -152,9 +157,12 @@ class Graph:
             axs.set(xlabel=f"$t$ ({de_data.time_unit})", ylabel="$N$")
             axs.legend(loc='upper right')
             self.fig.tight_layout()
+
             if show_plot:
                 plt.show()
+
         else:  # self.backend == plotly
+
             for i, sp in enumerate(list(de_data.odes.keys())):
                 if sp in species:
                     self.fig.add_trace(
@@ -172,8 +180,11 @@ class Graph:
                            range=[-0.01 * de_data.odes_sol.t[-1], de_data.odes_sol.t[-1]]),
                 yaxis=dict(title="$N$"),
             )
+
             if show_plot:
                 self.fig.show()
+
+        return self
 
     def plot_trajectories(self,
                           time,
@@ -181,7 +192,8 @@ class Graph:
                           *,
                           species: list[str] | tuple[str] = (),
                           show_plot: bool = True,
-                          ax_loc: tuple = ()):
+                          ax_loc: tuple = ()
+                          ) -> Self:
         """ Graph simulation time trajectories. """
         self.setup_spines_ticks(ax_loc)
         species = list(data.keys()) if len(species) == 0 else species
@@ -199,9 +211,12 @@ class Graph:
             axs.set(title="ABK trajectories")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
             # axs.legend(loc='best')
+
             if show_plot:
                 plt.show()
+
         else:  # self.backend == plotly
+
             for sp, sp_data in data.items():
                 if sp in species:
                     trajs = sp_data['N'].T
@@ -220,8 +235,11 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
+
             if show_plot:
                 self.fig.show()
+
+        return self
 
     def plot_avg_std(self,
                      time,
@@ -229,7 +247,8 @@ class Graph:
                      *,
                      species: list[str] | tuple[str] = (),
                      show_plot: bool = True,
-                     ax_loc: tuple = ()):
+                     ax_loc: tuple = ()
+                     ) -> Self:
         """
         Graph simulation average trajectories and
         1-standard-deviation envelopes.
@@ -253,9 +272,12 @@ class Graph:
             axs.set(xlabel="$t$ (sec)", ylabel="$N$")
             axs.legend(loc='upper right')
             self.fig.tight_layout()
+
             if show_plot:
                 plt.show()
+
         else:  # self.backend == plotly
+
             for sp, sp_data in data.items():
                 if sp in species:
                     self.fig.add_trace(
@@ -296,8 +318,11 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
+
             if show_plot:
                 self.fig.show()
+
+        return self
 
     def plot_eta(self,
                  time,
@@ -305,7 +330,8 @@ class Graph:
                  *,
                  species: list[str] | tuple[str] = (),
                  show_plot: bool = True,
-                 ax_loc: tuple = ()):
+                 ax_loc: tuple = ()
+                 ) -> Self:
         """ Graph the coefficient of variation. """
         self.setup_spines_ticks(ax_loc)
         species = list(data.keys()) if len(species) == 0 else species
@@ -323,9 +349,12 @@ class Graph:
             axs.set(title="Coefficient of Variation, $\\eta$")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
             axs.legend(loc='upper right')
+
             if show_plot:
                 plt.show()
-        else:
+
+        else:  # self.backend == plotly
+
             for sp, sp_data in data.items():
                 if sp in species:
                     self.fig.add_trace(
@@ -352,8 +381,11 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$\\eta$")
             )
+
             if show_plot:
                 self.fig.show()
+
+        return self
 
     def plot_het_metrics(self,
                          time,
@@ -362,7 +394,8 @@ class Graph:
                          *,
                          het_attr='k',
                          show_plot: bool = True,
-                         ax_loc: tuple = ()):
+                         ax_loc: tuple = ()
+                         ) -> Self:
         """
         Graph species- and process-specific metrics of population heterogeneity.
         """
@@ -418,7 +451,11 @@ class Graph:
 
             if show_plot:
                 plt.show()
+
+            return self
+
         else:  # self.backend == plotly
+
             self.fig.add_trace(
                 go.Scatter(
                     x=time.tolist(),
@@ -465,8 +502,8 @@ class Graph:
                 self.fig.show()
 
             # Plot psi on a separate figure
-            fig2 = go.Figure()
-            fig2.update_layout(
+            self.fig2 = go.Figure()
+            self.fig2.update_layout(
                 width=self.fig.layout.width,
                 height=self.fig.layout.height,
                 xaxis=dict(zeroline=True, showline=True, linewidth=2,
@@ -477,7 +514,7 @@ class Graph:
                            tickmode='auto', ticks='outside')
             )
 
-            fig2.add_trace(
+            self.fig2.add_trace(
                 go.Scatter(
                     x=time.tolist(),
                     y=proc_data['psi_avg'],
@@ -487,7 +524,7 @@ class Graph:
                 )
             )
 
-            fig2.add_trace(
+            self.fig2.add_trace(
                 go.Scatter(
                     x=time.tolist(),
                     y=proc_data['psi_avg'] + proc_data['psi_std'],
@@ -498,7 +535,7 @@ class Graph:
                 )
             )
 
-            fig2.add_trace(
+            self.fig2.add_trace(
                 go.Scatter(
                     x=time.tolist(),
                     y=proc_data['psi_avg'] - proc_data['psi_std'],
@@ -510,7 +547,7 @@ class Graph:
                 )
             )
 
-            fig2.update_layout(
+            self.fig2.update_layout(
                 title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
                 xaxis=dict(title=f"$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
@@ -522,7 +559,9 @@ class Graph:
             )
 
             if show_plot:
-                fig2.show()
+                self.fig2.show()
+
+            return self
 
     def savefig(self, filename, **kwargs):
         """ Save the figure as a file. """

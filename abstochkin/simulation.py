@@ -199,10 +199,12 @@ class Simulation(SimulationMethodsMixin):
         self.algo_sequence = list()
         self.progress_bar = None
 
+        self.graphs = None  # For storing any graphs that are shown
+
         if do_run:
             self.run_simulation()
             if show_graphs:  # Simulation must first be run before plotting
-                self.graph_results()
+                self.graphs = self.graph_results()
 
     def run_simulation(self):
         """
@@ -269,6 +271,7 @@ class Simulation(SimulationMethodsMixin):
                 of heterogeneity (`k` and `ψ`) and their
                 one-standard deviation envelopes.
         """
+        graphs_to_return = list()
 
         if graphs_to_show is None:
             graphs_to_show = ['avg', 'het']
@@ -280,18 +283,22 @@ class Simulation(SimulationMethodsMixin):
             with contextlib.suppress(AttributeError):
                 graph_avg.plot_ODEs(self.de_calcs, species=species_to_show, show_plot=False)
             graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_avg)
 
         if 'traj' in graphs_to_show:
             graph_traj = Graph(backend=self.graph_backend)
             graph_traj.plot_trajectories(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_traj)
 
         if 'ode' in graphs_to_show:
             graph_ode = Graph(backend=self.graph_backend)
             graph_ode.plot_ODEs(self.de_calcs, species=species_to_show)
+            graphs_to_return.append(graph_ode)
 
         if 'eta' in graphs_to_show:
             graph_eta = Graph(backend=self.graph_backend)
             graph_eta.plot_eta(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_eta)
 
         if 'het' in graphs_to_show:
             for proc in self._algo_processes:
@@ -328,6 +335,10 @@ class Simulation(SimulationMethodsMixin):
                                                        (str(proc), f"K_{{50}}={proc.K50}"),
                                                        self.K50_het_metrics[proc],
                                                        het_attr='K50')
+
+            graphs_to_return.append(graph_het)
+
+        return graphs_to_return
 
     def __repr__(self):
         return f"AbStochKin Simulation(p0={self.p0},\n" \
