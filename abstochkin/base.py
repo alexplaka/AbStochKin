@@ -8,11 +8,11 @@ Example
 >>> from abstochkin import AbStochKin
 >>> sim = AbStochKin()
 >>> sim.add_process_from_str('A -> ', 0.2)  # degradation process
->>> sim.simulate(p0={'A': 100}, t_max=20)
+>>> sim.simulate(p0={'A': 100},t_max=20,plot_backend=plotly)
 >>> # All data for the above simulation is stored in `sim.sims[0]`.
 >>>
 >>> # Now set up a new simulation without actually running it.
->>> sim.simulate(p0={'A': 10}, t_max=10, n=50, run=False)
+>>> sim.simulate(p0={'A': 10},t_max=10,n=50,run=False,plot_backend=plotly)
 >>> # All data for the new simulation is stored in `sim.sims[1]`.
 >>> # The simulation can then be manually run using methods
 >>> # documented in the class `Simulation`.
@@ -36,7 +36,7 @@ Example
 import re
 from ast import literal_eval
 from concurrent.futures import ProcessPoolExecutor
-from typing import Any
+from typing import Any, Literal
 
 from .het_calcs import get_het_processes
 from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
@@ -235,6 +235,7 @@ class AbStochKin:
                  ode_method: str = 'RK45',
                  run: bool = True,
                  show_plots: bool = True,
+                 plot_backend: Literal['matplotlib', 'plotly'] = 'matplotlib',
                  multithreading: bool = True,
                  max_agents_by_species: dict = None,
                  max_agents_multiplier: int = 2,
@@ -269,6 +270,8 @@ class AbStochKin:
             Specify whether to run an AbStochKin simulation.
         show_plots : bool, default: True, optional
             Specify whether to graph the results of the AbStochKin simulation.
+        plot_backend : str, default: 'matplotlib', optional
+            `Matplotlib` and `Plotly` are currently supported.
         multithreading : bool, default: True, optional
             Specify whether to parallelize the simulation
             using multithreading. If `False`, the ensemble
@@ -310,6 +313,7 @@ class AbStochKin:
                          ODE_method=ode_method,
                          do_run=run,
                          show_graphs=show_plots,
+                         graph_backend=plot_backend,
                          use_multithreading=multithreading,
                          max_agents=max_agents_by_species,
                          max_agents_multiplier=max_agents_multiplier,
