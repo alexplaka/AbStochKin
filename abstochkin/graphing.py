@@ -172,13 +172,15 @@ class Graph:
                            range=[-0.01 * de_data.odes_sol.t[-1], de_data.odes_sol.t[-1]]),
                 yaxis=dict(title="$N$"),
             )
-            self.fig.show()
+            if show_plot:
+                self.fig.show()
 
     def plot_trajectories(self,
                           time,
                           data,
                           *,
                           species: list[str] | tuple[str] = (),
+                          show_plot: bool = True,
                           ax_loc: tuple = ()):
         """ Graph simulation time trajectories. """
         self.setup_spines_ticks(ax_loc)
@@ -197,7 +199,8 @@ class Graph:
             axs.set(title="ABK trajectories")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
             # axs.legend(loc='best')
-            plt.show()
+            if show_plot:
+                plt.show()
         else:  # self.backend == plotly
             for sp, sp_data in data.items():
                 if sp in species:
@@ -217,13 +220,15 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
-            self.fig.show()
+            if show_plot:
+                self.fig.show()
 
     def plot_avg_std(self,
                      time,
                      data,
                      *,
                      species: list[str] | tuple[str] = (),
+                     show_plot: bool = True,
                      ax_loc: tuple = ()):
         """
         Graph simulation average trajectories and
@@ -248,7 +253,8 @@ class Graph:
             axs.set(xlabel="$t$ (sec)", ylabel="$N$")
             axs.legend(loc='upper right')
             self.fig.tight_layout()
-            plt.show()
+            if show_plot:
+                plt.show()
         else:  # self.backend == plotly
             for sp, sp_data in data.items():
                 if sp in species:
@@ -290,13 +296,15 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
-            self.fig.show()
+            if show_plot:
+                self.fig.show()
 
     def plot_eta(self,
                  time,
                  data,
                  *,
                  species: list[str] | tuple[str] = (),
+                 show_plot: bool = True,
                  ax_loc: tuple = ()):
         """ Graph the coefficient of variation. """
         self.setup_spines_ticks(ax_loc)
@@ -315,7 +323,8 @@ class Graph:
             axs.set(title="Coefficient of Variation, $\\eta$")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
             axs.legend(loc='upper right')
-            plt.show()
+            if show_plot:
+                plt.show()
         else:
             for sp, sp_data in data.items():
                 if sp in species:
@@ -343,7 +352,8 @@ class Graph:
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$\\eta$")
             )
-            self.fig.show()
+            if show_plot:
+                self.fig.show()
 
     def plot_het_metrics(self,
                          time,
@@ -351,6 +361,7 @@ class Graph:
                          proc_data: dict,
                          *,
                          het_attr='k',
+                         show_plot: bool = True,
                          ax_loc: tuple = ()):
         """
         Graph species- and process-specific metrics of population heterogeneity.
@@ -404,7 +415,9 @@ class Graph:
                               proc_data['psi_avg'] + proc_data['psi_std'],
                               color='red', alpha=0.5, linewidth=0)
             axs2.set_ylabel("$\\psi$", color='red')
-            plt.show()
+
+            if show_plot:
+                plt.show()
         else:  # self.backend == plotly
             self.fig.add_trace(
                 go.Scatter(
@@ -448,7 +461,8 @@ class Graph:
                            range=[0, 1.5 * np.max(proc_data[f"<{het_attr}_avg>"] + proc_data[f"<{het_attr}_std>"])])
             )
 
-            self.fig.show()
+            if show_plot:
+                self.fig.show()
 
             # Plot psi on a separate figure
             fig2 = go.Figure()
@@ -507,7 +521,8 @@ class Graph:
                            dtick=0.1)
             )
 
-            fig2.show()
+            if show_plot:
+                fig2.show()
 
     def savefig(self, filename, **kwargs):
         """ Save the figure as a file. """
