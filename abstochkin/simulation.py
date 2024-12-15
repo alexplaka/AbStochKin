@@ -301,6 +301,8 @@ class Simulation(SimulationMethodsMixin):
             graphs_to_return.append(graph_eta)
 
         if 'het' in graphs_to_show:
+            graph_het = None
+
             for proc in self._algo_processes:
                 if proc.is_heterogeneous:
                     graph_het = Graph(backend=self.graph_backend)
@@ -336,7 +338,8 @@ class Simulation(SimulationMethodsMixin):
                                                        self.K50_het_metrics[proc],
                                                        het_attr='K50')
 
-            graphs_to_return.append(graph_het)
+            if graph_het is not None:
+                graphs_to_return.append(graph_het)
 
         return graphs_to_return
 
