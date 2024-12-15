@@ -237,7 +237,10 @@ class Simulation(SimulationMethodsMixin):
         self._post_run_cleanup()  # free up some memory
         self.progress_bar.close()
 
-    def graph_results(self, /, graphs_to_show=None, species_to_show=None):
+    def graph_results(self,
+                      /,
+                      graphs_to_show=None,
+                      species_to_show=None):
         """
         Make graphs of the results.
 
@@ -275,7 +278,7 @@ class Simulation(SimulationMethodsMixin):
         if 'avg' in graphs_to_show:
             graph_avg = Graph(backend=self.graph_backend)
             with contextlib.suppress(AttributeError):
-                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show)
+                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show, show_plot=False)
             graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
 
         if 'traj' in graphs_to_show:

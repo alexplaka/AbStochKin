@@ -99,6 +99,7 @@ class Graph:
                   *,
                   num_pts: int = 1000,
                   species: list[str] | tuple[str] = (),
+                  show_plot: bool = True,
                   ax_loc: tuple = ()):
         """
         Plot the deterministic trajectories of all species obtained
@@ -118,6 +119,9 @@ class Graph:
                  An iterable sequence of strings specifying the species
                  names to plot. If no species are specified (the default),
                  then all species trajectories are plotted.
+
+        show_plot : bool, default: True, optional
+                 If True, show the plot.
 
         ax_loc : tuple, optional
                 If the figure is made up of subplots, specify the location
@@ -148,6 +152,8 @@ class Graph:
             axs.set(xlabel=f"$t$ ({de_data.time_unit})", ylabel="$N$")
             axs.legend(loc='upper right')
             self.fig.tight_layout()
+            if show_plot:
+                plt.show()
         else:  # self.backend == plotly
             for i, sp in enumerate(list(de_data.odes.keys())):
                 if sp in species:
@@ -191,6 +197,7 @@ class Graph:
             axs.set(title="ABK trajectories")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
             # axs.legend(loc='best')
+            plt.show()
         else:  # self.backend == plotly
             for sp, sp_data in data.items():
                 if sp in species:
@@ -241,6 +248,7 @@ class Graph:
             axs.set(xlabel="$t$ (sec)", ylabel="$N$")
             axs.legend(loc='upper right')
             self.fig.tight_layout()
+            plt.show()
         else:  # self.backend == plotly
             for sp, sp_data in data.items():
                 if sp in species:
@@ -307,6 +315,7 @@ class Graph:
             axs.set(title="Coefficient of Variation, $\\eta$")
             axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
             axs.legend(loc='upper right')
+            plt.show()
         else:
             for sp, sp_data in data.items():
                 if sp in species:
@@ -395,6 +404,7 @@ class Graph:
                               proc_data['psi_avg'] + proc_data['psi_std'],
                               color='red', alpha=0.5, linewidth=0)
             axs2.set_ylabel("$\\psi$", color='red')
+            plt.show()
         else:  # self.backend == plotly
             self.fig.add_trace(
                 go.Scatter(
