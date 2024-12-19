@@ -562,13 +562,13 @@ class Graph:
 
             return self
 
-    def savefig(self, filename, **kwargs):
+    def savefig(self, filename: str, image_format: str = 'svg', **kwargs):
         """ Save the figure as a file. """
-        graph_path = Path('.') / 'output'
+        graph_path = Path('.') / 'plots_output'
         graph_path.mkdir(exist_ok=True)
-        graph_path_svg = graph_path / filename
+        graph_path_svg = graph_path / f"{filename}.{image_format}"
         if self.backend == 'matplotlib':
-            self.fig.savefig(graph_path_svg, format="svg", **kwargs)
+            self.fig.savefig(graph_path_svg, format=image_format, **kwargs)
             plt.close(self.fig)
         else:  # self.backend == 'plotly'
-            self.fig.write_image(graph_path_svg, format="svg", **kwargs)
+            self.fig.write_image(graph_path_svg, format=image_format, **kwargs)
