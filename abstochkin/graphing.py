@@ -160,7 +160,7 @@ class Graph:
             if show_plot:
                 plt.show()
 
-        else:  # self.backend == plotly
+        else:  # self.backend == 'plotly'
 
             for i, sp in enumerate(list(de_data.odes.keys())):
                 if sp in species:
@@ -214,7 +214,7 @@ class Graph:
             if show_plot:
                 plt.show()
 
-        else:  # self.backend == plotly
+        else:  # self.backend == 'plotly'
 
             for sp, sp_data in data.items():
                 if sp in species:
@@ -275,7 +275,7 @@ class Graph:
             if show_plot:
                 plt.show()
 
-        else:  # self.backend == plotly
+        else:  # self.backend == 'plotly'
 
             for sp, sp_data in data.items():
                 if sp in species:
@@ -352,7 +352,7 @@ class Graph:
             if show_plot:
                 plt.show()
 
-        else:  # self.backend == plotly
+        else:  # self.backend == 'plotly'
 
             for sp, sp_data in data.items():
                 if sp in species:
@@ -453,7 +453,7 @@ class Graph:
 
             return self
 
-        else:  # self.backend == plotly
+        else:  # self.backend == 'plotly'
 
             self.fig.add_trace(
                 go.Scatter(
@@ -567,5 +567,8 @@ class Graph:
         graph_path = Path('.') / 'output'
         graph_path.mkdir(exist_ok=True)
         graph_path_svg = graph_path / filename
-        self.fig.savefig(graph_path_svg, **kwargs)
-        plt.close(self.fig)
+        if self.backend == 'matplotlib':
+            self.fig.savefig(graph_path_svg, format="svg", **kwargs)
+            plt.close(self.fig)
+        else:  # self.backend == 'plotly'
+            self.fig.write_image(graph_path_svg, format="svg", **kwargs)
