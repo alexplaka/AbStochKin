@@ -49,12 +49,14 @@ class AbStochKin:
 
     Attributes
     ----------
-    time_unit : str, default : 'sec', optional
-        A string of the time unit to be used for describing the kinetics
-        of the given processes.
     volume : float, default : None, optional
         The volume *in liters* of the compartment in which the processes
         are taking place.
+    volume_unit : str, default : 'L', optional
+        A string of the volume unit. The default value is 'L' for liters.
+    time_unit : str, default : 'sec', optional
+        A string of the time unit to be used for describing the kinetics
+        of the given processes.
     processes : list
         A list of the processes that the AbStochKin object has.
     het_processes : list
@@ -71,9 +73,9 @@ class AbStochKin:
                  volume: float = None,
                  volume_unit: str = 'L',
                  time_unit: str = 'sec'):
-        self.time_unit = time_unit
         self.volume = volume
         self.volume_unit = volume_unit
+        self.time_unit = time_unit
 
         self.processes = list()
         self.het_processes = list()

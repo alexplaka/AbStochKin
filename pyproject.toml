@@ -37,7 +37,7 @@ classifiers = [
 docs = [
   "myst_parser >=2.0",
   "sphinx >=7.0",
-  "pdoc3 >=0.10"
+  "pdoc >=15"
 ]
 plotly = [
   "plotly >=5.24",
