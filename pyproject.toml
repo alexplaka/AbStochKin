@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "abstochkin"
-version = "0.2"
+version = "0.2.0.1"
 description = "Agent-based Stochastic Kinetics: A method for simulating the dynamics of heterogeneous populations."
 readme = "README.md"
 license.file = "LICENSE"
@@ -26,9 +26,8 @@ classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering",
 ]
