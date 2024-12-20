@@ -37,7 +37,7 @@ or diversity, in the composition of species populations on the dynamics of a sys
 
 ## Installation
 The `abstochkin` package can be installed via `pip` in an environment with 
-Python 3.10+. 
+Python 3.12+. 
 ```
 $ pip install abstochkin 
 ```
