@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import unittest
 
 from abstochkin.base import AbStochKin
@@ -22,7 +23,9 @@ class TestAbStochKin(unittest.TestCase):
     def setUp(self):
         # Test importing processes from file 1
         self.sim1 = AbStochKin()
-        self.sim1.add_processes_from_file("processes_test_1.txt")
+        self.sim1.add_processes_from_file(
+            os.path.join(os.path.dirname(__file__), "processes_test_1.txt")
+        )
         self.sim1.add_process({'G0_3': 1}, {'None': 0}, 1.023)
         self.sim1.add_process_from_str(" -> X", 1)
         self.sim1.simulate(p0={'C': 10, 'CaM_4Ca': 15, 'W_2': 40, 'Pi': 6, 'H2O': 100,
@@ -40,7 +43,9 @@ class TestAbStochKin(unittest.TestCase):
 
         # Test importing processes from file 2
         self.sim3 = AbStochKin()
-        self.sim3.add_processes_from_file("processes_test_2.txt")
+        self.sim3.add_processes_from_file(
+            os.path.join(os.path.dirname(__file__), "processes_test_2.txt")
+        )
 
         # Test adding processes where the system is in a compartment with a specified volume
         self.sim4 = AbStochKin(volume=1.5e-15)  # Approximate volume of an E. coli cell
