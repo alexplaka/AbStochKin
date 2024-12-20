@@ -1,4 +1,4 @@
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -24,12 +24,14 @@ class TestReversibleProcessSimulation1(unittest.TestCase):
         self.sim1a = AbStochKin()
         self.sim1a.add_process_from_str("A <-> B", 0.3, k_rev=0.1)
         self.sim1a.simulate(p0={'A': 40, 'B': 10}, t_max=20, dt=0.01, n=100,
-                            max_agents_by_species={'A': 60, 'B': 60})
+                            max_agents_by_species={'A': 60, 'B': 60},
+                            show_plots=False)
 
         self.sim1b = AbStochKin()
         self.sim1b.add_process_from_str("A + B <--> C", 0.05, k_rev=0.1)
         self.sim1b.simulate(p0={'A': 40, 'B': 20, 'C': 0}, t_max=10, dt=0.01, n=100,
-                            max_agents_by_species={'A': 40, 'B': 40, 'C': 40})
+                            max_agents_by_species={'A': 40, 'B': 40, 'C': 40},
+                            show_plots=False)
 
     def test_simulations_1(self):
         # First make sure reversible process is split in two processes:

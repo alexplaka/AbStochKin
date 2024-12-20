@@ -10,7 +10,7 @@ The class `AgentStateData` is used by a `Simulation`
 object to store and handle some of the necessary runtime data.
 """
 
-#  Copyright (c) 2024, Alex Plakantonakis.
+#  Copyright (c) 2024-2025, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ object to store and handle some of the necessary runtime data.
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import contextlib
+from typing import Literal
 
 import numpy as np
 from tqdm import tqdm
@@ -94,6 +95,7 @@ class Simulation(SimulationMethodsMixin):
                  ODE_method: str,
                  do_run: bool,
                  show_graphs: bool,
+                 graph_backend: Literal['matplotlib', 'plotly'],
                  use_multithreading: bool,
                  max_agents: dict,
                  max_agents_multiplier: float | int,
@@ -124,6 +126,8 @@ class Simulation(SimulationMethodsMixin):
             run it by calling the class method `run_simulation()`.
         show_graphs : bool
             Specify whether to show graphs of the results.
+        graph_backend : str
+            `Matplotlib` and `Plotly` are currently supported.
         """
 
         self.p0 = p0  # dictionary of initial population sizes
@@ -167,6 +171,8 @@ class Simulation(SimulationMethodsMixin):
                       "each species when not solving the system ODEs.")
         # ********************************************************************
 
+        self.graph_backend = graph_backend
+
         self.total_time = self.t_max - self.t_min
         self.t_steps = int(self.total_time / self.dt)
         self.time = np.linspace(0, self.total_time, self.t_steps + 1)
@@ -193,10 +199,12 @@ class Simulation(SimulationMethodsMixin):
         self.algo_sequence = list()
         self.progress_bar = None
 
+        self.graphs = None  # For storing any graphs that are shown
+
         if do_run:
             self.run_simulation()
             if show_graphs:  # Simulation must first be run before plotting
-                self.graph_results()
+                self.graphs = self.graph_results()
 
     def run_simulation(self):
         """
@@ -231,7 +239,10 @@ class Simulation(SimulationMethodsMixin):
         self._post_run_cleanup()  # free up some memory
         self.progress_bar.close()
 
-    def graph_results(self, /, graphs_to_show=None, species_to_show=None):
+    def graph_results(self,
+                      /,
+                      graphs_to_show=None,
+                      species_to_show=None):
         """
         Make graphs of the results.
 
@@ -260,6 +271,7 @@ class Simulation(SimulationMethodsMixin):
                 of heterogeneity (`k` and `ψ`) and their
                 one-standard deviation envelopes.
         """
+        graphs_to_return = list()
 
         if graphs_to_show is None:
             graphs_to_show = ['avg', 'het']
@@ -267,34 +279,40 @@ class Simulation(SimulationMethodsMixin):
             species_to_show = self.all_species
 
         if 'avg' in graphs_to_show:
-            graph_avg = Graph()
+            graph_avg = Graph(backend=self.graph_backend)
             with contextlib.suppress(AttributeError):
-                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show)
+                graph_avg.plot_ODEs(self.de_calcs, species=species_to_show, show_plot=False)
             graph_avg.plot_avg_std(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_avg)
 
         if 'traj' in graphs_to_show:
-            graph_traj = Graph()
+            graph_traj = Graph(backend=self.graph_backend)
             graph_traj.plot_trajectories(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_traj)
 
         if 'ode' in graphs_to_show:
-            graph_ode = Graph()
+            graph_ode = Graph(backend=self.graph_backend)
             graph_ode.plot_ODEs(self.de_calcs, species=species_to_show)
+            graphs_to_return.append(graph_ode)
 
         if 'eta' in graphs_to_show:
-            graph_eta = Graph()
+            graph_eta = Graph(backend=self.graph_backend)
             graph_eta.plot_eta(self.time, self.results, species=species_to_show)
+            graphs_to_return.append(graph_eta)
 
         if 'het' in graphs_to_show:
+            graph_het = None
+
             for proc in self._algo_processes:
                 if proc.is_heterogeneous:
-                    graph_het = Graph()
+                    graph_het = Graph(backend=self.graph_backend)
                     graph_het.plot_het_metrics(self.time,
                                                (str(proc), ''),
                                                self.k_het_metrics[proc])
 
                 if isinstance(proc, (MichaelisMentenProcess, RegulatedMichaelisMentenProcess)):
                     if proc.is_heterogeneous_Km:
-                        graph_het = Graph()
+                        graph_het = Graph(backend=self.graph_backend)
                         graph_het.plot_het_metrics(self.time,
                                                    (str(proc), f"K_m={proc.Km}"),
                                                    self.Km_het_metrics[proc],
@@ -304,7 +322,7 @@ class Simulation(SimulationMethodsMixin):
                     if isinstance(proc.is_heterogeneous_K50, list):  # multiple regulators
                         for i in range(len(proc.regulating_species)):
                             if proc.is_heterogeneous_K50[i]:
-                                graph_het = Graph()
+                                graph_het = Graph(backend=self.graph_backend)
                                 extra_str = f"\\textrm{{{proc.regulation_type[i]} by }}" \
                                             f"{proc.regulating_species[i]}, " \
                                             f"K_{{50}}={proc.K50[i]}"
@@ -314,11 +332,16 @@ class Simulation(SimulationMethodsMixin):
                                                            het_attr='K50')
                     else:  # one regulator
                         if proc.is_heterogeneous_K50:
-                            graph_het = Graph()
+                            graph_het = Graph(backend=self.graph_backend)
                             graph_het.plot_het_metrics(self.time,
                                                        (str(proc), f"K_{{50}}={proc.K50}"),
                                                        self.K50_het_metrics[proc],
                                                        het_attr='K50')
+
+            if graph_het is not None:
+                graphs_to_return.append(graph_het)
+
+        return graphs_to_return
 
     def __repr__(self):
         return f"AbStochKin Simulation(p0={self.p0},\n" \
