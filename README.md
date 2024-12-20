@@ -46,9 +46,9 @@ For an overview of installing packages in Python, see the
 
 ### Requirements
 The package relies only on Python's scientific ecosystem 
-libraries (`numpy`, `scipy`, `matplotlib`, `sympy`) and 
+libraries (`numpy`, `scipy`, `sympy`, `matplotlib`) and 
 the standard library for implementing the core components of the algorithm. 
-These requirements can be easily met in any Python (3.10+) environment.
+These requirements can be easily met in any Python (version 3.12+) environment.
 
 ## What processes can be modeled?
 - Simple processes (0th, 1st, 2nd order).

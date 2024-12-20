@@ -399,7 +399,7 @@ class Graph:
         Graph species- and process-specific metrics of population heterogeneity.
         """
         self.setup_spines_ticks(ax_loc)
-        title = f"${proc_str[0].split(';')[0].replace(' ,', chr(92) + 'hspace{10pt} ,').replace('->', chr(92) + 'rightarrow')}$"
+        title = f"${proc_str[0].split(';')[0].replace(' ,', '\\hspace{10pt} ,').replace('->', '\\rightarrow')}$"
 
         if self.backend == 'matplotlib':
             axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
