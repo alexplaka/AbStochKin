@@ -14,7 +14,7 @@ authors = [
 maintainers = [
   { name = "Alex Plakantonakis", email = "alex.plaka@alumni.princeton.edu" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
   "numpy >=1.24",
   "scipy >=1.10",
