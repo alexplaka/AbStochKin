@@ -8,6 +8,7 @@ version.path = "abstochkin/__init__.py"
 [project]
 name = "abstochkin"
 description = "Agent-based Stochastic Kinetics: A method for simulating the dynamics of heterogeneous populations."
+dynamic = ["version"]
 readme = "README.md"
 license.file = "LICENSE"
 authors = [
