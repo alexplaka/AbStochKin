@@ -277,11 +277,11 @@ class Process:
             assert val >= 0, f"Coefficient cannot be negative: {val} {r}."
 
         # Check rate constants
-        error_msg = f"Rate constant values have to be positive: k = {self.k}."
+        error_msg = f"Rate constant values have to be non-negative: k = {self.k}."
         if isinstance(self.k, (list, tuple)):  # heterogeneous population
-            assert all(array(self.k) > 0), error_msg
+            assert all(array(self.k) >= 0), error_msg
         else:  # when k is a float or int, the population is homogeneous
-            assert self.k > 0, error_msg
+            assert self.k >= 0, error_msg
 
         # For normally-distributed k values, specification is a 2-tuple.
         if isinstance(self.k, tuple):  # normal distribution of k values
