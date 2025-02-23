@@ -59,6 +59,8 @@ class Simulation(SimulationMethodsMixin):
     n : int
         The number of repetitions of the simulation to be
         performed.
+    processes : list
+        A list of the processes to simulate.
     random_state : float or int
         A number used to seed the random number generator.
     use_multithreading : bool
@@ -88,8 +90,8 @@ class Simulation(SimulationMethodsMixin):
                  t_max: float,
                  dt: float,
                  n: int,
-                 processes: list,
                  *,
+                 processes: list,
                  random_state: int,
                  do_solve_ODEs: bool,
                  ODE_method: str,
@@ -135,6 +137,7 @@ class Simulation(SimulationMethodsMixin):
         self.t_max = t_max  # end simulation at time t_max
         self.dt = dt  # fixed time interval
         self.n = n  # repeat the simulation this many times
+        self.processes = processes
         self.random_state = random_state
         self.use_multithreading = use_multithreading
         self.max_agents = max_agents
@@ -142,13 +145,13 @@ class Simulation(SimulationMethodsMixin):
         self.time_unit = time_unit
 
         self.all_species, self._procs_by_reactant, self._procs_by_product = \
-            update_all_species(tuple(processes))
+            update_all_species(tuple(self.processes))
 
         """ Generate the list of processes to be used by the algorithm. 
         This is done because some processes (e.g., reversible processes) 
         need to be split up into the forward and reverse processes. """
         self._algo_processes = list()
-        self._gen_algo_processes(processes)
+        self._gen_algo_processes(self.processes)
         self._het_processes = get_het_processes(self._algo_processes)
         self._het_processes_num = len(self._het_processes)
 
@@ -158,7 +161,7 @@ class Simulation(SimulationMethodsMixin):
         self.streams = rng_streams(self.n, self.random_state)
 
         # ******************** Deterministic calculations ********************
-        self.de_calcs = DEcalcs(self.p0, self.t_min, self.t_max, processes,
+        self.de_calcs = DEcalcs(self.p0, self.t_min, self.t_max, self.processes,
                                 ode_method=ODE_method, time_unit=self.time_unit)
         if do_solve_ODEs:
             try:
