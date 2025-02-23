@@ -365,13 +365,44 @@ class AbStochKin:
 
         Examples
         --------
-        - Run a series of simulations by varying the initial population size of A.
+        - Run a series of simulations by varying the initial population size of $A$.
         >>>  from abstochkin import AbStochKin
         >>>
         >>>  sim = AbStochKin()
         >>>  sim.add_process_from_str("A -> B", 0.3, catalyst='E', Km=10)
-        >>>  series_kwargs = [{"p0": {'A': i, 'B': 0, 'E': 10}, "t_max": 10} for i in range(40, 51)]
-        >>>  sim.simulate_series_in_parallel(series_kwargs)
+        >>>  simulation_params = [{"p0": {'A': i, 'B': 0, 'E': 10}, "t_max": 10} for i in range(40, 51)]
+        >>>  sim.simulate_series_in_parallel(simulation_params)
+
+        - Run a series of simulations by varying the process parameters.
+        >>> from abstochkin import AbStochKin
+        >>> from abstochkin.process import Process, RegulatedProcess
+        >>>
+        >>> simulation_params = []
+        >>>
+        >>> for α in range(2, 5):
+        >>>     procs = [
+        >>>         Process.from_string(" -> R", k=0.02),
+        >>>         RegulatedProcess.from_string(" -> R",
+        >>>                                      k=1,
+        >>>                                      regulating_species='S',
+        >>>                                      K50=1,
+        >>>                                      nH=1,
+        >>>                                      alpha=α),
+        >>>         Process.from_string("R -> ", k=0.02)
+        >>>     ]
+        >>>
+        >>>     simulation_params.append(
+        >>>        dict(
+        >>>            processes=procs,
+        >>>            p0={'S': 10, "R": 0},
+        >>>            t_max=50,
+        >>>            dt=0.01,
+        >>>            n=20
+        >>>        )
+        >>>     )
+        >>>
+        >>> my_sim = AbStochKin()
+        >>> my_sim.simulate_series_in_parallel(simulation_params)
         """
         extra_opts = {"show_plots": False, "_return_simulation": True}
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
