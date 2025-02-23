@@ -913,7 +913,7 @@ class RegulatedProcess(Process):
                f"regulating_species='{self.regulating_species}', " \
                f"alpha={self.alpha}, " \
                f"K50={repr_K50}, " \
-               f"nH={self.nH}," \
+               f"nH={self.nH}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -1188,7 +1188,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
                f"K50={repr_K50}, " \
                f"nH={self.nH}, " \
                f"catalyst={self.catalyst}, " \
-               f"Km={repr_Km}," \
+               f"Km={repr_Km}, " \
                f"volume={self.volume})"
 
     def __str__(self):
@@ -1303,7 +1303,16 @@ def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
     procs_by_reactant, procs_by_product = dict(), dict()
 
     for proc in procs:
-        all_species = all_species.union(proc.species)
+        if isinstance(proc, (RegulatedProcess, RegulatedMichaelisMentenProcess)):
+            # Add regulating species to the set of all species
+            all_species = all_species.union(
+                proc.species.union(
+                    proc.regulating_species if isinstance(proc.regulating_species, list) else [proc.regulating_species]
+                )
+            )
+        else:
+            all_species = all_species.union(proc.species)
+
         rspecies = rspecies.union(proc.reactants)
         pspecies = pspecies.union(proc.products)
 
