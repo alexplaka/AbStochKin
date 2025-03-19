@@ -2,6 +2,7 @@
 Perform deterministic calculations on a set of processes.
 Construct the ordinary differential equations (ODEs)
 describing the system and obtain a numerical solution.
+Try to get the system's fixed points numerically and symbolically.
 """
 
 #  Copyright (c) 2024-2025, Alex Plakantonakis.
@@ -19,9 +20,10 @@ describing the system and obtain a numerical solution.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from numpy import mean
+from numpy import array, mean
 from scipy.integrate import solve_ivp
-from sympy import Add, Mul, Pow, sympify, lambdify, symbols
+from scipy.optimize import root
+from sympy import Add, Mul, Pow, Matrix, sympify, lambdify, symbols, solve
 # We want all single-letter and Greek-letter variables to be symbols.
 # We can then use the clashing-symbols dictionaries that have been defined
 # as private variables in `_clash` (which includes both single and
@@ -76,14 +78,20 @@ class DEcalcs:
         self._all_species, self._procs_by_reactant, self._procs_by_product = update_all_species(
             tuple(self.processes))
         self.odes = dict()  # store species-specific ODEs
+        self.odes_matrix = None  # store species-specific ODEs in matrix form
+        self._odes_lambdified = None  # for numerical integration using SciPy
+        self.jacobian_matrix = None  # Jacobian matrix
+
         self.odes_sol = None  # numerical solution of species trajectories
 
-        self.species_with_ode = list()
-        self.jac = None  # Jacobian matrix
-        self.fixed_pts = dict()  # dictionary of fixed points
+        self.fixed_pts_num_sol = None  # numerically-obtained fixed points
+        self.fixed_pts_num_sol_info = None  # numerical solver info
+        self.fixed_pts_sym_sol = None  # symbolically-obtained fixed points
 
+        self.species_with_ode = list()
+
+        # Set up the ODEs and compute the Jacobian matrix
         self.setup_ODEs()
-        # self.get_fixed_pts()
 
     def setup_ODEs(self, agent_based=True):
         """
@@ -163,6 +171,19 @@ class DEcalcs:
                 self.odes[m] = sympify(0)  # dm/dt = 0
                 self.species_with_ode.append(m)
 
+        # Set up the ODEs in matrix form and compute the Jacobian matrix
+        self.odes_matrix = Matrix([self.odes[sp] for sp in self.odes.keys()])
+        self.jacobian_matrix = self.odes_matrix.jacobian(
+            [sympify(sp, locals=_clash) for sp in self.odes.keys()]
+        )
+
+        self.get_fixed_pts_symbolically()
+
+    def lambdify_odes(self):
+        """ For converting ODE expressions: sympy -> scipy/numpy. """
+        return lambdify([sympify(sp, locals=_clash) for sp in self.odes.keys()],
+                        list(self.odes.values()))
+
     @staticmethod
     def get_term_multiplier(proc):
         """
@@ -216,22 +237,48 @@ class DEcalcs:
         -------------
         https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html
         """
-        # Converting ODE expressions: sympy -> scipy/numpy
-        _odes_lambdified = lambdify([sympify(sp, locals=_clash) for sp in self.odes.keys()],
-                                    list(self.odes.values()))
+        if self._odes_lambdified is None:
+            self._odes_lambdified = self.lambdify_odes()
 
         # Converting initial population values to a list to ensure that the order of
         # species-specific ODEs and initial values are correctly ordered.
         p0_list = [self.p0[sp] for sp in self.odes.keys()]
-        self.odes_sol = solve_ivp(lambda t, S: _odes_lambdified(*S),
+        self.odes_sol = solve_ivp(lambda t, S: self._odes_lambdified(*S),
                                   t_span=[self.t_min, self.t_max],
                                   y0=p0_list,
                                   method=self.ode_method,
                                   t_eval=None,  # Specify points where the solution is desired
                                   dense_output=True)  # Compute a continuous solution
 
-    # def get_fixed_pts(self):
-    #     """
-    #     Not currently implemented.
-    #     """
-    #     pass
+        self.get_fixed_pts_numerically()
+
+    def get_fixed_pts_numerically(self, root_method="hybr"):
+        """ Try to find fixed points numerically.
+        See the types of solvers (i.e., methods) to use at documentation below.
+
+        Documentation
+        -------------
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root.html#scipy.optimize.root
+        """
+        if self._odes_lambdified is None:
+            self._odes_lambdified = self.lambdify_odes()
+
+        fps = root(lambda S: self._odes_lambdified(*S),
+                   array([self.p0[sp] for sp in self.odes.keys()]),
+                   method=root_method)
+        # TODO: May need to do this for more initial guesses to get more/all fixed points.
+
+        self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
+        self.fixed_pts_num_sol_info = fps
+
+    def get_fixed_pts_symbolically(self):
+        """ Try to solve for the fixed points symbolically.
+        Note that one may have to substitute the initial population sizes
+        to obtain numerical values here."""
+        try:
+            self.fixed_pts_sym_sol = solve(self.odes_matrix,
+                                           [sympify(sp, locals=_clash) for sp in self.odes.keys()],
+                                           dict=True)
+        except Exception as e:
+            print(e)
+            print("Fixed points could not be obtained symbolically.")
