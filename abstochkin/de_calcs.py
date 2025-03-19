@@ -268,8 +268,9 @@ class DEcalcs:
                    method=root_method)
         # TODO: May need to do this for more initial guesses to get more/all fixed points.
 
-        self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
-        self.fixed_pts_num_sol_info = fps
+        if fps.success:
+            self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
+            self.fixed_pts_num_sol_info = fps
 
     def get_fixed_pts_symbolically(self):
         """ Try to solve for the fixed points symbolically.
