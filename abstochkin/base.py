@@ -8,11 +8,11 @@ Example
 >>> from abstochkin import AbStochKin
 >>> sim = AbStochKin()
 >>> sim.add_process_from_str('A -> ', 0.2)  # degradation process
->>> sim.simulate(p0={'A': 100},t_max=20,plot_backend=plotly)
+>>> sim.simulate(p0={'A': 100}, t_max=20)
 >>> # All data for the above simulation is stored in `sim.sims[0]`.
 >>>
 >>> # Now set up a new simulation without actually running it.
->>> sim.simulate(p0={'A': 10},t_max=10,n=50,run=False,plot_backend=plotly)
+>>> sim.simulate(p0={'A': 10}, t_max=10, n=50, run=False)
 >>> # All data for the new simulation is stored in `sim.sims[1]`.
 >>> # The simulation can then be manually run using methods
 >>> # documented in the class `Simulation`.
@@ -232,6 +232,7 @@ class AbStochKin:
                  dt: float = 0.01,
                  n: int = 100,
                  *,
+                 processes: list[Process, ...] = None,
                  random_seed: int = 19,
                  solve_odes: bool = True,
                  ode_method: str = 'RK45',
@@ -261,6 +262,12 @@ class AbStochKin:
             supports a fixed time step interval whose value is `dt`.
         n : int, default: 100, optional
             The number of repetitions of the simulation to be performed.
+        processes : list of Process objects, default: None, optional
+            A list of the processes to simulate. If the processes to
+            simulate are different from the ones in the base class attribute
+            `AbStochKin.processes`, they should be specified here.
+            If `None`, the processes in the base class attribute
+            `AbStochKin.processes` will be used.
         random_seed : int, default: 19, optional
             A number used to seed the random number generator.
         solve_odes : bool, default: True, optional
@@ -303,13 +310,16 @@ class AbStochKin:
         if max_agents_by_species is None:
             max_agents_by_species = dict()
 
-        self.het_processes = get_het_processes(self.processes)
+        # Override `self.processes` if `processes` are specified.
+        processes = self.processes if processes is None else processes
+
+        self.het_processes = get_het_processes(processes)
 
         sim = Simulation(p0,
                          t_max,
                          dt,
                          n,
-                         self.processes,
+                         processes=processes,
                          random_state=random_seed,
                          do_solve_ODEs=solve_odes,
                          ODE_method=ode_method,
@@ -355,13 +365,44 @@ class AbStochKin:
 
         Examples
         --------
-        - Run a series of simulations by varying the initial population size of A.
+        - Run a series of simulations by varying the initial population size of $A$.
         >>>  from abstochkin import AbStochKin
         >>>
         >>>  sim = AbStochKin()
         >>>  sim.add_process_from_str("A -> B", 0.3, catalyst='E', Km=10)
-        >>>  series_kwargs = [{"p0": {'A': i, 'B': 0, 'E': 10}, "t_max": 10} for i in range(40, 51)]
-        >>>  sim.simulate_series_in_parallel(series_kwargs)
+        >>>  simulation_params = [{"p0": {'A': i, 'B': 0, 'E': 10}, "t_max": 10} for i in range(40, 51)]
+        >>>  sim.simulate_series_in_parallel(simulation_params)
+
+        - Run a series of simulations by varying the process parameters.
+        >>> from abstochkin import AbStochKin
+        >>> from abstochkin.process import Process, RegulatedProcess
+        >>>
+        >>> simulation_params = []
+        >>>
+        >>> for α in range(2, 5):
+        >>>     procs = [
+        >>>         Process.from_string(" -> R", k=0.02),
+        >>>         RegulatedProcess.from_string(" -> R",
+        >>>                                      k=1,
+        >>>                                      regulating_species='S',
+        >>>                                      K50=1,
+        >>>                                      nH=1,
+        >>>                                      alpha=α),
+        >>>         Process.from_string("R -> ", k=0.02)
+        >>>     ]
+        >>>
+        >>>     simulation_params.append(
+        >>>        dict(
+        >>>            processes=procs,
+        >>>            p0={'S': 10, "R": 0},
+        >>>            t_max=50,
+        >>>            dt=0.01,
+        >>>            n=20
+        >>>        )
+        >>>     )
+        >>>
+        >>> my_sim = AbStochKin()
+        >>> my_sim.simulate_series_in_parallel(simulation_params)
         """
         extra_opts = {"show_plots": False, "_return_simulation": True}
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
