@@ -19,8 +19,11 @@ import os
 import unittest
 
 from sympy import symbols, Float
+import numpy as np
 
 from abstochkin.base import AbStochKin
+from abstochkin.de_calcs import DEcalcs
+from abstochkin.process import Process
 
 
 class TestDEcalcs1(unittest.TestCase):
@@ -228,6 +231,33 @@ class TestDEcalcsRegMM(unittest.TestCase):
         self.assertEqual(self.sim1.sims[0].de_calcs.odes['A'], -expr1)
         self.assertEqual(self.sim1.sims[0].de_calcs.odes['B'], expr1)
         self.assertEqual(self.sim1.sims[0].de_calcs.odes['C'], 0)
+
+
+class TestGetFixedPtsNumerically(unittest.TestCase):
+    """ Test that the fixed points are correctly found numerically. """
+
+    def setUp(self):
+        self.obj0 = DEcalcs(p0={'A': 20},
+                            t_min=0,
+                            t_max=5,
+                            processes=[Process.from_string("A -> ", k=0.1)],  # dummy process
+                            ode_method="RK45",
+                            time_unit='sec')
+        # self.obj0._odes_lambdified = lambda x: np.array([x[0] - 1, x[1] - 2])
+        self.obj0.get_fixed_pts_numerically()
+
+    def test_success(self):
+        self.assertTrue(self.obj0.fixed_pts_num_sol_info.success)
+
+    def test_fixed_pts_num_sol(self):
+        np.testing.assert_equal(self.obj0.fixed_pts_num_sol['A'], 0)
+
+    def test_root_method(self):
+        self.obj0.get_fixed_pts_numerically(root_method='lm')
+        self.assertEqual(self.obj0.fixed_pts_num_sol_info.method, 'lm')
+
+    def test_failure(self):
+        pass
 
 
 if __name__ == '__main__':
