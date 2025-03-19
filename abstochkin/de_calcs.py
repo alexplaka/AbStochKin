@@ -270,7 +270,8 @@ class DEcalcs:
 
         if fps.success:
             self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
-            self.fixed_pts_num_sol_info = fps
+
+        self.fixed_pts_num_sol_info = fps
 
     def get_fixed_pts_symbolically(self):
         """ Try to solve for the fixed points symbolically.
