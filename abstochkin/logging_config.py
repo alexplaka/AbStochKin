@@ -48,7 +48,10 @@ logger.setLevel(logging.DEBUG)  # Set the logging level
 # Create a file handler and a stream handler
 pathlib.Path("logs").mkdir(parents=True, exist_ok=True)
 file_handler = logging.FileHandler(f"logs/{datetime.now().strftime("%Y-%m-%d_%H:%M:%S")}.log")
+file_handler.setLevel(logging.DEBUG)
+
 stream_handler = logging.StreamHandler()
+stream_handler.setLevel(logging.WARNING)
 
 # Create a formatter and add it to the handlers
 formatter = CustomFormatter("{asctime} - {name} - {levelname} - {message}",
