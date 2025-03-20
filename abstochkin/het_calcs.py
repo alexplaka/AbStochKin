@@ -15,12 +15,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from collections import Counter
 
 from numpy import log, ndarray
 
 from .process import Process, ReversibleProcess, MichaelisMentenProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 ProcessClasses = Process | ReversibleProcess | MichaelisMentenProcess | RegulatedProcess | RegulatedMichaelisMentenProcess
 
@@ -76,7 +80,7 @@ def richness(arr: list | ndarray) -> int:
 
 def idx_het(arr: list | ndarray) -> float:
     """
-    Calculate the Index of Heterogeneity (ψ), defined as the probability
+    Calculate the Index of Heterogeneity ($\\psi$), defined as the probability
     that two randomly chosen agents (without replacement) from a species
     population belong to different subspecies.
 

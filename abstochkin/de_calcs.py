@@ -20,6 +20,8 @@ Try to get the system's fixed points numerically and symbolically.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from numpy import array, mean
 from scipy.integrate import solve_ivp
 from scipy.optimize import root
@@ -32,6 +34,9 @@ from sympy.abc import _clash
 
 from .process import update_all_species, MichaelisMentenProcess, RegulatedProcess, \
     RegulatedMichaelisMentenProcess
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class DEcalcs:
@@ -90,8 +95,7 @@ class DEcalcs:
 
         self.species_with_ode = list()
 
-        # Set up the ODEs and compute the Jacobian matrix
-        self.setup_ODEs()
+        self.setup_ODEs()  # Set up the ODEs and compute the Jacobian matrix
 
     def setup_ODEs(self, agent_based=True):
         """
@@ -269,6 +273,7 @@ class DEcalcs:
         # TODO: May need to do this for more initial guesses to get more/all fixed points.
 
         if fps.success:
+            logger.info(f"(Some) Fixed points found numerically: {list(zip(self.odes.keys(), fps.x))}")
             self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
 
         self.fixed_pts_num_sol_info = fps
@@ -282,5 +287,5 @@ class DEcalcs:
                                            [sympify(sp, locals=_clash) for sp in self.odes.keys()],
                                            dict=True)
         except Exception as e:
-            print(e)
-            print("Fixed points could not be obtained symbolically.")
+            logger.error(f"Fixed points could not be obtained symbolically.\n"
+                         f"Exception raised: {e}")

@@ -13,6 +13,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import contextlib
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
@@ -25,6 +26,9 @@ from .het_calcs import idx_het
 from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
 from .utils import r_squared
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class SimulationMethodsMixin:
@@ -32,11 +36,15 @@ class SimulationMethodsMixin:
 
     def _validate_p0(self):
         """ A couple of assertions regarding initial population sizes. """
-        assert len(self.p0) == len(self.all_species), \
-            f"Specification of initial population sizes does not match number of species.\n" \
-            f"len(p0)={len(self.p0)} , len(all_species)={len(self.all_species)}"
-        assert all([True if y0 >= 0 else False for y0 in self.p0.values()]), \
-            "An initial population size cannot be negative."
+        try:
+            assert len(self.p0) == len(self.all_species), \
+                f"Specification of initial population sizes does not match number of species.\n" \
+                f"len(p0)={len(self.p0)} , len(all_species)={len(self.all_species)}"
+            assert all([True if y0 >= 0 else False for y0 in self.p0.values()]), \
+                "An initial population size cannot be negative."
+        except AssertionError:
+            logger.error("Assertion failed: Initial population specification is invalid.\n"
+                         f"{self.p0=}, {self.all_species=}")
 
     def _setup_data(self):
         """
@@ -114,8 +122,13 @@ class SimulationMethodsMixin:
                 for each species. After examination of the deterministic 
                 trajectories and underlying dynamics, it may sometimes 
                 be preferred to simply specify the max agents for each species. """
-            assert len(self.max_agents) == len(self.all_species), \
-                "Must specify the maximum number of agents for all species."
+            try:
+                assert len(self.max_agents) == len(self.all_species), \
+                    "Must specify the maximum number of agents for all species."
+            except AssertionError:
+                logger.error("Assertion failed: Must specify the maximum number of "
+                             "agents for all species.")
+
             for sp in self.all_species:
                 self.rtd[sp] = AgentStateData(self.p0[sp], self.max_agents[sp], self.n,
                                               fill_state=self._get_fill_state(sp))
@@ -439,15 +452,23 @@ class SimulationMethodsMixin:
             array is `num_agents`.
         """
         if het_attr != 'k':
-            assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            try:
+                assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            except AssertionError:
+                logger.error(f"Assertion failed: {proc} does not have attribute {het_attr}.")
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
             attr = attr[het_attr_idx]
 
         num_subspecies = len(attr)
-        assert num_subspecies <= num_agents, \
-            "The number of subspecies cannot be greater than the population size."
+
+        try:
+            assert num_subspecies <= num_agents, \
+                "The number of subspecies cannot be greater than the population size."
+        except AssertionError:
+            logger.error("Assertion failed: The number of subspecies cannot be "
+                         "greater than the population size.")
 
         """ `vals` has shape (num_agents,). Note that `num_agents` 
         is the same as `max_agents` when setting up the data. So, this
@@ -525,7 +546,10 @@ class SimulationMethodsMixin:
         
         """
         if het_attr != 'k':
-            assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            try:
+                assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            except AssertionError:
+                logger.error(f"{proc} does not have attribute {het_attr}.")
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -545,6 +569,7 @@ class SimulationMethodsMixin:
                       f"{het_attr} values in simulated process {proc.__str__()} " \
                       f"has been exceeded. Please reconsider the " \
                       f"distribution of {het_attr} values for this process."
+            logger.error(f"Error: {err_msg}")
             raise AssertionError(err_msg)
 
     def _init_o2_vals(self, proc: Process):
@@ -705,7 +730,10 @@ class SimulationMethodsMixin:
         expected based on the discrete number of subinteractions.
         """
         if het_attr != 'k':
-            assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            try:
+                assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            except AssertionError:
+                logger.error(f"{proc} does not have attribute {het_attr}.")
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -722,9 +750,10 @@ class SimulationMethodsMixin:
                 k_overflow = True
 
         if k_overflow:
-            raise AssertionError(
-                "The number of subinteractions cannot be greater than the "
-                "total number of possible inter-agent interactions.")
+            error_msg = "The number of subinteractions cannot be greater than the " \
+                        "total number of possible inter-agent interactions."
+            logger.error(f"Error: {error_msg}")
+            raise AssertionError(error_msg)
 
         """ `k_vals` has shape (num_agents_1, num_agents_2). 
         Note that `num_agents_*` is the same as `max_agents` when setting 
@@ -781,7 +810,10 @@ class SimulationMethodsMixin:
         specified in the `het_attr` process parameter.
         """
         if het_attr != 'k':
-            assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            try:
+                assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
+            except AssertionError:
+                logger.error(f"{proc} does not have attribute {het_attr}.")
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -801,6 +833,7 @@ class SimulationMethodsMixin:
                       f"{het_attr} values in simulated process {proc.__str__()} " \
                       f"has been exceeded. Please reconsider the " \
                       f"distribution of {het_attr} values for this process."
+            logger.error(f"Error: {err_msg}")
             raise AssertionError(err_msg)
 
     def _gen_algo_processes(self, procs):
@@ -874,6 +907,7 @@ class SimulationMethodsMixin:
         'Default value of max_workers is `min(32, os.cpu_count() + 4)`:
         This default value preserves at least 5 workers for I/O bound tasks.'
         """
+        logger.debug("Starting simulation (with multithreading executor)...")
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             executor.map(self._repeat_sim, range(self.n))
 
@@ -882,6 +916,8 @@ class SimulationMethodsMixin:
         Run the simulation sequentially `n` times
         (without parallelization), i.e., using a simple `for` loop.
         """
+        logger.debug("Starting simulation (without multithreading; "
+                     "sequential executions of runs)...")
         for i in range(self.n):
             self._repeat_sim(i)
 

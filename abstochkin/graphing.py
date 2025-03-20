@@ -15,6 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from pathlib import Path
 from typing import Literal, Self
 
@@ -22,6 +23,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import plotly.graph_objects as go
+
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class Graph:
@@ -68,8 +73,10 @@ class Graph:
             )
             self.fig2 = None  # optional second figure
         else:
-            raise ValueError(f"Unknown backend: {self.backend}. "
-                             f"Please choose from 'matplotlib' (default), 'plotly'.")
+            error_msg = f"Unknown backend: {self.backend}. " \
+                        f"Please choose from 'matplotlib' (default), 'plotly'."
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
     def setup_spines_ticks(self, ax_loc):
         """
@@ -87,7 +94,6 @@ class Graph:
             axs.yaxis.set_minor_locator(ticker.AutoMinorLocator())
 
         else:  # self.backend == 'plotly'
-
             self.fig.update_layout(
                 xaxis=dict(zeroline=True, showline=True, linewidth=2,
                            zerolinecolor="black", showticklabels=True,
@@ -103,8 +109,7 @@ class Graph:
                   num_pts: int = 1000,
                   species: list[str] | tuple[str] = (),
                   show_plot: bool = True,
-                  ax_loc: tuple = ()
-                  ) -> Self:
+                  ax_loc: tuple = ()) -> Self:
         """
         Plot the deterministic trajectories of all species obtained
         by obtaining the solution to a system of ODEs.
@@ -161,7 +166,6 @@ class Graph:
                 plt.show()
 
         else:  # self.backend == 'plotly'
-
             for i, sp in enumerate(list(de_data.odes.keys())):
                 if sp in species:
                     self.fig.add_trace(
@@ -215,7 +219,6 @@ class Graph:
                 plt.show()
 
         else:  # self.backend == 'plotly'
-
             for sp, sp_data in data.items():
                 if sp in species:
                     trajs = sp_data['N'].T
@@ -246,8 +249,7 @@ class Graph:
                      *,
                      species: list[str] | tuple[str] = (),
                      show_plot: bool = True,
-                     ax_loc: tuple = ()
-                     ) -> Self:
+                     ax_loc: tuple = ()) -> Self:
         """
         Graph simulation average trajectories and
         1-standard-deviation envelopes.
@@ -276,7 +278,6 @@ class Graph:
                 plt.show()
 
         else:  # self.backend == 'plotly'
-
             for sp, sp_data in data.items():
                 if sp in species:
                     self.fig.add_trace(
@@ -329,8 +330,7 @@ class Graph:
                  *,
                  species: list[str] | tuple[str] = (),
                  show_plot: bool = True,
-                 ax_loc: tuple = ()
-                 ) -> Self:
+                 ax_loc: tuple = ()) -> Self:
         """ Graph the coefficient of variation. """
         self.setup_spines_ticks(ax_loc)
         species = list(data.keys()) if len(species) == 0 else species
@@ -353,7 +353,6 @@ class Graph:
                 plt.show()
 
         else:  # self.backend == 'plotly'
-
             for sp, sp_data in data.items():
                 if sp in species:
                     self.fig.add_trace(
@@ -454,7 +453,6 @@ class Graph:
             return self
 
         else:  # self.backend == 'plotly'
-
             self.fig.add_trace(
                 go.Scatter(
                     x=time.tolist(),

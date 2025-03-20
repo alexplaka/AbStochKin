@@ -20,12 +20,17 @@ kinetic parameters.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import functools
 from time import perf_counter
 
 import numpy as np
 from numpy import random
 from scipy.constants import N_A
+
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 def rng_streams(n: int, random_state: int):
@@ -81,7 +86,8 @@ def measure_runtime(fcn):
             msg = f"Simulation Runtime: {duration / 60:.3f} min"
         else:
             msg = f"Simulation Runtime: {duration / 3600:.3f} hr"
-        print(msg)
+
+        logger.info(msg)
 
     return inner
 
@@ -117,7 +123,11 @@ def r_squared(actual: np.array, theoretical: np.array) -> float:
     # ssr: sum of square residuals (data vs deterministic prediction)
     ssr = np.nansum((actual - theoretical) ** 2)
 
-    return 1 - ssr / sst if sst != 0 else np.nan
+    if sst == 0:
+        logger.warning("The total sum of squares is zero. R^2 is undefined.")
+        return np.nan
+    else:
+        return 1 - ssr / sst
 
 
 def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float | int, float | int],
@@ -168,17 +178,32 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
     Plakantonakis, Alex. “Agent-based Kinetics: A Nonspatial Stochastic Method
     for Simulating the Dynamics of Heterogeneous Populations.”
     OSF Preprints, 26 July 2019. Web. Section 2.1.
+    (Updated version of the paper in "/docs/Agent-basedKinetics_monograph.pdf")
     """
-    assert volume > 0, "The volume has to be a positive quantity."
-    assert order >= 0, "The process order cannot be negative."
+    try:
+        assert volume > 0, "The volume has to be a positive quantity."
+        assert order >= 0, "The process order cannot be negative."
+    except AssertionError:
+        logger.error(f"Assertion(s) failed: {volume=}, {order=}\n"
+                     f"The volume has to be a positive quantity. "
+                     f"The process order cannot be negative.")
 
     denom = (N_A * volume) ** (order - 1) if not inverse else 1 / (N_A * volume) ** (order - 1)
 
     if isinstance(macro_val, (list, tuple)):
-        assert all([True if val >= 0 else False for val in macro_val]), \
-            "The parameter values cannot be negative."
-        micro_vals = [val / denom for val in macro_val]
-        return micro_vals if isinstance(macro_val, list) else tuple(micro_vals)
+        try:
+            assert all([True if val >= 0 else False for val in macro_val]), \
+                "The parameter values cannot be negative."
+            micro_vals = [val / denom for val in macro_val]
+            return micro_vals if isinstance(macro_val, list) else tuple(micro_vals)
+        except AssertionError:
+            logger.error(f"Assertion failed: The parameter values cannot be negative. "
+                         f"{macro_val=}")
     else:
-        assert macro_val >= 0, "The parameter value cannot be negative."
-        return macro_val / denom
+        try:
+            assert macro_val >= 0, "The parameter value cannot be negative."
+            return macro_val / denom
+        except AssertionError:
+            logger.error(f"Assertion failed: The parameter value cannot be negative. "
+                         f"{macro_val=}")
+
