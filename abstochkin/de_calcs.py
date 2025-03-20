@@ -273,7 +273,7 @@ class DEcalcs:
         # TODO: May need to do this for more initial guesses to get more/all fixed points.
 
         if fps.success:
-            logger.info(f"(Some) Fixed points found numerically: {zip(self.odes.keys(), fps.x)}")
+            logger.info(f"(Some) Fixed points found numerically: {list(zip(self.odes.keys(), fps.x))}")
             self.fixed_pts_num_sol = {sp: fp for sp, fp in zip(self.odes.keys(), fps.x)}
 
         self.fixed_pts_num_sol_info = fps
