@@ -25,6 +25,7 @@ object to store and handle some of the necessary runtime data.
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import contextlib
 from typing import Literal
 
@@ -38,6 +39,9 @@ from .het_calcs import get_het_processes
 from .process import update_all_species, MichaelisMentenProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
 from .utils import rng_streams
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class Simulation(SimulationMethodsMixin):
@@ -163,15 +167,16 @@ class Simulation(SimulationMethodsMixin):
         # ******************** Deterministic calculations ********************
         self.de_calcs = DEcalcs(self.p0, self.t_min, self.t_max, self.processes,
                                 ode_method=ODE_method, time_unit=self.time_unit)
+
         if do_solve_ODEs:
             try:
                 self.de_calcs.solve_ODEs()
             except Exception as exc:
-                print(f"ODE solver exception:\n{exc}")
+                logger.exception(f"ODE solver exception:\n{exc}")
         else:
             if do_run:
-                print("Warning: Must specify the maximum number of agents for "
-                      "each species when not solving the system ODEs.")
+                logger.warning("Must specify the maximum number of agents for "
+                               "each species when not solving the system ODEs.")
         # ********************************************************************
 
         self.graph_backend = graph_backend
@@ -205,6 +210,7 @@ class Simulation(SimulationMethodsMixin):
         self.graphs = None  # For storing any graphs that are shown
 
         if do_run:
+            logger.info("Running simulation...")
             self.run_simulation()
             if show_graphs:  # Simulation must first be run before plotting
                 self.graphs = self.graph_results()
@@ -231,6 +237,7 @@ class Simulation(SimulationMethodsMixin):
         self._gen_algo_sequence()  # generate sequence of processes for algorithm
 
         self._parallel_run() if self.use_multithreading else self._sequential_run()
+        logger.debug("Simulation runs completed.")
 
         self._compute_trajectory_stats()  # Get statistics on simulation data
 
@@ -238,6 +245,7 @@ class Simulation(SimulationMethodsMixin):
         # self._compute_Km_het_stats()  # Get statistics on heterogeneity data (Km)
         # self._compute_K50_het_stats()  # Get statistics on heterogeneity data (Km)
         self._compute_het_stats()  # Get statistics on heterogeneity data
+        logger.debug("Statistics computed.")
 
         self._post_run_cleanup()  # free up some memory
         self.progress_bar.close()
@@ -278,6 +286,7 @@ class Simulation(SimulationMethodsMixin):
 
         if graphs_to_show is None:
             graphs_to_show = ['avg', 'het']
+
         if species_to_show is None:
             species_to_show = self.all_species
 

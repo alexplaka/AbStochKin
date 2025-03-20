@@ -15,13 +15,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import contextlib
 import re
 from typing import Self
 
 from numpy import array
 
-from abstochkin.utils import macro_to_micro
+from .utils import macro_to_micro
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class Process:
@@ -103,10 +107,14 @@ class Process:
         self.is_heterogeneous = False if isinstance(self.k, (int, float)) else True
 
         if self.order == 0:
-            msg = "Since a birth process does not depended on the presence of agents, " \
-                  "heterogeneity does not make sense in this context. Please define " \
-                  "the rate constant k as a number. "
-            assert not self.is_heterogeneous, msg
+            try:
+                msg = "Since a birth process does not depended on the presence of agents, " \
+                      "heterogeneity does not make sense in this context. Please define " \
+                      "the rate constant k as a number (not a list or tuple)."
+                assert not self.is_heterogeneous, msg
+            except AssertionError:
+                logger.error(f"Assertion failed: {self.order=}, {self.is_heterogeneous=}\n"
+                             f"{msg}")
 
         # Convert macroscopic to microscopic rate constant
         if self.volume is not None:
@@ -199,6 +207,7 @@ class Process:
 
         sep = '-->' if '-->' in proc_str else sep
         if sep not in proc_str:
+            logger.error(f"Cannot find separator '{sep}' in process string: '{proc_str}'")
             raise Exception("Cannot distinguish the reactants from the products.\n"
                             "Please use the *sep* keyword: e.g. sep='->'.")
 
@@ -237,7 +246,8 @@ class Process:
         if 'catalyst' in kwargs.keys():
             msg += f"If that's not what you intended, define the process " \
                    f"using MichaelisMentenProcess()."
-        print(msg)
+
+        logger.warning(msg)
 
     @staticmethod
     def _to_dict(terms: list) -> dict:
@@ -257,9 +267,12 @@ class Process:
                     stoic_coef = term[slice(*match.span())]  # extract stoichiometric coef
                     spec = re.split(patt, term)[-1].strip()  # extract species name
                     if spec == '' and stoic_coef != 0:
+                        logger.error("Cannot find species name.")
                         raise NullSpeciesNameError()
                     stoic_coef = int(stoic_coef)
                 except AttributeError:  # when there is no specified stoichiometric coefficient
+                    logger.debug(f"Attribute Error: Cannot find stoichiometric coefficient.\n"
+                                 f"{term=}, Assuming stoichiometric coefficient = 1.")
                     spec = re.split(patt, term)[-1]  # extract species name
                     stoic_coef = 1
 
@@ -274,23 +287,40 @@ class Process:
         """ Make sure coefficients, rate constant, and volume values are not negative. """
         # Check coefficients
         for r, val in (self.reactants | self.products).items():
-            assert val >= 0, f"Coefficient cannot be negative: {val} {r}."
+            try:
+                assert val >= 0, f"Coefficient cannot be negative: {val} {r}."
+            except AssertionError:
+                logger.error(f"Assertion failed: "
+                             f"Coefficient cannot be negative: {val}, species {r}.")
 
         # Check rate constants
         error_msg = f"Rate constant values have to be non-negative: k = {self.k}."
         if isinstance(self.k, (list, tuple)):  # heterogeneous population
-            assert all(array(self.k) >= 0), error_msg
+            try:
+                assert all(array(self.k) >= 0), error_msg
+            except AssertionError:
+                logger.error(f"Assertion failed: {error_msg}")
         else:  # when k is a float or int, the population is homogeneous
-            assert self.k >= 0, error_msg
+            try:
+                assert self.k >= 0, error_msg
+            except AssertionError:
+                logger.error(f"Assertion failed: {error_msg}")
 
         # For normally-distributed k values, specification is a 2-tuple.
         if isinstance(self.k, tuple):  # normal distribution of k values
-            assert len(self.k) == 2, "Please specify the mean and standard deviation " \
-                                     "of k in a 2-tuple: (mean, std)."
+            try:
+                error_msg = "Please specify the mean and standard deviation " \
+                            "of k in a 2-tuple: (mean, std)."
+                assert len(self.k) == 2, error_msg
+            except AssertionError:
+                logger.error(f"Assertion failed: {error_msg}")
 
         # Check volume
         if self.volume is not None:
-            assert self.volume > 0, f"Volume cannot be negative: {self.volume}."
+            try:
+                assert self.volume > 0, f"Volume cannot be negative: {self.volume}."
+            except AssertionError:
+                logger.error(f"Assertion failed: Volume cannot be negative: {self.volume}.")
 
     def __eq__(self, other):
         if isinstance(other, Process):
@@ -304,7 +334,8 @@ class Process:
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
         else:
-            print(f"{type(self)} and {type(other)} are instances of different classes.")
+            logger.info(f"{type(self)} and {type(other)} are "
+                        f"instances of different classes.")
             return False
 
     def __hash__(self):
@@ -422,6 +453,7 @@ class ReversibleProcess(Process):
         for s in ['<-->', '<=>', '<==>']:
             sep = s if s in proc_str else sep
         if sep not in proc_str:
+            logger.error(f"Cannot find separator '{sep}' in process string: '{proc_str}'")
             raise Exception("Cannot distinguish the reactants from the products.\n"
                             "Please use the *sep* keyword: e.g. sep='<->'.")
 
@@ -490,7 +522,7 @@ class ReversibleProcess(Process):
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
         else:
-            print(f"{type(self)} and {type(other)} are instances of different classes.")
+            logger.info(f"{type(self)} and {type(other)} are instances of different classes.")
             return False
 
     def __hash__(self):
@@ -541,6 +573,7 @@ class MichaelisMentenProcess(Process):
         assert self.order != 0, "A 0th order process has no substrate for a catalyst " \
                                 "to act on, therefore it cannot follow Michaelis-Menten kinetics."
         if self.order == 2:
+            logger.error("2nd order Michaelis-Menten processes are not currently supported.")
             raise NotImplementedError
 
         if self.volume is not None:  # Convert macroscopic to microscopic Km value
@@ -598,6 +631,7 @@ class MichaelisMentenProcess(Process):
         """
         sep = '-->' if '-->' in proc_str else sep
         if sep not in proc_str:
+            logger.error(f"Cannot find separator '{sep}' in process string: '{proc_str}'")
             raise Exception("Cannot distinguish the reactants from the products.\n"
                             "Please use the *sep* keyword: e.g. sep='->'.")
 
@@ -649,7 +683,7 @@ class MichaelisMentenProcess(Process):
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
         else:
-            print(f"{type(self)} and {type(other)} are instances of different classes.")
+            logger.info(f"{type(self)} and {type(other)} are instances of different classes.")
             return False
 
     def __hash__(self):
@@ -767,50 +801,94 @@ class RegulatedProcess(Process):
         if isinstance(self.regulating_species, list):  # multiple regulating species
             # First check that the right number of values for each parameter are specified
             rs_num = len(self.regulating_species)
-            msg = f"Must specify {rs_num} # values when there are {rs_num} regulating species."
-            assert len(self.alpha) == rs_num, msg.replace('#', 'alpha')
-            assert len(self.K50) == rs_num, msg.replace('#', 'K50')
-            assert len(self.nH) == rs_num, msg.replace('#', 'nH')
+            msg = f"Must specify {rs_num} values when there are {rs_num} regulating species."
+            try:
+                assert len(self.alpha) == rs_num, msg.replace('#', 'alpha')
+                assert len(self.K50) == rs_num, msg.replace('#', 'K50')
+                assert len(self.nH) == rs_num, msg.replace('#', 'nH')
+            except AssertionError:
+                logger.error(f"Assertion failed: {msg.replace('#', '')}. "
+                             f"{self.alpha=}, {self.K50=}, {self.nH=}")
 
             for i in range(len(self.regulating_species)):
-                assert self.alpha[i] >= 0, "The alpha parameter must be nonnegative."
+                try:
+                    assert self.alpha[i] >= 0, "The alpha parameter must be nonnegative."
+                except AssertionError:
+                    logger.error(f"Assertion failed: The alpha parameter must be nonnegative.")
+
                 if self.alpha[i] == 1:
-                    print("Warning: alpha=1 means the process is not regulated.")
+                    logger.warning("Warning: alpha=1 means the process is not regulated.")
 
                 if isinstance(self.K50[i], (float, int)):
-                    assert self.K50[i] > 0, "K50 has to be positive."
+                    try:
+                        assert self.K50[i] > 0, "K50 has to be positive."
+                    except AssertionError:
+                        logger.error(f"Assertion failed: K50 has to be positive.")
                 elif isinstance(self.K50[i], list):
-                    assert all([True if val > 0 else False for val in self.K50[i]]), \
-                        "Subspecies K50 values have to be positive."
+                    try:
+                        assert all([True if val > 0 else False for val in self.K50[i]]), \
+                            "Subspecies K50 values have to be positive."
+                    except AssertionError:
+                        logger.error(f"Assertion failed: Subspecies K50 values have to be positive.")
                 else:  # isinstance(self.K50, tuple)
-                    assert self.K50[i][0] > 0 and self.K50[i][1] > 0, \
-                        "Mean and std of K50 have to be positive."
+                    try:
+                        assert self.K50[i][0] > 0 and self.K50[i][1] > 0, \
+                            "Mean and std of K50 have to be positive."
+                    except AssertionError:
+                        logger.error(f"Assertion failed: Mean and std of K50 have to be positive.")
 
                 if self.order == 0:
-                    assert not self.is_heterogeneous_K50[i], \
-                        "Heterogeneity in parameter K50 is not allowed for a 0th order process."
+                    try:
+                        assert not self.is_heterogeneous_K50[i], \
+                            "Heterogeneity in parameter K50 is not allowed for a 0th order process."
+                    except AssertionError:
+                        logger.error(f"Assertion failed: "
+                                     f"Heterogeneity in parameter K50 is not allowed for a 0th order process.")
 
-                assert self.nH[i] > 0, "nH has to be positive."
+                try:
+                    assert self.nH[i] > 0, "nH has to be positive."
+                except AssertionError:
+                    logger.error(f"Assertion failed: nH has to be positive.")
 
         else:  # just one regulating species
-            assert self.alpha >= 0, "The alpha parameter must be nonnegative."
+            try:
+                assert self.alpha >= 0, "The alpha parameter must be nonnegative."
+            except AssertionError:
+                logger.error(f"Assertion failed: The alpha parameter must be nonnegative.")
+
             if self.alpha == 1:
-                print("Warning: alpha=1 means the process is not regulated.")
+                logger.warning("Warning: alpha=1 means the process is not regulated.")
 
             if isinstance(self.K50, (float, int)):
-                assert self.K50 > 0, "K50 has to be positive."
+                try:
+                    assert self.K50 > 0, "K50 has to be positive."
+                except AssertionError:
+                    logger.error(f"Assertion failed: K50 has to be positive.")
             elif isinstance(self.K50, list):
-                assert all([True if val > 0 else False for val in self.K50]), \
-                    "Subspecies K50 values have to be positive."
+                try:
+                    assert all([True if val > 0 else False for val in self.K50]), \
+                        "Subspecies K50 values have to be positive."
+                except AssertionError:
+                    logger.error(f"Assertion failed: Subspecies K50 values have to be positive.")
             else:  # isinstance(self.K50, tuple)
-                assert self.K50[0] > 0 and self.K50[1] > 0, \
-                    "Mean and std of K50 have to be positive."
+                try:
+                    assert self.K50[0] > 0 and self.K50[1] > 0, \
+                        "Mean and std of K50 have to be positive."
+                except AssertionError:
+                    logger.error(f"Assertion failed: Mean and std of K50 have to be positive.")
 
             if self.order == 0:
-                assert not self.is_heterogeneous_K50, \
-                    "Heterogeneity in parameter K50 is not allowed for a 0th order process."
+                try:
+                    assert not self.is_heterogeneous_K50, \
+                        "Heterogeneity in parameter K50 is not allowed for a 0th order process."
+                except AssertionError:
+                    logger.error(f"Assertion failed: "
+                                 f"Heterogeneity in parameter K50 is not allowed for a 0th order process.")
 
-            assert self.nH > 0, "nH has to be positive."
+            try:
+                assert self.nH > 0, "nH has to be positive."
+            except AssertionError:
+                logger.error(f"Assertion failed: nH has to be positive.")
 
     @classmethod
     def from_string(cls,
@@ -888,6 +966,7 @@ class RegulatedProcess(Process):
         """
         sep = '-->' if '-->' in proc_str else sep
         if sep not in proc_str:
+            logger.error(f"Cannot find separator '{sep}' in process string: '{proc_str}'")
             raise Exception("Cannot distinguish the reactants from the products.\n"
                             "Please use the *sep* keyword: e.g. sep='->'.")
 
@@ -959,7 +1038,7 @@ class RegulatedProcess(Process):
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
         else:
-            print(f"{type(self)} and {type(other)} are instances of different classes.")
+            logger.info(f"{type(self)} and {type(other)} are instances of different classes.")
             return False
 
     def __hash__(self):
@@ -1066,6 +1145,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
         assert self.order != 0, "A 0th order process has no substrate for a catalyst " \
                                 "to act on, therefore it cannot follow Michaelis-Menten kinetics."
         if self.order == 2:
+            logger.error("2nd order Michaelis-Menten processes are not currently supported.")
             raise NotImplementedError
 
         if self.volume is not None:  # Convert macroscopic to microscopic Km value
@@ -1158,6 +1238,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
         """
         sep = '-->' if '-->' in proc_str else sep
         if sep not in proc_str:
+            logger.error(f"Cannot find separator '{sep}' in process string: '{proc_str}'")
             raise Exception("Cannot distinguish the reactants from the products.\n"
                             "Please use the *sep* keyword: e.g. sep='->'.")
 
@@ -1247,7 +1328,7 @@ class RegulatedMichaelisMentenProcess(RegulatedProcess):
         elif isinstance(other, str):
             return self._str == other or self._str.replace(' ', '') == other
         else:
-            print(f"{type(self)} and {type(other)} are instances of different classes.")
+            logger.info(f"{type(self)} and {type(other)} are instances of different classes.")
             return False
 
     def __hash__(self):
@@ -1296,8 +1377,11 @@ def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
             procs.remove(proc)
             procs.extend([forward_proc, reverse_proc])
 
-    assert len(set(procs)) == len(procs), \
-        "WARNING: Duplicate processes found. Examine the list of processes to resolve this."
+    try:
+        error_msg = "Duplicate processes found. Examine the list of processes to resolve this."
+        assert len(set(procs)) == len(procs), f"WARNING: {error_msg}"
+    except AssertionError:
+        logger.warning(error_msg)
 
     all_species, rspecies, pspecies = set(), set(), set()
     procs_by_reactant, procs_by_product = dict(), dict()

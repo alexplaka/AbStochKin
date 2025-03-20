@@ -33,6 +33,7 @@ Example
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import re
 from ast import literal_eval
 from concurrent.futures import ProcessPoolExecutor
@@ -42,6 +43,9 @@ from .het_calcs import get_het_processes
 from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
 from .simulation import Simulation
+from .logging_config import logger
+
+logger = logger.getChild(os.path.basename(__file__))
 
 
 class AbStochKin:
@@ -193,9 +197,9 @@ class AbStochKin:
             else:  # simple unidirectional process
                 self.processes.remove(Process.from_string(process_str, k, **kwargs))
         except ValueError:
-            print("Process to be removed was not found.")
+            logger.error(f"ValueError: Process to be removed ({process_str}) was not found.")
         else:
-            print(f"Removed: {process_str}, k = {k}, kwargs = {kwargs}")
+            logger.info(f"Removed: {process_str}, k = {k}, kwargs = {kwargs}")
 
     def del_process(self,
                     /,
@@ -220,10 +224,11 @@ class AbStochKin:
             else:  # simple unidirectional process
                 self.processes.remove(Process(reactants, products, k, **kwargs))
         except ValueError:
-            print("Process to be removed was not found.")
+            logger.error(f"ValueError: Process to be removed "
+                         f"({reactants=} -> {products=}) was not found.")
         else:
             lhs, rhs = Process(reactants, products, k)._reconstruct_string()
-            print(f"Removed: " + " -> ".join([lhs, rhs]) + f", k = {k}, kwargs = {kwargs}")
+            logger.info(f"Removed: " + " -> ".join([lhs, rhs]) + f", k = {k}, kwargs = {kwargs}")
 
     def simulate(self,
                  /,
@@ -315,6 +320,7 @@ class AbStochKin:
 
         self.het_processes = get_het_processes(processes)
 
+        logger.debug("Creating object of class `Simulation`.")
         sim = Simulation(p0,
                          t_max,
                          dt,
@@ -332,8 +338,12 @@ class AbStochKin:
                          time_unit=self.time_unit)
 
         if _return_simulation:
-            assert run, "Must run individual simulations if a series of " \
-                        "simulations is to be run with multiprocessing."
+            try:
+                assert run, "Must run individual simulations if a series of " \
+                            "simulations is to be run with multiprocessing."
+            except AssertionError:
+                logger.error("Assertion failed: Must run individual simulations "
+                             "if a series of simulations is to be run with multiprocessing.")
 
             # Set un-pickleable objects to None for data serialization to work
             sim.algo_sequence = None
@@ -410,3 +420,5 @@ class AbStochKin:
                        series_kwargs]
             for future in futures:
                 self.sims.append(future.result())
+
+        logger.debug(f"Simulation runs in parallel ({max_workers=}): completed.")
