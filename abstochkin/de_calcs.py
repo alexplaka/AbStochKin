@@ -287,5 +287,5 @@ class DEcalcs:
                                            [sympify(sp, locals=_clash) for sp in self.odes.keys()],
                                            dict=True)
         except Exception as e:
-            logger.error(f"Fixed points could not be obtained symbolically.\n\n"
-                         f"Exception raised: \n{e}")
+            logger.error(f"Fixed points could not be obtained symbolically.\n"
+                         f"Exception raised: {e}")
