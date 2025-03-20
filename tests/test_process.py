@@ -16,6 +16,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import io
+import logging
+from contextlib import redirect_stdout
 
 from abstochkin.process import NullSpeciesNameError
 from abstochkin.process import Process, ReversibleProcess, MichaelisMentenProcess, \
@@ -98,7 +101,15 @@ class TestProcess(unittest.TestCase):
         self.assertDictEqual(self.proc3a.products, {'A': 1})
         self.assertDictEqual(self.proc3b.products, {'z': 3})
         self.assertDictEqual(self.proc3c.products, {'F': 5})
-        self.assertRaises(AssertionError, Process.from_string, '2A 4G-->-5 F', 2E-4)
+
+        output = io.StringIO()
+        handler = logging.StreamHandler(output)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+        with redirect_stdout(output):
+            Process.from_string('2A 4G-->-5 F', 2E-4)
+        self.assertEqual(output.getvalue(), "Assertion failed: Coefficient cannot be negative: -5, species F.\n")
+
         self.assertRaises(NullSpeciesNameError, Process.from_string, '2A + X -> 3', 0.11)
 
         self.assertEqual(self.proc1a.prods_, ['B'])

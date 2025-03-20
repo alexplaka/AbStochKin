@@ -14,6 +14,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import io
+import logging
 import unittest
 from contextlib import redirect_stdout
 from time import sleep
@@ -127,10 +128,14 @@ class TestMeasureRuntime(unittest.TestCase):
             sleep(1.243)
 
         output = io.StringIO()
+        handler = logging.StreamHandler(output)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+
         with redirect_stdout(output):
             sleeping_function()
 
-        # Test if the message "Simulation Runtime: 1.000 sec" is printed
+        # Test if the message "Simulation Runtime: 1.243 sec" is printed
         self.assertEqual(output.getvalue(), "Simulation Runtime: 1.243 sec\n")
 
 

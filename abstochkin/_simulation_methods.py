@@ -569,7 +569,7 @@ class SimulationMethodsMixin:
                       f"{het_attr} values in simulated process {proc.__str__()} " \
                       f"has been exceeded. Please reconsider the " \
                       f"distribution of {het_attr} values for this process."
-            logger.error(err_msg)
+            logger.error(f"Error: {err_msg}")
             raise AssertionError(err_msg)
 
     def _init_o2_vals(self, proc: Process):
