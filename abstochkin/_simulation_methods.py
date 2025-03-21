@@ -45,6 +45,7 @@ class SimulationMethodsMixin:
         except AssertionError:
             logger.error("Assertion failed: Initial population specification is invalid.\n"
                          f"{self.p0=}, {self.all_species=}")
+            raise
 
     def _setup_data(self):
         """
@@ -128,6 +129,7 @@ class SimulationMethodsMixin:
             except AssertionError:
                 logger.error("Assertion failed: Must specify the maximum number of "
                              "agents for all species.")
+                raise
 
             for sp in self.all_species:
                 self.rtd[sp] = AgentStateData(self.p0[sp], self.max_agents[sp], self.n,
@@ -456,6 +458,7 @@ class SimulationMethodsMixin:
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
             except AssertionError:
                 logger.error(f"Assertion failed: {proc} does not have attribute {het_attr}.")
+                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -469,6 +472,7 @@ class SimulationMethodsMixin:
         except AssertionError:
             logger.error("Assertion failed: The number of subspecies cannot be "
                          "greater than the population size.")
+            raise
 
         """ `vals` has shape (num_agents,). Note that `num_agents` 
         is the same as `max_agents` when setting up the data. So, this
@@ -550,6 +554,7 @@ class SimulationMethodsMixin:
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
             except AssertionError:
                 logger.error(f"{proc} does not have attribute {het_attr}.")
+                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -734,6 +739,7 @@ class SimulationMethodsMixin:
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
             except AssertionError:
                 logger.error(f"{proc} does not have attribute {het_attr}.")
+                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -814,6 +820,7 @@ class SimulationMethodsMixin:
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
             except AssertionError:
                 logger.error(f"{proc} does not have attribute {het_attr}.")
+                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:

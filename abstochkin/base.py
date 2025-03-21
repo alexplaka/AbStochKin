@@ -198,6 +198,7 @@ class AbStochKin:
                 self.processes.remove(Process.from_string(process_str, k, **kwargs))
         except ValueError:
             logger.error(f"ValueError: Process to be removed ({process_str}) was not found.")
+            raise
         else:
             logger.info(f"Removed: {process_str}, k = {k}, kwargs = {kwargs}")
 
@@ -226,6 +227,7 @@ class AbStochKin:
         except ValueError:
             logger.error(f"ValueError: Process to be removed "
                          f"({reactants=} -> {products=}) was not found.")
+            raise
         else:
             lhs, rhs = Process(reactants, products, k)._reconstruct_string()
             logger.info(f"Removed: " + " -> ".join([lhs, rhs]) + f", k = {k}, kwargs = {kwargs}")
@@ -344,6 +346,7 @@ class AbStochKin:
             except AssertionError:
                 logger.error("Assertion failed: Must run individual simulations "
                              "if a series of simulations is to be run with multiprocessing.")
+                raise
 
             # Set un-pickleable objects to None for data serialization to work
             sim.algo_sequence = None

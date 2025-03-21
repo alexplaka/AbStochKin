@@ -187,6 +187,7 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
         logger.error(f"Assertion(s) failed: {volume=}, {order=}\n"
                      f"The volume has to be a positive quantity. "
                      f"The process order cannot be negative.")
+        raise
 
     denom = (N_A * volume) ** (order - 1) if not inverse else 1 / (N_A * volume) ** (order - 1)
 
@@ -199,6 +200,7 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
         except AssertionError:
             logger.error(f"Assertion failed: The parameter values cannot be negative. "
                          f"{macro_val=}")
+            raise
     else:
         try:
             assert macro_val >= 0, "The parameter value cannot be negative."
@@ -206,4 +208,5 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
         except AssertionError:
             logger.error(f"Assertion failed: The parameter value cannot be negative. "
                          f"{macro_val=}")
+            raise
 
