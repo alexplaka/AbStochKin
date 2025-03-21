@@ -17,6 +17,6 @@
 
 from .base import AbStochKin
 
-__version__ = '0.2.0.1'
+__version__ = '0.3.0'
 __author__ = 'Alex Plakantonakis'
 __license__ = "GPL-3.0"

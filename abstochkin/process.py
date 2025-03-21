@@ -268,8 +268,8 @@ class Process:
                         raise NullSpeciesNameError()
                     stoic_coef = int(stoic_coef)
                 except AttributeError:  # when there is no specified stoichiometric coefficient
-                    logger.debug(f"Attribute Error: Cannot find stoichiometric coefficient.\n"
-                                 f"{term=}, Assuming stoichiometric coefficient = 1.")
+                    # logger.debug(f"Attribute Error: Cannot find stoichiometric coefficient.\n"
+                    #              f"{term=}, Assuming stoichiometric coefficient = 1.")
                     spec = re.split(patt, term)[-1]  # extract species name
                     stoic_coef = 1
 
