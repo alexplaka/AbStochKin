@@ -135,7 +135,6 @@ class TestMeasureRuntime(unittest.TestCase):
         with redirect_stdout(output):
             sleeping_function()
 
-        # Test if the message "Simulation Runtime: 1.243 sec" is printed
         self.assertEqual(output.getvalue(), "Simulation Runtime: 1.243 sec\n")
 
 

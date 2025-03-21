@@ -25,7 +25,7 @@ from .agentstatedata import AgentStateData
 from .het_calcs import idx_het
 from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
-from .utils import r_squared
+from .utils import r_squared, log_exceptions
 from .logging_config import logger
 
 logger = logger.getChild(os.path.basename(__file__))
@@ -36,16 +36,12 @@ class SimulationMethodsMixin:
 
     def _validate_p0(self):
         """ A couple of assertions regarding initial population sizes. """
-        try:
+        with log_exceptions():
             assert len(self.p0) == len(self.all_species), \
                 f"Specification of initial population sizes does not match number of species.\n" \
                 f"len(p0)={len(self.p0)} , len(all_species)={len(self.all_species)}"
             assert all([True if y0 >= 0 else False for y0 in self.p0.values()]), \
                 "An initial population size cannot be negative."
-        except AssertionError:
-            logger.error("Assertion failed: Initial population specification is invalid.\n"
-                         f"{self.p0=}, {self.all_species=}")
-            raise
 
     def _setup_data(self):
         """
@@ -123,13 +119,9 @@ class SimulationMethodsMixin:
                 for each species. After examination of the deterministic 
                 trajectories and underlying dynamics, it may sometimes 
                 be preferred to simply specify the max agents for each species. """
-            try:
+            with log_exceptions():
                 assert len(self.max_agents) == len(self.all_species), \
                     "Must specify the maximum number of agents for all species."
-            except AssertionError:
-                logger.error("Assertion failed: Must specify the maximum number of "
-                             "agents for all species.")
-                raise
 
             for sp in self.all_species:
                 self.rtd[sp] = AgentStateData(self.p0[sp], self.max_agents[sp], self.n,
@@ -454,11 +446,8 @@ class SimulationMethodsMixin:
             array is `num_agents`.
         """
         if het_attr != 'k':
-            try:
+            with log_exceptions():
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
-            except AssertionError:
-                logger.error(f"Assertion failed: {proc} does not have attribute {het_attr}.")
-                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -466,13 +455,9 @@ class SimulationMethodsMixin:
 
         num_subspecies = len(attr)
 
-        try:
+        with log_exceptions():
             assert num_subspecies <= num_agents, \
                 "The number of subspecies cannot be greater than the population size."
-        except AssertionError:
-            logger.error("Assertion failed: The number of subspecies cannot be "
-                         "greater than the population size.")
-            raise
 
         """ `vals` has shape (num_agents,). Note that `num_agents` 
         is the same as `max_agents` when setting up the data. So, this
@@ -550,11 +535,8 @@ class SimulationMethodsMixin:
         
         """
         if het_attr != 'k':
-            try:
+            with log_exceptions():
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
-            except AssertionError:
-                logger.error(f"{proc} does not have attribute {het_attr}.")
-                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -735,11 +717,8 @@ class SimulationMethodsMixin:
         expected based on the discrete number of subinteractions.
         """
         if het_attr != 'k':
-            try:
+            with log_exceptions():
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
-            except AssertionError:
-                logger.error(f"{proc} does not have attribute {het_attr}.")
-                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:
@@ -816,11 +795,8 @@ class SimulationMethodsMixin:
         specified in the `het_attr` process parameter.
         """
         if het_attr != 'k':
-            try:
+            with log_exceptions():
                 assert hasattr(proc, het_attr), f"{proc} does not have attribute {het_attr}."
-            except AssertionError:
-                logger.error(f"{proc} does not have attribute {het_attr}.")
-                raise
 
         attr = getattr(proc, het_attr)
         if isinstance(attr, list) and het_attr_idx is not None:

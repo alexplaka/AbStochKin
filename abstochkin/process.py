@@ -18,12 +18,11 @@
 import os
 import contextlib
 import re
-import sys
 from typing import Self
 
 from numpy import array
 
-from .utils import macro_to_micro
+from .utils import macro_to_micro, log_exceptions
 from .logging_config import logger
 
 logger = logger.getChild(os.path.basename(__file__))
@@ -108,15 +107,11 @@ class Process:
         self.is_heterogeneous = False if isinstance(self.k, (int, float)) else True
 
         if self.order == 0:
-            try:
-                msg = "Since a birth process does not depended on the presence of agents, " \
-                      "heterogeneity does not make sense in this context. Please define " \
-                      "the rate constant k as a number (not a list or tuple)."
-                assert not self.is_heterogeneous, msg
-            except AssertionError:
-                logger.error(f"Assertion failed: {self.order=}, {self.is_heterogeneous=}\n"
-                             f"{msg}")
-                raise
+            with log_exceptions():
+                assert not self.is_heterogeneous, \
+                    "Since a birth process does not depended on the presence of agents, " \
+                    "heterogeneity does not make sense in this context. Please define " \
+                    "the rate constant k as a number (not a list or tuple)."
 
         # Convert macroscopic to microscopic rate constant
         if self.volume is not None:
@@ -289,45 +284,30 @@ class Process:
         """ Make sure coefficients, rate constant, and volume values are not negative. """
         # Check coefficients
         for r, val in (self.reactants | self.products).items():
-            try:
+            with log_exceptions():
                 assert val >= 0, f"Coefficient cannot be negative: {val} {r}."
-            except AssertionError:
-                logger.error(f"Assertion failed: "
-                             f"Coefficient cannot be negative: {val}, species {r}.")
-                raise
 
         # Check rate constants
-        error_msg = f"Rate constant values have to be non-negative: k = {self.k}."
         if isinstance(self.k, (list, tuple)):  # heterogeneous population
-            try:
-                assert all(array(self.k) >= 0), error_msg
-            except AssertionError:
-                logger.error(f"Assertion failed: {error_msg}")
-                raise
+            with log_exceptions():
+                assert all(array(self.k) >= 0), \
+                    f"Rate constant values have to be non-negative: k = {self.k}."
         else:  # when k is a float or int, the population is homogeneous
-            try:
-                assert self.k >= 0, error_msg
-            except AssertionError:
-                logger.error(f"Assertion failed: {error_msg}")
-                raise
+            with log_exceptions():
+                assert self.k >= 0, \
+                    f"Rate constant values have to be non-negative: k = {self.k}."
 
         # For normally-distributed k values, specification is a 2-tuple.
         if isinstance(self.k, tuple):  # normal distribution of k values
-            try:
-                error_msg = "Please specify the mean and standard deviation " \
-                            "of k in a 2-tuple: (mean, std)."
-                assert len(self.k) == 2, error_msg
-            except AssertionError:
-                logger.error(f"Assertion failed: {error_msg}")
-                raise
+            with log_exceptions():
+                assert len(self.k) == 2, \
+                    "Please specify the mean and standard deviation " \
+                    "of k in a 2-tuple: (mean, std)."
 
         # Check volume
         if self.volume is not None:
-            try:
+            with log_exceptions():
                 assert self.volume > 0, f"Volume cannot be negative: {self.volume}."
-            except AssertionError:
-                logger.error(f"Assertion failed: Volume cannot be negative: {self.volume}.")
-                raise
 
     def __eq__(self, other):
         if isinstance(other, Process):
@@ -809,106 +789,64 @@ class RegulatedProcess(Process):
             # First check that the right number of values for each parameter are specified
             rs_num = len(self.regulating_species)
             msg = f"Must specify {rs_num} values when there are {rs_num} regulating species."
-            try:
+            with log_exceptions():
                 assert len(self.alpha) == rs_num, msg.replace('#', 'alpha')
                 assert len(self.K50) == rs_num, msg.replace('#', 'K50')
                 assert len(self.nH) == rs_num, msg.replace('#', 'nH')
-            except AssertionError:
-                logger.error(f"Assertion failed: {msg.replace('#', '')}. "
-                             f"{self.alpha=}, {self.K50=}, {self.nH=}")
-                raise
 
             for i in range(len(self.regulating_species)):
-                try:
+                with log_exceptions():
                     assert self.alpha[i] >= 0, "The alpha parameter must be nonnegative."
-                except AssertionError:
-                    logger.error(f"Assertion failed: The alpha parameter must be nonnegative.")
-                    raise
 
                 if self.alpha[i] == 1:
                     logger.warning("Warning: alpha=1 means the process is not regulated.")
 
                 if isinstance(self.K50[i], (float, int)):
-                    try:
+                    with log_exceptions():
                         assert self.K50[i] > 0, "K50 has to be positive."
-                    except AssertionError:
-                        logger.error(f"Assertion failed: K50 has to be positive.")
-                        raise
                 elif isinstance(self.K50[i], list):
-                    try:
+                    with log_exceptions():
                         assert all([True if val > 0 else False for val in self.K50[i]]), \
                             "Subspecies K50 values have to be positive."
-                    except AssertionError:
-                        logger.error(f"Assertion failed: Subspecies K50 values have to be positive.")
-                        raise
                 else:  # isinstance(self.K50, tuple)
-                    try:
+                    with log_exceptions():
                         assert self.K50[i][0] > 0 and self.K50[i][1] > 0, \
                             "Mean and std of K50 have to be positive."
-                    except AssertionError:
-                        logger.error(f"Assertion failed: Mean and std of K50 have to be positive.")
-                        raise
 
                 if self.order == 0:
-                    try:
+                    with log_exceptions():
                         assert not self.is_heterogeneous_K50[i], \
                             "Heterogeneity in parameter K50 is not allowed for a 0th order process."
-                    except AssertionError:
-                        logger.error(f"Assertion failed: "
-                                     f"Heterogeneity in parameter K50 is not allowed for a 0th order process.")
-                        raise
 
-                try:
+                with log_exceptions():
                     assert self.nH[i] > 0, "nH has to be positive."
-                except AssertionError:
-                    logger.error(f"Assertion failed: nH has to be positive.")
-                    raise
 
         else:  # just one regulating species
-            try:
+            with log_exceptions():
                 assert self.alpha >= 0, "The alpha parameter must be nonnegative."
-            except AssertionError:
-                logger.error(f"Assertion failed: The alpha parameter must be nonnegative.")
-                raise
 
             if self.alpha == 1:
                 logger.warning("Warning: alpha=1 means the process is not regulated.")
 
             if isinstance(self.K50, (float, int)):
-                try:
+                with log_exceptions():
                     assert self.K50 > 0, "K50 has to be positive."
-                except AssertionError:
-                    logger.error(f"Assertion failed: K50 has to be positive.")
-                    raise
             elif isinstance(self.K50, list):
-                try:
+                with log_exceptions():
                     assert all([True if val > 0 else False for val in self.K50]), \
                         "Subspecies K50 values have to be positive."
-                except AssertionError:
-                    logger.error(f"Assertion failed: Subspecies K50 values have to be positive.")
-                    raise
             else:  # isinstance(self.K50, tuple)
-                try:
+                with log_exceptions():
                     assert self.K50[0] > 0 and self.K50[1] > 0, \
                         "Mean and std of K50 have to be positive."
-                except AssertionError:
-                    logger.error(f"Assertion failed: Mean and std of K50 have to be positive.")
-                    raise
 
             if self.order == 0:
-                try:
+                with log_exceptions():
                     assert not self.is_heterogeneous_K50, \
                         "Heterogeneity in parameter K50 is not allowed for a 0th order process."
-                except AssertionError:
-                    logger.error(f"Assertion failed: "
-                                 f"Heterogeneity in parameter K50 is not allowed for a 0th order process.")
-                    raise
 
-            try:
+            with log_exceptions():
                 assert self.nH > 0, "nH has to be positive."
-            except AssertionError:
-                logger.error(f"Assertion failed: nH has to be positive.")
-                raise
 
     @classmethod
     def from_string(cls,
@@ -1397,11 +1335,9 @@ def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
             procs.remove(proc)
             procs.extend([forward_proc, reverse_proc])
 
-    try:
-        error_msg = "Duplicate processes found. Examine the list of processes to resolve this."
-        assert len(set(procs)) == len(procs), f"WARNING: {error_msg}"
-    except AssertionError:
-        logger.warning(error_msg)
+    with log_exceptions():
+        assert len(set(procs)) == len(procs), \
+            f"WARNING: Duplicate processes found. Examine the list of processes to resolve this."
 
     all_species, rspecies, pspecies = set(), set(), set()
     procs_by_reactant, procs_by_product = dict(), dict()

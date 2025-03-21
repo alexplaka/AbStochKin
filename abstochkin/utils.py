@@ -22,6 +22,7 @@ kinetic parameters.
 
 import os
 import functools
+from contextlib import contextmanager
 from time import perf_counter
 
 import numpy as np
@@ -76,6 +77,8 @@ def measure_runtime(fcn):
     """ Decorator for measuring the duration of a function's execution. """
     @functools.wraps(fcn)
     def inner(*args, **kwargs):
+        """ This is a wrapper function that measures the execution time of the
+        decorated function (`fcn`) and logs it. """
         start = perf_counter()
         fcn(*args, **kwargs)
         stop = perf_counter()
@@ -210,3 +213,22 @@ def macro_to_micro(macro_val: float | int | list[float | int, ...] | tuple[float
                          f"{macro_val=}")
             raise
 
+
+@contextmanager
+def log_exceptions():
+    """
+    A context manager for logging exceptions.
+
+    Use this context manager to log any exceptions that occur within
+    the given code block. The exception is re-raised after logging.
+
+    Example
+    -------
+    with log_exceptions():
+        # Code that may raise an exception
+    """
+    try:
+        yield
+    except Exception as e:
+        logger.error("Exception occurred.", exc_info=e)
+        raise

@@ -44,6 +44,7 @@ from .process import Process, MichaelisMentenProcess, ReversibleProcess, \
     RegulatedProcess, RegulatedMichaelisMentenProcess
 from .simulation import Simulation
 from .logging_config import logger
+from .utils import log_exceptions
 
 logger = logger.getChild(os.path.basename(__file__))
 
@@ -340,13 +341,9 @@ class AbStochKin:
                          time_unit=self.time_unit)
 
         if _return_simulation:
-            try:
+            with log_exceptions():
                 assert run, "Must run individual simulations if a series of " \
                             "simulations is to be run with multiprocessing."
-            except AssertionError:
-                logger.error("Assertion failed: Must run individual simulations "
-                             "if a series of simulations is to be run with multiprocessing.")
-                raise
 
             # Set un-pickleable objects to None for data serialization to work
             sim.algo_sequence = None

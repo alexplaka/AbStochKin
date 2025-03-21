@@ -173,6 +173,7 @@ class Simulation(SimulationMethodsMixin):
                 self.de_calcs.solve_ODEs()
             except Exception as exc:
                 logger.exception(f"ODE solver exception:\n{exc}")
+                raise
         else:
             if do_run:
                 logger.warning("Must specify the maximum number of agents for "

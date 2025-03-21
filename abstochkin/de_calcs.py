@@ -289,3 +289,4 @@ class DEcalcs:
         except Exception as e:
             logger.error(f"Fixed points could not be obtained symbolically.\n"
                          f"Exception raised: {e}")
+            raise
