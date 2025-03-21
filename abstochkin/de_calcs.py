@@ -181,7 +181,7 @@ class DEcalcs:
             [sympify(sp, locals=_clash) for sp in self.odes.keys()]
         )
 
-        self.get_fixed_pts_symbolically()
+        # self.get_fixed_pts_symbolically()
 
     def lambdify_odes(self):
         """ For converting ODE expressions: sympy -> scipy/numpy. """
