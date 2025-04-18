@@ -421,4 +421,4 @@ class AbStochKin:
             for future in futures:
                 self.sims.append(future.result())
 
-        logger.debug(f"Simulation runs in parallel ({max_workers=}): completed.")
+        logger.info(f"Simulation runs in parallel ({max_workers=}): completed.")

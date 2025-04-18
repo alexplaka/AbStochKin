@@ -21,7 +21,7 @@ from time import sleep
 
 import numpy as np
 
-from abstochkin.utils import rng_streams, macro_to_micro, measure_runtime
+from abstochkin.utils import rng_streams, macro_to_micro, measure_runtime, r_squared, log_exceptions
 
 
 class TestRng(unittest.TestCase):
@@ -59,6 +59,23 @@ class TestRng(unittest.TestCase):
             test_3[i, :] = self.streams_3[i].random(self.num)
         self.assertEqual(np.sum(test_1 - test_2), 0)
         self.assertNotEqual(np.sum(test_1 - test_3), 0)
+
+    def test_rng_streams_normal(self):
+        test_1 = self.streams_1[0].normal(0, 1, self.num)
+        test_2 = self.streams_2[0].normal(0, 1, self.num)
+        test_3 = self.streams_3[0].normal(0, 1, self.num)
+        self.assertEqual(np.sum(test_1 - test_2), 0)
+        self.assertNotEqual(np.sum(test_1 - test_3), 0)
+
+    def test_rng_streams_edge_cases(self):
+        # Test n=0
+        streams_0 = rng_streams(0, random_state=19)
+        self.assertEqual(len(streams_0), 0)
+
+        # Test n=1
+        streams_1 = rng_streams(1, random_state=19)
+        self.assertEqual(len(streams_1), 1)
+        self.assertIsInstance(streams_1[0], np.random.Generator)
 
 
 class TestMacroToMicro(unittest.TestCase):
@@ -136,6 +153,103 @@ class TestMeasureRuntime(unittest.TestCase):
             sleeping_function()
 
         self.assertEqual(output.getvalue(), "Simulation Runtime: 1.243 sec\n")
+
+
+class TestRSquared(unittest.TestCase):
+    def test_perfect_fit(self):
+        actual = np.array([1.0, 2.0, 3.0, 4.0])
+        theoretical = np.array([1.0, 2.0, 3.0, 4.0])
+        self.assertEqual(r_squared(actual, theoretical), 1.0)
+
+    def test_no_fit(self):
+        actual = np.array([1.0, 1.0, 1.0, 1.0])
+        theoretical = np.array([2.0, 2.0, 2.0, 2.0])
+        self.assertTrue(np.isnan(r_squared(actual, theoretical)))
+
+    def test_partial_fit(self):
+        actual = np.array([1.0, 2.0, 3.0, 4.0])
+        theoretical = np.array([1.5, 2.5, 3.5, 4.5])
+        r2 = r_squared(actual, theoretical)
+        self.assertTrue(0 < r2 < 1)
+
+    def test_with_nan_values(self):
+        actual = np.array([1.0, np.nan, 3.0, 4.0])
+        theoretical = np.array([1.0, 2.0, 3.0, 4.0])
+        r2 = r_squared(actual, theoretical)
+        self.assertFalse(np.isnan(r2))
+
+    def test_different_lengths(self):
+        actual = np.array([1.0, 2.0, 3.0])
+        theoretical = np.array([1.0, 2.0])
+        with self.assertRaises(ValueError):
+            r_squared(actual, theoretical)
+
+    def test_all_nan_values(self):
+        actual = np.array([np.nan, np.nan, np.nan])
+        theoretical = np.array([1.0, 2.0, 3.0])
+        r2 = r_squared(actual, theoretical)
+        self.assertTrue(np.isnan(r2))
+
+    def test_empty_arrays(self):
+        actual = np.array([])
+        theoretical = np.array([])
+        r2 = r_squared(actual, theoretical)
+        self.assertTrue(np.isnan(r2))
+
+
+class TestMacroToMicroErrors(unittest.TestCase):
+    def test_negative_volume(self):
+        with self.assertRaises(AssertionError):
+            macro_to_micro(0.001, -1e-6, 0)
+
+    def test_negative_order(self):
+        with self.assertRaises(AssertionError):
+            macro_to_micro(0.001, 1e-6, -1)
+
+    def test_negative_values_list(self):
+        with self.assertRaises(AssertionError):
+            macro_to_micro([-0.001, 0.002], 1e-6, 0)
+
+    def test_mixed_types(self):
+        result = macro_to_micro([1, 2.5], 1e-6, 0)
+        self.assertIsInstance(result[0], float)
+        self.assertIsInstance(result[1], float)
+
+    def test_empty_sequence(self):
+        result_list = macro_to_micro([], 1e-6, 0)
+        self.assertEqual(result_list, [])
+        result_tuple = macro_to_micro((), 1e-6, 0)
+        self.assertEqual(result_tuple, ())
+
+    def test_zero_values(self):
+        self.assertEqual(macro_to_micro(0, 1e-6, 0), 0)
+        self.assertEqual(macro_to_micro([0, 0], 1e-6, 1), [0, 0])
+        self.assertEqual(macro_to_micro((0, 0), 1e-6, 2), (0, 0))
+
+
+class TestLogExceptions(unittest.TestCase):
+    def test_no_exception(self):
+        output = io.StringIO()
+        handler = logging.StreamHandler(output)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+
+        with log_exceptions():
+            x = 1 + 1
+
+        self.assertEqual(output.getvalue(), "")
+
+    def test_with_exception(self):
+        output = io.StringIO()
+        handler = logging.StreamHandler(output)
+        logger = logging.getLogger()
+        logger.addHandler(handler)
+
+        with self.assertRaises(ZeroDivisionError):
+            with log_exceptions():
+                x = 1 / 0
+
+        self.assertIn("ZeroDivisionError", output.getvalue())
 
 
 if __name__ == '__main__':
