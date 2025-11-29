@@ -100,6 +100,7 @@ the details of setting up the code for multiprocessing. Instead, they can simply
 call a method of the base class.
 ```python
 from abstochkin import AbStochKin
+
 sim = AbStochKin()
 # Define a process that obeys Michaelis-Menten kinetics:
 sim.add_process_from_str("A -> B", k=0.3, catalyst='E', Km=10)
@@ -120,7 +121,3 @@ We welcome any contributions to the project in the form of bug reports,
 feature requests, and pull requests. Feel free to contact the core developer 
 and maintainer at alex dot plaka at alumni dot princeton.edu to introduce 
 yourself and discuss possible ways to contribute.
-
-### Financial contribution or support
-If you would like to financially contribute to or further support 
-the development of this project, please go to my [sponsor page](https://github.com/sponsors/alexplaka).
