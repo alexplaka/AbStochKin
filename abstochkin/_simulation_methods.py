@@ -923,6 +923,18 @@ class SimulationMethodsMixin:
         """
         Assess if a transition event occurs. Then update the agent-state vector
         `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : float, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
         trans_p = transition_p if transition_p is not None else self.trans_p[proc]
 
@@ -963,6 +975,18 @@ class SimulationMethodsMixin:
         Determine the transition events for a 1st order process `proc`
         in a single time step of an AbStochKin simulation. Then update the
         agent-state vector `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : np.ndarray, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
         trans_p = transition_p if transition_p is not None else self.trans_p[proc]
 
@@ -1095,6 +1119,18 @@ class SimulationMethodsMixin:
         Determine the transition events for a 2nd order process `proc`
         in a single time step of an AbStochKin simulation. Then update the
         agent-state vector(s) `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : np.ndarray, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
         trans_p = transition_p if transition_p is not None else self.trans_p[proc]
 
