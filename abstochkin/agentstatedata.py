@@ -69,10 +69,17 @@ class AgentStateData:
     def __post_init__(self):
         # Set up initial (t=0) agent-state vector (asv):
         self.asv_ini = np.concatenate(
-            (np.ones(shape=(2, self.p_init), dtype=np.int8),
-             np.full(shape=(2, self.max_agents - self.p_init),
-                     fill_value=self.fill_state,
-                     dtype=np.int8)),
+            (
+                np.ones(
+                    shape=(2, self.p_init),
+                    dtype=np.int8
+                ),
+                np.full(
+                    shape=(2, self.max_agents - self.p_init),
+                    fill_value=self.fill_state,
+                    dtype=np.int8
+                )
+            ),
             axis=1
         )
 
