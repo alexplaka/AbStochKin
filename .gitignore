@@ -41,3 +41,5 @@ coverage.json
 venv
 .venv
 /.idea/modules.xml
+logs
+uv.lock
