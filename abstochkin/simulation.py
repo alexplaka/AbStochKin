@@ -10,7 +10,7 @@ The class `AgentStateData` is used by a `Simulation`
 object to store and handle some of the necessary runtime data.
 """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -147,6 +147,7 @@ class Simulation(SimulationMethodsMixin):
         self.max_agents = max_agents
         self.max_agents_multiplier = max_agents_multiplier
         self.time_unit = time_unit
+        self.graph_backend: Literal['matplotlib', 'plotly'] = graph_backend
 
         self.all_species, self._procs_by_reactant, self._procs_by_product = \
             update_all_species(tuple(self.processes))
@@ -338,7 +339,7 @@ class Simulation(SimulationMethodsMixin):
                                 graph_het = Graph(backend=self.graph_backend)
                                 extra_str = f"\\textrm{{{proc.regulation_type[i]} by }}" \
                                             f"{proc.regulating_species[i]}, " \
-                                            f"K_{{50}}={proc.K50[i]}"
+                                            f"K_{{50}}={proc.K50[i]}" # type: ignore
                                 graph_het.plot_het_metrics(self.time,
                                                            (str(proc), extra_str),
                                                            self.K50_het_metrics[proc][i],

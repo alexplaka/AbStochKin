@@ -1,6 +1,6 @@
 """ Define a process of the form Reactants -> Products. """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -234,15 +234,15 @@ class Process:
         msg = f"Warning: Additional parameters {','.join([str(i) for i in kwargs.items()])} " \
               f"will have no effect. "
         if 'k_rev' in kwargs.keys():
-            msg += f"If that's not what you intended, define the process " \
-                   f"using ReversibleProcess()."
+            msg += "If that's not what you intended, define the process " \
+                   "using ReversibleProcess()."
         if 'regulating_species' in kwargs.keys() or 'alpha' in kwargs.keys() or \
                 'nH' in kwargs.keys() or 'K50' in kwargs.keys():
-            msg += f"If that's not what you intended, define the process " \
-                   f"using RegulatedProcess()."
+            msg += "If that's not what you intended, define the process " \
+                   "using RegulatedProcess()."
         if 'catalyst' in kwargs.keys():
-            msg += f"If that's not what you intended, define the process " \
-                   f"using MichaelisMentenProcess()."
+            msg += "If that's not what you intended, define the process " \
+                   "using MichaelisMentenProcess()."
 
         logger.warning(msg)
 
@@ -1300,7 +1300,7 @@ class NullSpeciesNameError(Exception):
         return "A species name cannot be an empty string."
 
 
-def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
+def update_all_species(procs: tuple[Process, ...]) -> tuple[set[str], dict[str, list[Process]], dict[str, list[Process]]]:
     """ Categorize all species in a list of processes.
 
     Extract all species from a list of processes. Then categorize each of them
@@ -1325,24 +1325,24 @@ def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
             products in one or more processes. The value for each
             key is a list of processes.
     """
-    procs = list(procs)
-    for proc in procs:
+    procs_list = list(procs)
+    for proc in procs_list:
         # For a reversible process, replace it with separate instances
         # of Process objects representing the forward and reverse reactions.
         if isinstance(proc, ReversibleProcess):
             forward_proc = Process(proc.reactants, proc.products, proc.k)
             reverse_proc = Process(proc.products, proc.reactants, proc.k_rev)
-            procs.remove(proc)
-            procs.extend([forward_proc, reverse_proc])
+            procs_list.remove(proc)
+            procs_list.extend([forward_proc, reverse_proc])
 
     with log_exceptions():
-        assert len(set(procs)) == len(procs), \
-            f"WARNING: Duplicate processes found. Examine the list of processes to resolve this."
+        assert len(set(procs_list)) == len(procs_list), \
+            "WARNING: Duplicate processes found. Examine the list of processes to resolve this."
 
     all_species, rspecies, pspecies = set(), set(), set()
     procs_by_reactant, procs_by_product = dict(), dict()
 
-    for proc in procs:
+    for proc in procs_list:
         if isinstance(proc, (RegulatedProcess, RegulatedMichaelisMentenProcess)):
             # Add regulating species to the set of all species
             all_species = all_species.union(
@@ -1360,13 +1360,13 @@ def update_all_species(procs: tuple[Process, ...]) -> tuple[set, dict, dict]:
     # This will be used when solving the system ODEs.
     for rspec in rspecies:
         if rspec != '':  # omit reactant species parsed from 0th order processes
-            procs_by_reactant[rspec] = [proc for proc in procs if rspec in proc.reactants]
+            procs_by_reactant[rspec] = [proc for proc in procs_list if rspec in proc.reactants]
             # deleted 1st clause in above `if`: `rspec != '' and`
 
     # Make a list containing the processes each product species takes part in.
     # This will be used for solving the system ODEs.
     for pspec in pspecies:
         if pspec != '':  # omitting product species parsed from degradation processes
-            procs_by_product[pspec] = [proc for proc in procs if pspec in proc.products]
+            procs_by_product[pspec] = [proc for proc in procs_list if pspec in proc.products]
 
     return all_species, procs_by_reactant, procs_by_product

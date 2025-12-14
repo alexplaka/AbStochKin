@@ -3,7 +3,7 @@ Class for storing the state of all agents of a certain species during an
 AbStochKin simulation.
 """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

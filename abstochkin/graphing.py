@@ -1,6 +1,6 @@
 """  Graphing for AbStochKin simulations. """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -107,7 +107,7 @@ class Graph:
                   de_data,
                   *,
                   num_pts: int = 1000,
-                  species: list[str] | tuple[str] = (),
+                  species: list[str] | tuple[str] | set[str] | None = None,
                   show_plot: bool = True,
                   ax_loc: tuple = ()) -> Self:
         """
@@ -124,7 +124,7 @@ class Graph:
                  Number of points used to calculate DE curves at.
                  Used to approximate a smooth/continuous curve.
 
-        species : sequence of strings, default: (), optional
+        species : sequence of strings, default: None, optional
                  An iterable sequence of strings specifying the species
                  names to plot. If no species are specified (the default),
                  then all species trajectories are plotted.
@@ -140,7 +140,7 @@ class Graph:
                 a 1-D array. For figures with multiple rows and columns of
                 subplots, a 2-D tuple is needed.
         """
-        species = list(de_data.odes.keys()) if len(species) == 0 else species
+        species = list(de_data.odes.keys()) if not species else species
         # t, y = ode_sol.t, ode_sol.y.T  # values at precomputed time pts
         t = np.linspace(de_data.odes_sol.t[0], de_data.odes_sol.t[-1],
                         num_pts)  # time points for obtaining...
@@ -193,13 +193,13 @@ class Graph:
                           time,
                           data,
                           *,
-                          species: list[str] | tuple[str] = (),
+                          species: list[str] | tuple[str] | set[str] | None = None,
                           show_plot: bool = True,
                           ax_loc: tuple = ()
                           ) -> Self:
         """ Graph simulation time trajectories. """
         self.setup_spines_ticks(ax_loc)
-        species = list(data.keys()) if len(species) == 0 else species
+        species = list(data.keys()) if not species else species
 
         if self.backend == 'matplotlib':
             axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
@@ -212,7 +212,7 @@ class Graph:
                         axs.plot(time, traj, linewidth=0.25)
 
             axs.set(title="ABK trajectories")
-            axs.set(xlabel=f"$t$ (sec)", ylabel="$N$")
+            axs.set(xlabel="$t$ (sec)", ylabel="$N$")
             # axs.legend(loc='best')
 
             if show_plot:
@@ -233,7 +233,7 @@ class Graph:
                             )
                         )
             self.fig.update_layout(
-                xaxis=dict(title=f"$t \\; (sec)$",
+                xaxis=dict(title="$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
@@ -247,7 +247,7 @@ class Graph:
                      time,
                      data,
                      *,
-                     species: list[str] | tuple[str] = (),
+                     species: list[str] | tuple[str] | set[str] | None = None,
                      show_plot: bool = True,
                      ax_loc: tuple = ()) -> Self:
         """
@@ -255,7 +255,7 @@ class Graph:
         1-standard-deviation envelopes.
         """
         self.setup_spines_ticks(ax_loc)
-        species = list(data.keys()) if len(species) == 0 else species
+        species = list(data.keys()) if not species else species
 
         if self.backend == 'matplotlib':
             axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
@@ -314,7 +314,7 @@ class Graph:
                     )
 
             self.fig.update_layout(
-                xaxis=dict(title=f"$t \\; (sec)$",
+                xaxis=dict(title="$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$N$")
             )
@@ -328,12 +328,12 @@ class Graph:
                  time,
                  data,
                  *,
-                 species: list[str] | tuple[str] = (),
+                 species: list[str] | tuple[str] | set[str] | None = None,
                  show_plot: bool = True,
                  ax_loc: tuple = ()) -> Self:
         """ Graph the coefficient of variation. """
         self.setup_spines_ticks(ax_loc)
-        species = list(data.keys()) if len(species) == 0 else species
+        species = list(data.keys()) if not species else species
 
         if self.backend == "matplotlib":
             axs = self.ax if len(ax_loc) == 0 else self.ax[ax_loc]
@@ -346,7 +346,7 @@ class Graph:
                              label=f"${sp}_{{Poisson}}$", color=(0.5, 0.5, 0.5))
 
             axs.set(title="Coefficient of Variation, $\\eta$")
-            axs.set(xlabel=f"$t$ (sec)", ylabel="$\\eta$")
+            axs.set(xlabel="$t$ (sec)", ylabel="$\\eta$")
             axs.legend(loc='upper right')
 
             if show_plot:
@@ -375,7 +375,7 @@ class Graph:
 
             self.fig.update_layout(
                 title="Coefficient of Variation",
-                xaxis=dict(title=f"$t \\; (sec)$",
+                xaxis=dict(title="$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$\\eta$")
             )
@@ -416,7 +416,7 @@ class Graph:
             axs.tick_params(axis='y', labelcolor='blue')
 
             axs.set(title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
-                    xlabel=f"$t$ (sec)")
+                    xlabel="$t$ (sec)")
 
             if het_attr == 'Km':
                 axs.set_ylabel("$K_m$", color='blue')
@@ -488,7 +488,7 @@ class Graph:
 
             self.fig.update_layout(
                 title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
-                xaxis=dict(title=f"$t \\; (sec)$",
+                xaxis=dict(title="$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$K_m$" if het_attr == "Km" else "$K_{50}$" if het_attr == "K50" else f"${het_attr}$",
                            color="blue",
@@ -516,7 +516,7 @@ class Graph:
                     x=time.tolist(),
                     y=proc_data['psi_avg'],
                     mode='lines',
-                    name=f"$<\\psi>$",
+                    name="$<\\psi>$",
                     line=dict(width=2, color='red'),
                 )
             )
@@ -526,7 +526,7 @@ class Graph:
                     x=time.tolist(),
                     y=proc_data['psi_avg'] + proc_data['psi_std'],
                     mode='lines',
-                    name=f"$<\\psi> + \\sigma$",
+                    name="$<\\psi> + \\sigma$",
                     line=dict(width=0),
                     showlegend=False
                 )
@@ -537,7 +537,7 @@ class Graph:
                     x=time.tolist(),
                     y=proc_data['psi_avg'] - proc_data['psi_std'],
                     mode='lines',
-                    name=f"$<\\psi> + \\sigma$",
+                    name="$<\\psi> + \\sigma$",
                     line=dict(width=0),
                     fill='tonexty',
                     showlegend=False
@@ -546,7 +546,7 @@ class Graph:
 
             self.fig2.update_layout(
                 title=title + (f"$, {proc_str[1]}$" if proc_str[1] != "" else ""),
-                xaxis=dict(title=f"$t \\; (sec)$",
+                xaxis=dict(title="$t \\; (sec)$",
                            range=[-0.01 * time[-1], time[-1]]),
                 yaxis=dict(title="$\\psi$",
                            color="red",
