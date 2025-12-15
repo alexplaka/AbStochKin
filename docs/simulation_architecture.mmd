@@ -1,0 +1,96 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#2C3E50',
+    'edgeLabelBackground': '#ffffff',
+    'tertiaryColor': '#ecf0f1',
+    'lineColor': '#7f8c8d'
+  }
+}}%%
+
+flowchart TB
+    %% --- STYLE DEFINITIONS ---
+    classDef controller fill:#2C3E50,stroke:#2C3E50,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef process fill:#FFFFFF,stroke:#34495E,stroke-width:2px,color:#2C3E50,rx:5,ry:5;
+    classDef data fill:#EBF5FB,stroke:#3498DB,stroke-width:2px,color:#2C3E50,stroke-dasharray: 5 5;
+    classDef math fill:#FDF2E9,stroke:#D35400,stroke-width:2px,color:#D35400;
+    classDef result fill:#EAFAF1,stroke:#2ECC71,stroke-width:2px,color:#27AE60;
+
+    %% Style for the invisible layout wrapper
+    classDef container fill:none,stroke:none;
+
+    %% --- MAIN SIMULATION FLOW (Horizontal) ---
+    subgraph ExecutionFlow [" "]
+        direction LR
+
+        %% 1. SETUP
+        subgraph Setup ["🛠️ Simulation Setup"]
+            direction TB
+            A[/"fa:fa-cogs Simulation Class"\]:::controller
+            B(Process List):::process
+            C(Initial Pop.):::data
+            D(Params):::data
+
+            A -- Initializes --> B
+            A -- Initializes --> C & D
+        end
+
+        %% 2. MATH
+        subgraph Math ["🧮 ODE & Heterogeneity"]
+            direction TB
+            J["DEcalcs Class"]:::math
+            K("fa:fa-chart-line ODE Solver"):::math
+            L["het_calcs Module"]:::math
+            M("Heterogeneity Metrics"):::math
+
+            J -- Solves --> K
+            K -. Feedback .-> A
+            L -- Calculates --> M
+        end
+
+        %% 3. LOOP
+        subgraph Loop ["🔄 Core Loop"]
+            direction TB
+            E{"Algorithm Sequence"}:::process
+            F["Time Steps"]:::process
+            G["fa:fa-play Process Functions"]:::process
+
+            B -- Defines --> E
+            E -- Iterates --> F
+            F -- Step --> G
+        end
+
+        %% 4. STATE MANAGEMENT
+        subgraph StateMgmt ["💾 State Execution"]
+            direction TB
+            I[("AgentStateData")]:::data
+            H("Agent-State Vectors"):::data
+
+            G -- Updates --> H
+            I -- Manages --> H
+            I -. Provides State .-> G
+        end
+    end
+
+    %% --- RESULTS (Bottom Center) ---
+    subgraph Output ["📊 Results Analysis"]
+        direction TB
+        N("fa:fa-database Results"):::result
+        O["fa:fa-chart-bar Graph Class"]:::result
+
+        N -- Visualized by --> O
+    end
+
+    %% Apply invisible style to the wrapper
+    class ExecutionFlow container;
+
+    %% --- CROSS CONNECTIONS ---
+    %% Flow Logic
+    A --> J
+    A --> L
+    A ====> E
+    M --> G
+
+    %% Connections to Results (This centers the Output subgraph)
+    A ----> N
+    H -- Aggregates --> N

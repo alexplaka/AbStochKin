@@ -3,7 +3,7 @@ Test running a simulation of a 0th order process:  -> A
 Test running a simulation of a regulated 0th order process:  -> A
 """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

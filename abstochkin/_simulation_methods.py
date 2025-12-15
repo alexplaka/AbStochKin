@@ -1,4 +1,4 @@
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -851,7 +851,7 @@ class SimulationMethodsMixin:
                     else:
                         self.algo_sequence.append(partial(self._order_0_reg, proc))
                 else:
-                    self.algo_sequence.append(partial(self._order_0, proc))
+                    self.algo_sequence.append(partial(self._order_0_base, proc))
             elif proc.order == 1:
                 if isinstance(proc, MichaelisMentenProcess):
                     self.algo_sequence.append(partial(self._order_1_mm, proc))
@@ -866,7 +866,7 @@ class SimulationMethodsMixin:
                     else:
                         self.algo_sequence.append(partial(self._order_1_reg, proc))
                 else:
-                    self.algo_sequence.append(partial(self._order_1, proc))
+                    self.algo_sequence.append(partial(self._order_1_base, proc))
             else:  # order 2
                 if isinstance(proc, RegulatedProcess):
                     if isinstance(proc.regulating_species, list):
@@ -874,7 +874,7 @@ class SimulationMethodsMixin:
                     else:
                         self.algo_sequence.append(partial(self._order_2_reg, proc))
                 else:
-                    self.algo_sequence.append(partial(self._order_2, proc))
+                    self.algo_sequence.append(partial(self._order_2_base, proc))
 
     def _parallel_run(self, num_workers=None):
         """
@@ -919,14 +919,26 @@ class SimulationMethodsMixin:
 
         self.progress_bar.update(1)
 
-    def _order_0(self, proc: Process, r: int, t: int):
+    def _order_0_base(self, proc: Process, r: int, t: int, transition_p: float = None):
         """
-        Determine the transition probability for a 0th order process `proc`
-        in a single time step of an AbStochKin simulation and assess if a
-        transition event occurs. Then update the agent-state vector
+        Assess if a transition event occurs. Then update the agent-state vector
         `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : float, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
-        if self.streams[r].random() < self.trans_p[proc]:
+        trans_p = transition_p if transition_p is not None else self.trans_p[proc]
+
+        if self.streams[r].random() < trans_p:
             available_agent = np.argmin(self.rtd[proc.prods_[0]].asv[r][0])
             self.rtd[proc.prods_[0]].asv[r][1, available_agent] = 1
 
@@ -939,9 +951,9 @@ class SimulationMethodsMixin:
         ratio = self.results[proc.regulating_species]['N'][t - 1, r] / proc.K50
         mult = (1 + proc.alpha * ratio ** proc.nH) / (1 + ratio ** proc.nH)
 
-        self.trans_p[proc] = proc.k * mult * self.dt
+        transition_probability = proc.k * mult * self.dt
 
-        self._order_0(proc, r, t)
+        self._order_0_base(proc, r, t, transition_probability)
 
     def _order_0_reg_gt1(self, proc: RegulatedProcess, r: int, t: int):
         """
@@ -954,20 +966,34 @@ class SimulationMethodsMixin:
             ratio = self.results[sp]['N'][t - 1, r] / proc.K50[i]
             mult *= (1 + proc.alpha[i] * ratio ** proc.nH[i]) / (1 + ratio ** proc.nH[i])
 
-        self.trans_p[proc] = proc.k * mult * self.dt
+        transition_probability = proc.k * mult * self.dt
 
-        self._order_0(proc, r, t)
+        self._order_0_base(proc, r, t, transition_probability)
 
-    def _order_1(self, proc: Process, r: int, t: int):
+    def _order_1_base(self, proc: Process, r: int, t: int, transition_p: np.ndarray = None):
         """
         Determine the transition events for a 1st order process `proc`
         in a single time step of an AbStochKin simulation. Then update the
         agent-state vector `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : np.ndarray, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
+        trans_p = transition_p if transition_p is not None else self.trans_p[proc]
+
         # Get random numbers (rn) and transition probabilities (tp)
         rn, tp = self.rtd[proc.reacts_[0]].get_vals_o1(r,
                                                        self.streams[r],
-                                                       self.trans_p[proc])
+                                                       trans_p)
 
         transition_events = rn < tp  # Determine all transition events in this time step
 
@@ -993,9 +1019,10 @@ class SimulationMethodsMixin:
         """
         mult = self.results[proc.catalyst]['N'][t - 1, r] / (
                 self.results[proc.reacts_[0]]['N'][t - 1, r] + self.Km_vals[proc])
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
 
-        self._order_1(proc, r, t)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+
+        self._order_1_base(proc, r, t, transition_probability)
 
         if proc.is_heterogeneous_Km:  # Now compute metrics of heterogeneity (Km)
             new_Km_vals = self.Km_vals[proc] * (self.rtd[proc.reacts_[0]].asv[r][1, :] > 0)
@@ -1009,8 +1036,9 @@ class SimulationMethodsMixin:
         """
         ratio = self.results[proc.regulating_species]['N'][t - 1, r] / self.K50_vals[proc]
         mult = (1 + proc.alpha * ratio ** proc.nH) / (1 + ratio ** proc.nH)
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
-        self._order_1(proc, r, t)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+
+        self._order_1_base(proc, r, t, transition_probability)
 
         if proc.is_heterogeneous_K50:  # Now compute metrics of heterogeneity (K50)
             new_K50_vals = self.K50_vals[proc] * (self.rtd[proc.reacts_[0]].asv[r][1, :] > 0)
@@ -1026,8 +1054,9 @@ class SimulationMethodsMixin:
         for i, sp in enumerate(proc.regulating_species):
             ratio = self.results[sp]['N'][t - 1, r] / self.K50_vals[proc][i]
             mult *= (1 + proc.alpha[i] * ratio ** proc.nH[i]) / (1 + ratio ** proc.nH[i])
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
-        self._order_1(proc, r, t)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+
+        self._order_1_base(proc, r, t, transition_probability)
 
         for i in range(len(proc.regulating_species)):
             if proc.is_heterogeneous_K50[i]:  # Now compute metrics of heterogeneity (K50)
@@ -1046,8 +1075,9 @@ class SimulationMethodsMixin:
         mult_mm = self.results[proc.catalyst]['N'][t - 1, r] / (
                 self.results[proc.reacts_[0]]['N'][t - 1, r] + self.Km_vals[proc])
         mult = mult_reg * mult_mm
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
-        self._order_1(proc, r, t)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+
+        self._order_1_base(proc, r, t, transition_probability)
 
         if proc.is_heterogeneous_K50:  # Now compute metrics of heterogeneity (K50)
             new_K50_vals = self.K50_vals[proc] * (self.rtd[proc.reacts_[0]].asv[r][1, :] > 0)
@@ -1071,8 +1101,9 @@ class SimulationMethodsMixin:
         mult_mm = self.results[proc.catalyst]['N'][t - 1, r] / (
                 self.results[proc.reacts_[0]]['N'][t - 1, r] + self.Km_vals[proc])
         mult = mult_reg * mult_mm
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
-        self._order_1(proc, r, t)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+
+        self._order_1_base(proc, r, t, transition_probability)
 
         for i in range(len(proc.regulating_species)):
             if proc.is_heterogeneous_K50[i]:  # Now compute metrics of heterogeneity (K50)
@@ -1083,17 +1114,31 @@ class SimulationMethodsMixin:
             new_Km_vals = self.Km_vals[proc] * (self.rtd[proc.reacts_[0]].asv[r][1, :] > 0)
             self._compute_Km_het_metrics(proc, new_Km_vals, t, r)
 
-    def _order_2(self, proc: Process, r: int, t: int):
+    def _order_2_base(self, proc: Process, r: int, t: int, transition_p: np.ndarray = None):
         """
         Determine the transition events for a 2nd order process `proc`
         in a single time step of an AbStochKin simulation. Then update the
         agent-state vector(s) `asv` accordingly.
+
+        Parameters
+        ----------
+        proc : Process
+            The process object for which the transition is being assessed.
+        r : int
+            The repetition index of the simulation.
+        t : int
+            The time step index of the simulation.
+        transition_p : np.ndarray, optional
+            The transition probability to use for this event.
+            If `None`, defaults to `self.trans_p[proc]`.
         """
+        trans_p = transition_p if transition_p is not None else self.trans_p[proc]
+
         # Get random numbers (rn) and transition probabilities (tp)
         rn, tp = self.rtd[proc.reacts_[0]].get_vals_o2(self.rtd[proc.reacts_[1]],
                                                        r,
                                                        self.streams[r],
-                                                       self.trans_p[proc])
+                                                       trans_p)
 
         transition_events = rn < tp  # Determine all transition events in this time step
 
@@ -1128,9 +1173,9 @@ class SimulationMethodsMixin:
         """
         ratio = self.results[proc.regulating_species]['N'][t - 1, r] / self.K50_vals[proc]
         mult = (1 + proc.alpha * ratio ** proc.nH) / (1 + ratio ** proc.nH)
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
 
-        self._order_2(proc, r, t)
+        self._order_2_base(proc, r, t, transition_probability)
 
         if proc.is_heterogeneous_K50:  # Now compute metrics of heterogeneity (K50)
             new_K50_vals = self.K50_vals[proc] * (
@@ -1148,9 +1193,9 @@ class SimulationMethodsMixin:
         for i, sp in enumerate(proc.regulating_species):
             ratio = self.results[sp]['N'][t - 1, r] / self.K50_vals[proc][i]
             mult *= (1 + proc.alpha[i] * ratio ** proc.nH[i]) / (1 + ratio ** proc.nH[i])
-        self.trans_p[proc] = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
+        transition_probability = 1 - np.exp(-1 * self.k_vals[proc] * mult * self.dt)
 
-        self._order_2(proc, r, t)
+        self._order_2_base(proc, r, t, transition_probability)
 
         for i in range(len(proc.regulating_species)):
             if proc.is_heterogeneous_K50[i]:  # Now compute metrics of heterogeneity (K50)

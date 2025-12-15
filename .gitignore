@@ -30,5 +30,16 @@ dist/
 build/
 *.egg-info/
 
+# test coverage files
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+coverage.json
+.pytest_cache/
+
 venv
+.venv
 /.idea/modules.xml
+logs
+uv.lock

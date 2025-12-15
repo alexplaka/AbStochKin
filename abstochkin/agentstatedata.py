@@ -3,7 +3,7 @@ Class for storing the state of all agents of a certain species during an
 AbStochKin simulation.
 """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -69,10 +69,17 @@ class AgentStateData:
     def __post_init__(self):
         # Set up initial (t=0) agent-state vector (asv):
         self.asv_ini = np.concatenate(
-            (np.ones(shape=(2, self.p_init), dtype=np.int8),
-             np.full(shape=(2, self.max_agents - self.p_init),
-                     fill_value=self.fill_state,
-                     dtype=np.int8)),
+            (
+                np.ones(
+                    shape=(2, self.p_init),
+                    dtype=np.int8
+                ),
+                np.full(
+                    shape=(2, self.max_agents - self.p_init),
+                    fill_value=self.fill_state,
+                    dtype=np.int8
+                )
+            ),
             axis=1
         )
 

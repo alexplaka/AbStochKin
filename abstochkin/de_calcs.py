@@ -5,7 +5,7 @@ describing the system and obtain a numerical solution.
 Try to get the system's fixed points numerically and symbolically.
 """
 
-#  Copyright (c) 2024-2025, Alex Plakantonakis.
+#  Copyright (c) 2024-2026, Alex Plakantonakis.
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
