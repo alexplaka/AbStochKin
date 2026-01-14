@@ -41,9 +41,9 @@ or diversity, in the composition of species populations on the dynamics of a sys
 
 ## Installation
 
-The `abstochkin` package can be installed via `pip` in an environment with Python 3.12+.
+The `abstochkin` package can be installed via `pip` or `uv` (or other package and dependecy managers) in an environment with Python 3.12+.
 
-`$ pip install abstochkin`
+`$ pip install abstochkin` or `$ uv pip install abstochkin` or `$ uv add abstochkin`
 
 ### Requirements
 
@@ -118,7 +118,8 @@ sim.simulate_series_in_parallel(series_kwargs)
 
 ## Documentation
 
-See the documentation [here](https://alexplaka.github.io/AbStochKin).
+See the documentation [here](https://alexplaka.github.io/AbStochKin). 
+There is also a [wiki](https://deepwiki.com/alexplaka/AbStochKin).
 
 A monograph detailing the theoretical underpinnings of the *Agent-based Kinetics*
 algorithm and a multitude of case studies highlighting its use can be found
