@@ -12,13 +12,16 @@
     <img src="https://img.shields.io/pypi/pyversions/abstochkin"
          alt="Python versions">
   </a>
+  <a href="https://github.com/alexplaka/abstochkin/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/alexplaka/abstochkin"
+         alt="GitHub license">
+  </a>
   <a href="https://alexplaka.github.io/AbStochKin">
     <img src="https://img.shields.io/badge/-documentation-blue"
          alt="Documentation">
   </a>
-  <a href="https://github.com/alexplaka/abstochkin/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/alexplaka/abstochkin"
-         alt="GitHub license">
+  <a href="https://deepwiki.com/alexplaka/AbStochKin">
+    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
   </a>
 </p>
 
