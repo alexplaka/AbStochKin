@@ -25,7 +25,7 @@ jobs:
           pip install uv
           uv pip install -r pyproject.toml --system --all-extras
 
-      - run: pdoc --docformat numpy --math --footer-text "© Copyright 2024-2026, Alex Plakantonakis." --theme-toggle abstochkin -o ./docs
+      - run: pdoc --docformat numpy --math --footer-text "© Copyright 2024-2026, Alex Plakantonakis." abstochkin -o ./docs
 
       - uses: actions/upload-pages-artifact@v3
         with:
